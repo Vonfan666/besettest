@@ -1,6 +1,6 @@
 <template>
   <div class="hd-header" >
-      <el-table :data="tableData" style="wight:100%" border="">
+      <el-table :data="tableData" style="wight:100%" border>
           <el-table-column label="操作">
             <template slot-scope> 
                 <span class="el-icon-close"></span>
@@ -71,6 +71,7 @@ export default {
 <style>
 .hd-header{
     margin-top: 20px;
+    min-width: 100px;
 
   
 }
@@ -88,11 +89,14 @@ export default {
     
 
 }
-.el-table__row:hover .cname{
+/* .el-table__row:hover .cname{
     background: rgb(245, 247, 250);
     border: 2px solid rgb(245, 247, 250)
+} */
+
+
+
+.el-table--enable-row-hover .el-table__body tr:hover>td{
+background-color: #ffffff !important;
 }
-
-
-
 </style>

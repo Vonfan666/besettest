@@ -53,7 +53,7 @@
       </div>
     </div>
     <div class="ir-title top-1 " >
-        <el-form :model="model" :rules="rules">
+        <el-form :model="model" :rules="rules" >
             <el-form-item label="接口名称" prop="infaterName" label-width="70px">
                 <el-input v-model="model.infaterName" clearable="" placeholder="请输入接口名称"></el-input>
             </el-form-item>
@@ -68,8 +68,8 @@
 
     <div class="postData">
         <div class="pd-title">
-            <span @click="changeBottomColor($event)">请求头(header)</span>
-            <span @click="changeBottomColor($event)" class="colorCode">请求参数(body)</span>
+            <span @click="changeBottomColor($event,'header-com')">请求头(header)</span>
+            <span @click="changeBottomColor($event,'data-com')" class="colorCode">请求参数(body)</span>
         </div>
         <div class="hd-com">
           
@@ -83,12 +83,12 @@
 </template>
 
 <script>
-import  headerCom from "./IrPost/postHeader.vue"
-import  dataCom from "./IrPost/PostData"
+// import  headerCom from "./IrPost/postHeader.vue"
+// import  dataCom from "./IrPost/PostData"
 export default {
   components:{
-    "header-com":headerCom,
-    "data-com":dataCom
+    "header-com":()=>import("./IrPost/postHeader.vue"),
+    "data-com":()=>import("./IrPost/PostData")
   },
   data() {
     return {
@@ -150,16 +150,18 @@ export default {
     };
   },
   methods:{
-      changeBottomColor(event){
+      changeBottomColor(event,value){
         if(document.querySelector(".colorCode")){
             document.querySelector(".colorCode").classList.remove("colorCode")
         }
         event.currentTarget.classList.add("colorCode")
-        if (this.bindCom=="data-com"){
-          this.bindCom="header-com"
-        }else{
-          this.bindCom="data-com"
-        }
+        console.log(this.bindCom)
+        // if (this.bindCom=="data-com"){
+        //   this.bindCom="header-com"
+        // }else{
+        //   this.bindCom="data-com"
+        // }
+        this.bindCom=value
         
       }
   }

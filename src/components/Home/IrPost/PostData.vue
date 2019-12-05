@@ -69,6 +69,11 @@ export default {
 </style>
 
 <style>
+.hd-header{
+    margin-top: 20px;
+min-width: 100px;
+  
+}
 .cname{
     position: relative;
     overflow: visible;
@@ -84,11 +89,13 @@ export default {
 .hd-header .cell{
     text-align: center
 }
-.el-table__row:hover .cname{
+/* .el-table__row:hover .cname{
     background: rgb(245, 247, 250);
     border: 2px solid rgb(245, 247, 250)
+} */
+
+.el-table--enable-row-hover .el-table__body tr:hover>td{
+background-color: #ffffff !important;
 }
-
-
 
 </style>
