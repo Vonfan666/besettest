@@ -74,10 +74,13 @@
         <div class="hd-com">
           
           <keep-alive>
-              <component :is="bindCom"></component>
+              <component :is="bindCom" ref="child"></component>
           </keep-alive>
             
         </div>
+    </div>
+    <div class="tt">
+        <button @click="test()">dianji</button>
     </div>
   </div>
 </template>
@@ -163,6 +166,9 @@ export default {
         // }
         this.bindCom=value
         
+      },
+      test(){
+        console.log(this.$refs.child.tableData)
       }
   }
 };

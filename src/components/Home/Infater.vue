@@ -406,7 +406,7 @@ export default {
   padding: 5px;
   background-color: #eee;
   box-sizing: border-box;
-  overflow: hidden;
+  overflow-y: scroll;
 }
 .resize-save {
   position: absolute;
