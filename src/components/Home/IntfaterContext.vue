@@ -52,35 +52,54 @@
         <el-select></el-select>-->
       </div>
     </div>
-    <div class="ir-title top-1 " >
-        <el-form :model="model" :rules="rules" >
-            <el-form-item label="接口名称" prop="infaterName" label-width="70px">
-                <el-input v-model="model.infaterName" clearable="" placeholder="请输入接口名称"></el-input>
-            </el-form-item>
-            <el-form-item label="请求地址" prop="postAttr" label-width="70px">
-                <el-input v-model="model.postAttr" clearable="" placeholder="请输入请求地址"></el-input>
-            </el-form-item>
-            <el-form-item label="接口描述" label-width="70px">
-                <el-input v-model="model.interDetail" clearable="" placeholder="请输入接口描述"></el-input>
-            </el-form-item>
-        </el-form>
+    <div class="ir-title top-1">
+      <el-form :model="model" :rules="rules">
+        <el-form-item label="接口名称" prop="infaterName" label-width="70px">
+          <el-input v-model="model.infaterName" clearable placeholder="请输入接口名称"></el-input>
+        </el-form-item>
+        <el-form-item label="请求地址" prop="postAttr" label-width="70px">
+          <el-input v-model="model.postAttr" clearable placeholder="请输入请求地址"></el-input>
+        </el-form-item>
+        <el-form-item label="接口描述" label-width="70px">
+          <el-input v-model="model.interDetail" clearable placeholder="请输入接口描述"></el-input>
+        </el-form-item>
+      </el-form>
     </div>
 
     <div class="postData">
-        <div class="pd-title">
-            <span @click="changeBottomColor($event,'header-com')">请求头(header)</span>
-            <span @click="changeBottomColor($event,'data-com')" class="colorCode">请求参数(body)</span>
-        </div>
-        <div class="hd-com">
-          
-          <keep-alive>
-              <component :is="bindCom" ref="child"></component>
-          </keep-alive>
-            
-        </div>
+      <div class="pd-title">
+        <span @click="changeBottomColor($event,'header-com')">请求头(header)</span>
+        <span @click="changeBottomColor($event,'data-com')" class="colorCode">请求参数(body)</span>
+      </div>
+      <div class="hd-com">
+        <keep-alive>
+          <component :is="bindCom" ref="child"></component>
+        </keep-alive>
+      </div>
+      <div class="pd-title">
+        <span @click="changeBottomColor2($event,'header-com')">响应头(header)</span>
+        <span @click="changeBottomColor2($event,'data-com')" class="colorCode2">响应参数(body)</span>
+      </div>
+      <keep-alive>
+        <component :is="bindCom2" ref="child"></component>
+      </keep-alive>
+
+         <div class="pd-title">
+      <span class="colorCode3">示例数据</span>
     </div>
+    <div class="slData">
+      <el-input
+        type="textarea"
+        :rows="2"
+        placeholder="请输入内容"
+        v-model="JSON.stringify(textarea,null,'\t')"
+        :autosize="{ minRows:5, maxRows: 10}"
+      ></el-input>
+    </div>
+    </div>
+ 
     <div class="tt">
-        <button @click="test()">dianji</button>
+      <button @click="test()">dianji</button>
     </div>
   </div>
 </template>
@@ -89,27 +108,76 @@
 // import  headerCom from "./IrPost/postHeader.vue"
 // import  dataCom from "./IrPost/PostData"
 export default {
-  components:{
-    "header-com":()=>import("./IrPost/postHeader.vue"),
-    "data-com":()=>import("./IrPost/PostData")
+  components: {
+    "header-com": () => import("./IrPost/postHeader.vue"),
+    "data-com": () => import("./IrPost/PostData"),
+    "header-com2": () => import("./IrPost/postHeader.vue"),
+    "data-com2": () => import("./IrPost/PostData")
   },
   data() {
     return {
-      bindCom:"data-com",
+      textarea: {
+        status: "0",
+        msg: "操作成功",
+        result: {
+          pageEnity: {
+            currentPage: 2,
+            pageSize: 10,
+            totalCount: 16,
+            totalPage: 2
+          },
+          list: [
+            {
+              imageUrl:
+                "http://hbimg.b0.upaiyun.com/c8aee369ba87fe1e2e366fc81d53c0a85fd2a5147a8d6-QvfJEx_fw658",
+              desc: "美女13"
+            },
+            {
+              imageUrl:
+                "http://hbimg.b0.upaiyun.com/c8aee369ba87fe1e2e366fc81d53c0a85fd2a5147a8d6-QvfJEx_fw658",
+              desc: "美女14"
+            },
+            {
+              imageUrl:
+                "http://hbimg.b0.upaiyun.com/c8aee369ba87fe1e2e366fc81d53c0a85fd2a5147a8d6-QvfJEx_fw658",
+              desc: "美女0"
+            },
+            {
+              imageUrl:
+                "http://hbimg.b0.upaiyun.com/c8aee369ba87fe1e2e366fc81d53c0a85fd2a5147a8d6-QvfJEx_fw658",
+              desc: "美女1"
+            },
+            {
+              imageUrl:
+                "http://hbimg.b0.upaiyun.com/c8aee369ba87fe1e2e366fc81d53c0a85fd2a5147a8d6-QvfJEx_fw658",
+              desc: "美女2"
+            },
+            {
+              imageUrl:
+                "http://hbimg.b0.upaiyun.com/c8aee369ba87fe1e2e366fc81d53c0a85fd2a5147a8d6-QvfJEx_fw658",
+              desc: "ddd"
+            }
+          ]
+        }
+      },
+      bindCom: "data-com",
+      bindCom2: "data-com2",
       model: {
         postMethods: "",
         postType: "",
         resType: "",
         responseStatus: "",
-        infaterName:"",
-        postAttr:"",
-        interDetail:"",
+        infaterName: "",
+        postAttr: "",
+        interDetail: ""
       },
-      rules:{
-         infaterName:[
-             {required:true,message:"请输入接口名称",trigger:"blur"}
-             ],
-        postAttr:[ {required:true,message:"请输入请求地址",trigger:"blur"}]
+      rules: {
+        infaterName: [
+          { required: true, message: "请输入接口名称", trigger: "blur" }
+        ],
+        postAttr: [
+          { required: true, message: "请输入请求地址", trigger: "blur" }
+        ]
       },
 
       //后台返回的数据
@@ -152,24 +220,36 @@ export default {
       }
     };
   },
-  methods:{
-      changeBottomColor(event,value){
-        if(document.querySelector(".colorCode")){
-            document.querySelector(".colorCode").classList.remove("colorCode")
-        }
-        event.currentTarget.classList.add("colorCode")
-        console.log(this.bindCom)
-        // if (this.bindCom=="data-com"){
-        //   this.bindCom="header-com"
-        // }else{
-        //   this.bindCom="data-com"
-        // }
-        this.bindCom=value
-        
-      },
-      test(){
-        console.log(this.$refs.child.tableData)
+  methods: {
+    changeBottomColor(event, value) {
+      if (document.querySelector(".colorCode")) {
+        document.querySelector(".colorCode").classList.remove("colorCode");
       }
+      event.currentTarget.classList.add("colorCode");
+      console.log(this.bindCom);
+      // if (this.bindCom=="data-com"){
+      //   this.bindCom="header-com"
+      // }else{
+      //   this.bindCom="data-com"
+      // }
+      this.bindCom = value;
+    },
+    changeBottomColor2(event, value) {
+      if (document.querySelector(".colorCode2")) {
+        document.querySelector(".colorCode2").classList.remove("colorCode2");
+      }
+      event.currentTarget.classList.add("colorCode2");
+      console.log(this.bindCom2);
+      // if (this.bindCom=="data-com"){
+      //   this.bindCom="header-com"
+      // }else{
+      //   this.bindCom="data-com"
+      // }
+      this.bindCom2 = value;
+    },
+    test() {
+      console.log(this.$refs.child.tableData);
+    }
   }
 };
 </script>
@@ -199,27 +279,28 @@ export default {
     justify-content: space-between;
     .top-eft {
     }
-
-   
   }
 }
-.postData{
-    
-    font-size: 14px;
-    .pd-title{
-        border-bottom: 1px solid rgb(201, 178, 178);
-        padding: 15px 0;
-    }
-    .pd-title span{
-        margin-right: 20px;
-        cursor: pointer;
-        padding: 16px 10px;
-        
-    }
-    .colorCode{
-        border-bottom: 1px solid #1e87f0;
-        
-    }
+.postData {
+  font-size: 14px;
+  .pd-title {
+    border-bottom: 1px solid rgb(201, 178, 178);
+    padding: 15px 0;
+  }
+  .pd-title span {
+    margin-right: 20px;
+    cursor: pointer;
+    padding: 16px 10px;
+  }
+  .colorCode {
+    border-bottom: 1px solid #1e87f0;
+  }
+}
+.colorCode2 {
+  border-bottom: 1px solid #1e87f0;
+}
+.colorCode3 {
+  border-bottom: 1px solid #1e87f0;
 }
 </style>
 <style>
@@ -228,9 +309,11 @@ export default {
   text-align: right;
   padding: 0;
   margin: 0;
-  
 }
-.IR .el-input{
-    margin-left: 5px;
+.IR .el-input {
+  margin-left: 5px;
+}
+.slData{
+  margin-top: 20px;
 }
 </style>

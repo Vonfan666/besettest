@@ -88,7 +88,23 @@ export default {
         { cname: "d", isrequired: "ture", type: "ture", detail: "这是网站4" },
         { cname: "e", isrequired: "ture", type: "ture", detail: "这是网站5" },
         { cname: "f", isrequired: "ture", type: "ture", detail: "这是网站6" }
-      ]
+      ],
+      postHeader:[
+        { cname: "a1", isrequired: "ture", type: "ture", detail: "这是网站1" },
+        { cname: "b1", isrequired: "ture", type: "ture", detail: "这是网站2" },
+        { cname: "c1", isrequired: "ture", type: "ture", detail: "这是网站3" },
+        { cname: "d1", isrequired: "ture", type: "ture", detail: "这是网站4" },
+        { cname: "e1", isrequired: "ture", type: "ture", detail: "这是网站5" },
+        { cname: "f1", isrequired: "ture", type: "ture", detail: "这是网站6" }
+      ],
+      postData:[
+        { cname: "a2", isrequired: "ture", type: "ture", detail: "这是网站1" },
+        { cname: "b2", isrequired: "ture", type: "ture", detail: "这是网站2" },
+        { cname: "c2", isrequired: "ture", type: "ture", detail: "这是网站3" },
+        { cname: "d2", isrequired: "ture", type: "ture", detail: "这是网站4" },
+        { cname: "e2", isrequired: "ture", type: "ture", detail: "这是网站5" },
+        { cname: "f2", isrequired: "ture", type: "ture", detail: "这是网站6" }
+      ],
     };
   },
   methods: {
