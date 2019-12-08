@@ -302,6 +302,9 @@ export default {
 .colorCode3 {
   border-bottom: 1px solid #1e87f0;
 }
+.slData{
+  margin: 20px 0;
+}
 </style>
 <style>
 .IR .el-form-item__label {
@@ -313,7 +316,5 @@ export default {
 .IR .el-input {
   margin-left: 5px;
 }
-.slData{
-  margin-top: 20px;
-}
+
 </style>
