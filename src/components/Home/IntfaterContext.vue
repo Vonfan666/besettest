@@ -80,24 +80,29 @@
         <span @click="changeBottomColor2($event,'header-com')">响应头(header)</span>
         <span @click="changeBottomColor2($event,'data-com')" class="colorCode2">响应参数(body)</span>
       </div>
-      <keep-alive>
-        <component :is="bindCom2" ref="child"></component>
-      </keep-alive>
+      <div class="hd-com">
+        <keep-alive>
+          <component :is="bindCom2" ref="child" :msbox.sync="messageboxStatus"></component>
+        </keep-alive>
+      </div>
+      <div class="pd-title">
+        <span class="colorCode3">示例数据</span>
+      </div>
+      <div class="slData">
+        <el-input
+          type="textarea"
+          :rows="2"
+          placeholder="请输入内容"
+          v-model="JSON.stringify(textarea,null,'\t')"
+          :autosize="{ minRows:5, maxRows: 10}"
+        ></el-input>
+      </div>
+    </div>
+    <!-- 新建文件 -->
 
-         <div class="pd-title">
-      <span class="colorCode3">示例数据</span>
-    </div>
-    <div class="slData">
-      <el-input
-        type="textarea"
-        :rows="2"
-        placeholder="请输入内容"
-        v-model="JSON.stringify(textarea,null,'\t')"
-        :autosize="{ minRows:5, maxRows: 10}"
-      ></el-input>
-    </div>
-    </div>
- 
+    <message-box v-if="messageboxStatus" v-slot:postJsonData>
+        <p>导入就送数据</p>
+    </message-box>
     <div class="tt">
       <button @click="test()">dianji</button>
     </div>
@@ -112,11 +117,14 @@ export default {
     "header-com": () => import("./IrPost/postHeader.vue"),
     "data-com": () => import("./IrPost/PostData"),
     "header-com2": () => import("./IrPost/postHeader.vue"),
-    "data-com2": () => import("./IrPost/PostData")
+    "data-com2": () => import("./IrPost/PostData"),
+    "message-box":()=>import("../public/MessageBox.vue")
   },
   data() {
     return {
-      textarea: {
+      
+      messageboxStatus:false,
+      textarea: {        
         status: "0",
         msg: "操作成功",
         result: {
@@ -169,7 +177,7 @@ export default {
         responseStatus: "",
         infaterName: "",
         postAttr: "",
-        interDetail: ""
+        interDetail: "",
       },
       rules: {
         infaterName: [
@@ -177,7 +185,8 @@ export default {
         ],
         postAttr: [
           { required: true, message: "请输入请求地址", trigger: "blur" }
-        ]
+        ],
+   
       },
 
       //后台返回的数据
@@ -221,6 +230,8 @@ export default {
     };
   },
   methods: {
+    
+
     changeBottomColor(event, value) {
       if (document.querySelector(".colorCode")) {
         document.querySelector(".colorCode").classList.remove("colorCode");
@@ -255,6 +266,17 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.mbAddFiels{
+  margin: 10px;
+  .bt-botton{
+    float: right;
+    margin-top: 30px;
+    margin-right: 20px;
+  }
+  .bt-botton .bottom{
+    margin-left: 20px;
+  }
+}
 .IR {
   margin: 10px;
   text-align: left;
@@ -302,7 +324,7 @@ export default {
 .colorCode3 {
   border-bottom: 1px solid #1e87f0;
 }
-.slData{
+.slData {
   margin: 20px 0;
 }
 </style>
@@ -316,5 +338,4 @@ export default {
 .IR .el-input {
   margin-left: 5px;
 }
-
 </style>

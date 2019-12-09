@@ -65,11 +65,18 @@
     </el-table>
 
     <div>
-        <div class="addParm">
-            
-            <span class="apbt" @click="addTT()"><el-button type="primary" size="small"><span class="el-icon-circle-plus-outline"></span>&#12288;添加参数</el-button></span>
-            <span class="apbt"><el-button type="primary" size="small"><span class="el-icon-sort"></span> 导入json数据</el-button></span>
-        </div>
+      <div class="addParm">
+        <span class="apbt" @click="addTT()">
+          <el-button type="primary" size="small">
+            <span class="el-icon-circle-plus-outline"></span>&#12288;添加参数
+          </el-button>
+        </span>
+        <span class="apbt">
+          <el-button type="primary" size="small" @click="pushData()">
+            <span class="el-icon-sort"></span> 导入json数据
+          </el-button>
+        </span>
+      </div>
     </div>
     <!-- <el-button :plain="true" @click="open2()">成功</el-button> -->
   </div>
@@ -79,6 +86,8 @@
 export default {
   data() {
     return {
+
+      prop: ["msbox"],
       dragging: null,
       indent: [], //输入框的边距
       tableData: [
@@ -89,7 +98,7 @@ export default {
         { cname: "e", isrequired: "ture", type: "ture", detail: "这是网站5" },
         { cname: "f", isrequired: "ture", type: "ture", detail: "这是网站6" }
       ],
-      postHeader:[
+      postHeader: [
         { cname: "a1", isrequired: "ture", type: "ture", detail: "这是网站1" },
         { cname: "b1", isrequired: "ture", type: "ture", detail: "这是网站2" },
         { cname: "c1", isrequired: "ture", type: "ture", detail: "这是网站3" },
@@ -97,30 +106,33 @@ export default {
         { cname: "e1", isrequired: "ture", type: "ture", detail: "这是网站5" },
         { cname: "f1", isrequired: "ture", type: "ture", detail: "这是网站6" }
       ],
-      postData:[
+      postData: [
         { cname: "a2", isrequired: "ture", type: "ture", detail: "这是网站1" },
         { cname: "b2", isrequired: "ture", type: "ture", detail: "这是网站2" },
         { cname: "c2", isrequired: "ture", type: "ture", detail: "这是网站3" },
         { cname: "d2", isrequired: "ture", type: "ture", detail: "这是网站4" },
         { cname: "e2", isrequired: "ture", type: "ture", detail: "这是网站5" },
         { cname: "f2", isrequired: "ture", type: "ture", detail: "这是网站6" }
-      ],
+      ]
     };
   },
   methods: {
-          // draggable 属性规定元素是否可拖动
-// dragstart 事件在用户开始拖动元素或选择的文本时触发
-// dragover 当某被拖动的对象在另一对象容器范围内拖动时触发此事件
-// dragenter - 当被鼠标拖动的对象进入其容器范围内时触发此事件
+    pushData(){
+      console.log(this.msbox)
+      return this.$emit("update:msbox", this.msbox = !this.msbox)
+    },
+    // draggable 属性规定元素是否可拖动
+    // dragstart 事件在用户开始拖动元素或选择的文本时触发
+    // dragover 当某被拖动的对象在另一对象容器范围内拖动时触发此事件
+    // dragenter - 当被鼠标拖动的对象进入其容器范围内时触发此事件
     // dragend - 用户完成元素拖动后触发-->
     handleDragStart(e, item) {
-        
       this.dragging = item;
-      console.log("ceshi1 ",item)
+      console.log("ceshi1 ", item);
     },
     handleDragEnd(e, item) {
       this.dragging = null;
-       console.log("ceshi2 ")
+      console.log("ceshi2 ");
     },
     //首先把div变成可以放置的元素，即重写dragenter/dragover
     // DataTransfer 对象用来保存，通过拖放动作，拖动到浏览器的数据。
@@ -133,36 +145,36 @@ export default {
       if (item === this.dragging) {
         return;
       }
-      console.log(e,item)
-      console.log(this.dragging)
-      const startEleIndex=this.tableData.indexOf(this.dragging)
-      const endEleIndex=this.tableData.indexOf(item)
-      console.log(startEleIndex,endEleIndex)
+      console.log(e, item);
+      console.log(this.dragging);
+      const startEleIndex = this.tableData.indexOf(this.dragging);
+      const endEleIndex = this.tableData.indexOf(item);
+      console.log(startEleIndex, endEleIndex);
 
-      if (this.dragging){
-          var  startEle=this.tableData[startEleIndex]
-            var  endEle=this.tableData[endEleIndex]
-            console.log(startEle,"初始拖拽值")
-            console.log(endEle,"交换拖拽值")
-            this.tableData.splice(startEleIndex,1,endEle)
-            this.tableData.splice(endEleIndex,1,startEle)
-            this.dragging=null
+      if (this.dragging) {
+        var startEle = this.tableData[startEleIndex];
+        var endEle = this.tableData[endEleIndex];
+        console.log(startEle, "初始拖拽值");
+        console.log(endEle, "交换拖拽值");
+        this.tableData.splice(startEleIndex, 1, endEle);
+        this.tableData.splice(endEleIndex, 1, startEle);
+        this.dragging = null;
       }
-      
-    //   const newItems = [...this.items];
-    //   console.log(newItems);
-    //   const src = newItems.indexOf(this.dragging);
-    //   const dst = newItems.indexOf(item);
-    //   // 替换
-    //   newItems.splice(dst, 0, ...newItems.splice(src, 1));
-    //   // 让item的颜色等于新交换的颜色
-    //   this.items = newItems;
+
+      //   const newItems = [...this.items];
+      //   console.log(newItems);
+      //   const src = newItems.indexOf(this.dragging);
+      //   const dst = newItems.indexOf(item);
+      //   // 替换
+      //   newItems.splice(dst, 0, ...newItems.splice(src, 1));
+      //   // 让item的颜色等于新交换的颜色
+      //   this.items = newItems;
     },
-    aa(){
-        console.log("按下")
+    aa() {
+      console.log("按下");
     },
-    bb(){
-        console.log("songkai")
+    bb() {
+      console.log("songkai");
     },
     addTS(index, event) {
       console.log(index);
@@ -175,27 +187,27 @@ export default {
       var tt = this.indent[index];
       this.indent.splice(index + 1, 0, 15 + tt);
     },
-    addTT(){
-        this.tableData.push({
+    addTT() {
+      this.tableData.push({
         prop: "",
         isrequired: null,
         type: "",
         detail: ""
       });
-      this.indent.push(0)
-      this.open2()
+      this.indent.push(0);
+      this.open2();
     },
     open2() {
-        this.$message({
-          message: '新增成功',
-          type: 'success',
-          duration:500,
-        });
-      },
-    removeTS(index){
-        console.log(index)
-        this.tableData.splice(index,1)
-        this.indent.splice(index,1)
+      this.$message({
+        message: "新增成功",
+        type: "success",
+        duration: 500
+      });
+    },
+    removeTS(index) {
+      console.log(index);
+      this.tableData.splice(index, 1);
+      this.indent.splice(index, 1);
     },
     isListData() {
       if (this.tableData.length == 0) {
@@ -207,7 +219,7 @@ export default {
         });
       }
     },
- 
+
     indentMarginLeft() {
       this.tableData.forEach((item, index) => {
         console.log(index, item);
@@ -239,7 +251,7 @@ export default {
   /* overflow:none !important; */
 }
 
-.cname {
+.hd-header .cname {
   position: relative;
   /* overflow: visible; */
   border: 1px solid #ffffff;
@@ -253,25 +265,23 @@ export default {
     border: 2px solid rgb(245, 247, 250)
 } */
 
-.el-table--enable-row-hover .el-table__body tr:hover > td {
+.hd-header .el-table--enable-row-hover .el-table__body tr:hover > td {
   background-color: #ffffff !important;
 }
-.hd-com  tbody .el-table__row td{
-    padding: 0px  !important;
+.hd-com tbody .el-table__row td {
+  padding: 0px !important;
 }
 .hd-com .el-input .el-input__icon {
-    height: 33px;
-
+  height: 33px;
 }
-.hd-com  .el-input  .el-input__inner{
-    height: 25px;
+.hd-com .el-input .el-input__inner {
+  height: 25px;
 }
-.addParm{
-    margin: 10px 0 10px 0;
+.hd-header .addParm {
+  margin: 10px 0 10px 0;
 }
-.addParm .apbt{
-    width: 20px;
-    margin-right: 10px;
+.hd-header .addParm .apbt {
+  width: 20px;
+  margin-right: 10px;
 }
-
 </style>

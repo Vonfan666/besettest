@@ -224,7 +224,7 @@ export default {
   /* overflow:none !important; */
 }
 
-.cname {
+.hd-header .cname {
   position: relative;
   /* overflow: visible; */
   border: 1px solid #ffffff;
@@ -238,7 +238,7 @@ export default {
     border: 2px solid rgb(245, 247, 250)
 } */
 
-.el-table--enable-row-hover .el-table__body tr:hover > td {
+.hd-header .el-table--enable-row-hover .el-table__body tr:hover > td {
   background-color: #ffffff !important;
 }
 .hd-com  tbody .el-table__row td{
@@ -251,10 +251,14 @@ export default {
 .hd-com  .el-input  .el-input__inner{
     height: 25px;
 }
-.addParm{
+.hd-com .cell .el-select__caret{
+  height: 25px;
+  line-height: 25px;
+}
+.hd-header .addParm{
     margin: 10px 0 10px 0;
 }
-.addParm .apbt{
+.hd-header .addParm .apbt{
     width: 20px;
     margin-right: 10px;
 }

@@ -20,7 +20,7 @@
             </div>
             <div class="addFiles" @click="addFiles()">
               <span class="el-icon-plus"></span>
-              <span>新建文件</span>
+              <span>新建文件夹</span>
             </div>
           </div>
           <div class="searchPopOver" v-if="searchStatus">
@@ -91,37 +91,57 @@
     <div class="other">
       <el-dialog title="复制接口" :visible.sync="dialogFormVisible">
         <el-form :model="updateFiels" :rules="rules" ref="copeEle">
-          <el-form-item label="选择文件夹"  prop="updateFiels" label-width="95px">
+          <el-form-item label="选择文件夹" prop="updateFiels" label-width="95px">
             <el-select v-model="updateFiels.updateFiels" placeholder="请选择复制到的文件">
-              <el-option v-for="(item,index) in  list" :key="index" :label="item.name" :value="index"></el-option>
-              
+              <el-option
+                v-for="(item,index) in  list"
+                :key="index"
+                :label="item.name"
+                :value="index"
+              ></el-option>
             </el-select>
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
           <el-button @click="dialogFormVisible = false">取 消</el-button>
-          <el-button type="primary"  @click="copeFiels(updateFiels.updateFiels)">确 定</el-button>
+          <el-button type="primary" @click="copeFiels(updateFiels.updateFiels)">确 定</el-button>
         </div>
       </el-dialog>
     </div>
     <div class="infater-right">
       <div class="InCon">
-        <ir-con></ir-con>
+        <ir-con ref="irCon"></ir-con>
       </div>
     </div>
+    <!-- 新建文件 -->
+    <message-box v-if="mbFielsStutas" v-slot:addFiels>
+      <div class="mbAddFiels">
+        <h3>新建文件夹</h3>
+        <el-form :model="updateFiels" :rules="rules" ref="refAddfiles">
+          <el-form-item label="文件夹名称" prop="fielsName" label-width="100px">
+            <el-input v-model="updateFiels.fielsName" clearable></el-input>
+          </el-form-item>
+        </el-form>
+        <div class="bt-botton">
+          <el-button type="primary" @click="mbFielsStutas=!mbFielsStutas">取消</el-button>
+          <el-button type="primary" class="bottom" @click="addFielsSubmit()">确认</el-button>
+        </div>
+      </div>
+    </message-box>
   </div>
 </template>
 
 <script>
-import InfaterContext from "./IntfaterContext.vue"
+import InfaterContext from "./IntfaterContext.vue";
 export default {
-  components:{
-    "ir-con":InfaterContext
-  }
-  ,
+  components: {
+    "ir-con": InfaterContext,
+    "message-box":()=>import("../public/MessageBox.vue")
+  },
   data() {
     return {
-      copeCode:{},
+      mbFielsStutas: false, //新增文件蒙层状态
+      copeCode: {},
       searchStatus: false,
       contextStatus: true, //左侧文件夹是否展示
       iconOpen: [], //箭头的方向
@@ -129,15 +149,20 @@ export default {
       directionFalse: false,
       iconStatus: false,
       searchName: "", //输入框输入内容
-      updateFiels:{
-        updateFiels:""
+      updateFiels: {
+        updateFiels: "",//修改文件
+        fielsName: "" //新增文件名称
       },
+    
       dialogTableVisible: false,
       dialogFormVisible: false,
-      rules:{
-        updateFiels:[
-          {required:true,message:"请选择复制的文件夹",trigger:"click"}
-          ]
+      rules: {
+        updateFiels: [
+          { required: true, message: "请选择复制的文件夹", trigger: "click" }
+        ],
+        fielsName: [
+          { required: true, message: "请输入文件名称", trigger: "blur" }
+        ]
       },
       list: [
         {
@@ -189,18 +214,27 @@ export default {
     };
   },
   methods: {
-    addFiles() {
-      //新增文件夹
-      //新增文件直接请求接口  新增先请求后台--然后根据后台返回的id--新增文件夹
-      let id = 4; //后台返回的id
-      this.$set(this.list, this.list.length, {
-        id: id,
-        name: "修改",
-        Clist: []
+    addFielsSubmit() {
+      this.$refs.refAddfiles.validate(valid => {
+        if (valid) {
+          //这里请求后台获取一个文件夹id
+          let id = 4; //假设后台返回id=4
+          this.$set(this.list, this.list.length, {
+            id: id,
+            name: this.updateFiels.fielsName,
+            Clist: []
+          });
+          //新建文件时需要---标记该文件是否打开 箭头 iconOpen  以及 directions
+          this.mbFielsStutas = !this.mbFielsStutas;
+          this.$set(this.iconOpen, this.iconOpen.length, "el-icon-caret-right");
+          this.$set(this.directions, this.directions.length, false);
+        } else {
+          return false;
+        }
       });
-      //新建文件时需要---标记该文件是否打开 箭头 iconOpen  以及 directions
-      this.$set(this.iconOpen, this.iconOpen.length, "el-icon-caret-right");
-      this.$set(this.directions, this.directions.length, false);
+    },
+    addFiles() {
+      this.mbFielsStutas = !this.mbFielsStutas;
     },
     addContext(event, id, index) {
       //文件夹下添加接口
@@ -313,34 +347,38 @@ export default {
       }
       if (command.type == "b") {
         //先提交后台修改名称成功之后--然后在执行--否则直接失败
-        this.dialogFormVisible = true
-        console.log("zhixing-----")
+        this.dialogFormVisible = true;
+        console.log("zhixing-----");
         // console.log(this.updateFiels)
-        this.copeCode=command
+        this.copeCode = command;
       }
       if (command.type == "c") {
         //先提交后台删除成功之后--然后在执行--否则直接失败
         // this.$set(,command.index1)
-        this.list[command.index].Clist.splice(command.index1,1)
-        
+        this.list[command.index].Clist.splice(command.index1, 1);
       }
     },
-    copeFiels(index){   //把需要复制到的文件索引传过来
-      this.$refs.copeEle.validate(valid=>{
-        if(valid){
-          this.dialogFormVisible = false
-          console.log(index)
-          console.log(this.copeCode,"接口请求到后台--返回成功就继续下面操作")
-          var copeAfter=this.list[this.copeCode.index].Clist[this.copeCode.index1]   //找到复制的接口
-          console.log(copeAfter,typeof index)
-          console.log(this.list[index],"zheshi ")
-          this.$set(this.list[index].Clist,this.list[index].Clist.length,copeAfter)
-        }else{
-          return false
+    copeFiels(index) {
+      //把需要复制到的文件索引传过来
+      this.$refs.copeEle.validate(valid => {
+        if (valid) {
+          this.dialogFormVisible = false;
+          console.log(index);
+          console.log(this.copeCode, "接口请求到后台--返回成功就继续下面操作");
+          var copeAfter = this.list[this.copeCode.index].Clist[
+            this.copeCode.index1
+          ]; //找到复制的接口
+          console.log(copeAfter, typeof index);
+          console.log(this.list[index], "zheshi ");
+          this.$set(
+            this.list[index].Clist,
+            this.list[index].Clist.length,
+            copeAfter
+          );
+        } else {
+          return false;
         }
-      })
-      
-      
+      });
     },
     open3(command) {
       this.$prompt("请输入您要修改的名称", "修改接口名称", {
@@ -383,7 +421,19 @@ export default {
 //     height: 100%;
 //     background: white;
 //   }
-
+.mbAddFiels{
+  margin: 10px;
+  .bt-botton{
+    margin-top: 50px;
+    margin-right: 20px;
+    display: flex;
+    justify-content:center;
+  }
+  .bt-botton .bottom{
+    margin-left: 20px;
+  }
+ 
+}
 .backColor {
   background: grey;
 }
@@ -574,37 +624,35 @@ dl {
 //   margin-right: 3px;
 
 // }
-
-
 </style>
 <style >
-.other .el-dialog__header{
+.other .el-dialog__header {
   position: relative;
-  text-align: left
+  text-align: left;
 }
-.other .el-dialog__title{
+.other .el-dialog__title {
   position: absolute;
-  left: 10px
+  left: 10px;
 }
-.other .el-input--suffix{
- 
+.other .el-input--suffix {
 }
-.other .el-form-item__label{
+.other .el-form-item__label {
   color: black;
   margin-left: 10px;
 }
 .other .el-form-item {
-  margin-top:20px;
+  margin-top: 20px;
 }
-.other .el-form-item__content{
+.other .el-form-item__content {
   margin: 0;
   position: absolute;
   left: 110px;
 }
-.other .el-dialog__body{
+.other .el-dialog__body {
   padding: 0;
   padding-top: 20px;
 }
-
-
+ .mbAddFiels .el-form-item__label{
+    color: #606266
+  }
 </style>
