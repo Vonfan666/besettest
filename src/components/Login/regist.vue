@@ -49,8 +49,11 @@
 
 <script>
 import validator from "@/libs/validate.js";
+import {
+  login,
+} from "@/axios/api"
 export default {
-  // props: ["style"],
+  // props: ["style"],  
   data() {
      var validatePass = (rule, value, callback) => {
        console.log(this.regist.password)
@@ -120,9 +123,18 @@ export default {
       this.$refs.elForm.validate(valid => {
         if (valid) {
           
-          
-            console.log(this.regist);
-            this.open("注册成功");
+            login({
+                name:this.regist.readlyName,
+                department:this.regist.department,
+                mobil:this.regist.phone,
+                password:this.regist.password
+              }).then(res=>{
+                console.log(res,"这是奇偶我怕多吗")
+                this.open("注册成功");
+              }).catch(res=>{
+                console.log(res)
+              })
+            
             document.querySelector(".regist-child").classList.add("active");
           
           

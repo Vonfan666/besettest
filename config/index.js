@@ -10,7 +10,16 @@ module.exports = {
     // Paths
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
-    proxyTable: {},
+    proxyTable: {
+      '/users': {
+       target: 'http://localhost:8089',
+       changeOrigin: true,
+       pathRewrite: {
+        '^/users': '/users' // pathRewrite方法重写url, 这样配置出来的url为http://localhost:8081/api/seller
+        // '^/api': '/' // pathRewrite方法重写url, 这样配置出来的url为http://localhost:8081/seller
+       }
+      }
+     },
 
     // Various Dev Server settings
     host: 'localhost', // can be overwritten by process.env.HOST
