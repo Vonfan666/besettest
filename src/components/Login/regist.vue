@@ -14,8 +14,8 @@
             <el-option
               v-for="(item,index) in data.list"
               :key="index"
-              :label="item.name"
-              :value="item.name"
+              :label="item.d_name"
+              :value="item.d_id"
             ></el-option>
           </el-select>
         </el-form-item>
@@ -50,15 +50,15 @@
 <script>
 import validator from "@/libs/validate.js";
 import {
-  login,
+  regist,
 } from "@/axios/api"
+
+import  storage from "@/libs/storage.js"
 export default {
   // props: ["style"],  
+  prop:["departmentlist"],
   data() {
      var validatePass = (rule, value, callback) => {
-       console.log(this.regist.password)
-          console.log(this.regist.forgetPassword)
-          console.log(value)
         if  (value !== this.regist.password) {
           callback(new Error('两次输入密码不一致!'));
         } else {
@@ -108,7 +108,7 @@ export default {
     };
   },
   methods: {
-    open(message) {
+    open() {
       this.$message({
         message: message,
         type: "success"
@@ -122,15 +122,14 @@ export default {
     submitRegist() {
       this.$refs.elForm.validate(valid => {
         if (valid) {
-          
-            login({
+            
+            regist({
                 name:this.regist.readlyName,
                 department:this.regist.department,
                 mobil:this.regist.phone,
-                password:this.regist.password
+                password:this.regist.password,
               }).then(res=>{
-                console.log(res,"这是奇偶我怕多吗")
-                this.open("注册成功");
+                console.log(res,"操作成功")
               }).catch(res=>{
                 console.log(res)
               })
@@ -144,15 +143,12 @@ export default {
       });
     }
   },
-  mounted() {
-    this.data.list = [
-      { name: "研发部" },
-      { name: "测试部" },
-      { name: "设计部" },
-      { name: "产品部" }
-    ];
-    console.log(this.data.list);
+  watch:{
+    'departmentlist'(newVvalue,oldValue){
+        console.log(newVvalue,oldValue,"cao")
+    }
   }
+
 };
 </script>
 

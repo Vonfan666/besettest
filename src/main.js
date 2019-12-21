@@ -6,10 +6,8 @@ import router from './router'
 import ElementUi  from "element-ui"
 import 'element-ui/lib/theme-chalk/index.css';
 import "../static/icon/iconfont.css"
-import VueDND from "awe-dnd"
 Vue.config.productionTip = false
 
-Vue.use(VueDND)
 
 Vue.use(ElementUi)
 /* eslint-disable no-new */

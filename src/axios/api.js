@@ -1,5 +1,13 @@
-import { postRequest } from './requests';
+import { postRequest,getRequest } from './requests';
 
-export  const login = (params) => {
-    return postRequest('/users/register/', params)
+
+// 获取部门列表
+export  const department = (params) => {
+    return getRequest('/users/department/', params)
 }
+
+//提交注册
+export  const regist = (params) => {
+    return postRequest('/users/registers/', params)
+}
+

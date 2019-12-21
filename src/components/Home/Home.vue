@@ -227,7 +227,7 @@ export default {
       text-align: left;
       cursor: pointer;
       color: white;
-      z-index: 1;
+      z-index: 100;
 
       .setting-name-context {
         position: relative;
@@ -241,6 +241,7 @@ export default {
         margin-top: -25px;
         margin-left: 20px;
         background: #141414;
+        z-index: 100
         
       }
       .setting-open-context{

@@ -1,9 +1,9 @@
-import axios from "axios"
-import qs from "qs"
-import app from "../main.js"
+import axios from "axios";
+import Qs from "qs";
+import { Message } from "element-ui";
+import storage from "@/libs/storage"
 
-
-axios.defaults.timeout = 15000;
+// axios.defaults.timeout = 15000;
 
 
 
@@ -11,7 +11,7 @@ axios.defaults.timeout = 15000;
 axios.interceptors.request.use(config => {
     console.log(config,"请求拦截器")
     
-    return config;
+    return config
 }, err => {
     Message.error('请求超时');
     return Promise.resolve(err);
@@ -19,9 +19,18 @@ axios.interceptors.request.use(config => {
 
 //后端返回数据拦截
 axios.interceptors.response.use(response=>{
+    const data=response.data
     console.log(response,"返回拦截器")
-    console.log(response.data.status)
-    switch(response.data.status){
+    console.log(response.data)
+    switch(data.status){
+        
+        case 200:
+            if (data.message){
+                Message.success(data.message)
+            }
+               
+            break;
+        
         case 401:
             console.log("返回状态码是401");
             if (data.message !== null) {
@@ -40,14 +49,16 @@ axios.interceptors.response.use(response=>{
             break;
         case 500:
             console.log("返回状态码500")
-            if (response.data.message !== null) {
-                Message.error(response.data.message);
+            if (data.message !== null) {
+                console.log("这个执行了吗啊")
+                Message.error(data.message);
             } else {
                 Message.error("未知错误");
             }
-        default: return response.data
+        default: return data
     }
-    return response
+    console.log(data,"zuih")
+    return data
 },(err) => {
     // 返回状态码不为200时候的错误处理
     console.log(err,"这个执行啥")
@@ -58,24 +69,35 @@ axios.interceptors.response.use(response=>{
 
 
 
+export const getRequest = (url, params) => {
+    let accessToken = storage.get('accessToken');
+    console.log("请求开始",params)
+    return axios({
+        method: 'get',
+        url: `${url}`,
+        params: params,
+        headers: {
+            'accessToken': accessToken
+        }
+    });
+   
+};
+
 
 export const postRequest = (url, params) => {
+    // console.log(qs.stringify(params),"aadsads")
+    let accessToken = storage.get("accessToken");
+    console.log("accessToken",accessToken)
+    console.log(typeof params)
     // let accessToken = getStore("accessToken");
+
     return axios({
         method: 'post',
         url: `${url}`,
-        data: params,
-        // transformRequest: [function (data) {
-        //     let ret = '';
-        //     for (let it in data) {
-        //         ret += encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&';
-        //     }
-        //     ret = ret.substring(0, ret.length - 1);
-        //     return ret;
-        // }],
+        data: Qs.stringify(params),
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
-            // 'accessToken': accessToken
+            'accessToken': accessToken
         }
     });
 };

@@ -23,9 +23,9 @@
         </div>
       </div>
     </div>
-    <div class="regist-child active">
+    <div class="regist-child active" >
       <!--通过active决定子组件是否展示-->
-      <Regist></Regist>
+      <Regist :departmentlist="departmentList"  ref="regists"></Regist>
     </div>
     <div class="forgetPw-child active" >
       <forget-pw></forget-pw>
@@ -35,9 +35,9 @@
 
 <script>
 import valids from "@/libs/validate.js";
-import Regist from "./regist";
+// import Regist from "./regist";
 import forgetpassword from "./Forgetpassworf"
-
+import { department } from "@/axios/api.js"
 export default {
   data() {
     return {
@@ -56,7 +56,8 @@ export default {
           { required: true, message: "密码不能为空" },
           { validator: valids.passwordValidate, trigger: "blur" }
         ]
-      }
+      },
+      departmentList:[]
     };
   },
   methods: {
@@ -69,14 +70,26 @@ export default {
     },
     removeClass() {
       document.querySelector(".regist-child").classList.remove("active");
+      department().then(res=>{
+        this.departmentList=res
+        console.log(this.departmentList,"修改过后departmentList的值")
+        this.$refs.regists.data.list=res.results
+      }
+        
+      )
+
     },
     forgetpassword(){
       document.querySelector(".forgetPw-child").classList.remove("active");
     }
   },
   components: {
-    Regist,
+    "Regist":()=>import("./regist"),
     "forget-pw":forgetpassword
+  },
+  mounted(){
+    this.loginForm.phone="",
+    this.loginForm.password=""
   }
 };
 </script>
