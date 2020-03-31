@@ -51,13 +51,23 @@
           </el-select>
         </template>
       </el-table-column>
-
-      <el-table-column label="描述">
+      <!-- <el-table-column label="mock数据">
         <template slot-scope="scope">
           <input
             type="text"
             class="cname"
             v-model="tableData[scope.$index].detail"
+            @input="aa(scope.$index,scope.row.name)"
+          />
+        </template>
+      </el-table-column> -->
+
+      <el-table-column label="描述">
+        <template slot-scope="scope">
+          <input
+            type="text"
+            class="mock"
+            v-model="tableData[scope.$index].mock"
             @input="aa(scope.$index,scope.row.name)"
           />
         </template>
@@ -86,7 +96,6 @@
 export default {
   data() {
     return {
-
       prop: ["msbox"],
       dragging: null,
       indent: [], //输入框的边距
@@ -99,16 +108,16 @@ export default {
         { cname: "f", isrequired: "ture", type: "ture", detail: "这是网站6" }
       ],
       postHeader: [
-        { cname: "a1", isrequired: "ture", type: "ture", detail: "这是网站1" },
+        { cname: "a1", isrequired: "ture", type: "ture", detail: "这是网站1"},
         { cname: "b1", isrequired: "ture", type: "ture", detail: "这是网站2" },
         { cname: "c1", isrequired: "ture", type: "ture", detail: "这是网站3" },
-        { cname: "d1", isrequired: "ture", type: "ture", detail: "这是网站4" },
+        { cname: "d1", isrequired: "ture", type: "ture", detail: "这是网站4"},
         { cname: "e1", isrequired: "ture", type: "ture", detail: "这是网站5" },
-        { cname: "f1", isrequired: "ture", type: "ture", detail: "这是网站6" }
+        { cname: "f1", isrequired: "ture", type: "ture", detail: "这是网站6"}
       ],
       postData: [
         { cname: "a2", isrequired: "ture", type: "ture", detail: "这是网站1" },
-        { cname: "b2", isrequired: "ture", type: "ture", detail: "这是网站2" },
+        { cname: "b2", isrequired: "ture", type: "ture" , detail: "这是网站2"},
         { cname: "c2", isrequired: "ture", type: "ture", detail: "这是网站3" },
         { cname: "d2", isrequired: "ture", type: "ture", detail: "这是网站4" },
         { cname: "e2", isrequired: "ture", type: "ture", detail: "这是网站5" },
@@ -117,9 +126,9 @@ export default {
     };
   },
   methods: {
-    pushData(){
-      console.log(this.msbox)
-      return this.$emit("update:msbox", this.msbox = !this.msbox)
+    pushData() {
+      console.log(this.msbox);
+      return this.$emit("update:msbox", (this.msbox = !this.msbox));
     },
     // draggable 属性规定元素是否可拖动
     // dragstart 事件在用户开始拖动元素或选择的文本时触发
@@ -127,7 +136,7 @@ export default {
     // dragenter - 当被鼠标拖动的对象进入其容器范围内时触发此事件
     // dragend - 用户完成元素拖动后触发-->
     handleDragStart(e, item) {
-      this.dragging = item;
+      this.dragging = item; // 元素
       console.log("ceshi1 ", item);
     },
     handleDragEnd(e, item) {
@@ -138,27 +147,32 @@ export default {
     // DataTransfer 对象用来保存，通过拖放动作，拖动到浏览器的数据。
     // 如果dropEffect 属性设定为none,则不允许被拖放到目标元素中。
     handleDragOver(e) {
-      e.dataTransfer.dropEffect = "move"; // e.dataTransfer.dropEffect="move";//在dragenter中针对放置目标来设置!
+      e.dataTransfer.dropEffect = "all"; // e.dataTransfer.dropEffect="move";//在dragenter中针对放置目标来设置!
     },
     handleDragEnter(e, item) {
-      e.dataTransfer.effectAllowed = "move"; //为需要移动的元素设置dragstart事件
+      e.dataTransfer.effectAllowed = "all"; //为需要移动的元素设置dragstart事件
       if (item === this.dragging) {
         return;
       }
       console.log(e, item);
-      console.log(this.dragging);
-      const startEleIndex = this.tableData.indexOf(this.dragging);
-      const endEleIndex = this.tableData.indexOf(item);
-      console.log(startEleIndex, endEleIndex);
+      console.log(this.dragging, "dragging");
+      const startEleIndex = this.tableData.indexOf(this.dragging); // 开始的元素位置索引
+
+      const endEleIndex = this.tableData.indexOf(item); // 现在元素位置
+      console.log(startEleIndex, endEleIndex, "元素位置");
 
       if (this.dragging) {
         var startEle = this.tableData[startEleIndex];
         var endEle = this.tableData[endEleIndex];
         console.log(startEle, "初始拖拽值");
         console.log(endEle, "交换拖拽值");
-        this.tableData.splice(startEleIndex, 1, endEle);
-        this.tableData.splice(endEleIndex, 1, startEle);
-        this.dragging = null;
+        console.log(this.tableData, "this.table");
+        this.tableData.splice(startEleIndex, 1, endEle); //删除初始位置的元素--并向现在所属位置添加初始位置的元素
+        // this.indent.splice(startEleIndex,1,this.indent[startEleIndex])
+
+        this.tableData.splice(endEleIndex, 1, startEle); // 删除光标现在所在位置的值---并添加上次光标所在位置的值
+        // this.indent.splice(endEleIndex,1,this.indent[endEleIndex])
+        // this.dragging = null;
       }
 
       //   const newItems = [...this.items];
@@ -171,10 +185,10 @@ export default {
       //   this.items = newItems;
     },
     aa() {
-      console.log("按下");
+      // console.log("按下");
     },
     bb() {
-      console.log("songkai");
+      // console.log("songkai");
     },
     addTS(index, event) {
       console.log(index);
@@ -213,8 +227,8 @@ export default {
       if (this.tableData.length == 0) {
         this.$set(this.tableData, 0, {
           prop: "",
-          isrequired: null,
-          type: "",
+          isrequired: "true",
+          type: "true",
           detail: ""
         });
       }

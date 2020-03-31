@@ -68,17 +68,18 @@
 
     <div class="postData">
       <div class="pd-title">
-        <span @click="changeBottomColor($event,'header-com')">请求头(header)</span>
+        <span @click="changeBottomColor($event,'header-com')" >请求头(header)</span>
         <span @click="changeBottomColor($event,'data-com')" class="colorCode">请求参数(body)</span>
       </div>
       <div class="hd-com">
         <keep-alive>
           <component :is="bindCom" ref="child"></component>
         </keep-alive>
+        
       </div>
       <div class="pd-title">
-        <span @click="changeBottomColor2($event,'header-com')">响应头(header)</span>
-        <span @click="changeBottomColor2($event,'data-com')" class="colorCode2">响应参数(body)</span>
+        <span @click="changeBottomColor2($event,'header-com')" >响应头(header)</span>
+        <span @click="changeBottomColor2($event,'data-com')" class="colorCode2" >响应参数(body)</span>
       </div>
       <div class="hd-com">
         <keep-alive>
@@ -90,10 +91,10 @@
       </div>
       <div class="slData">
         <el-input
+          v-model="textareaCode"
           type="textarea"
           :rows="2"
           placeholder="请输入内容"
-          v-model="JSON.stringify(textarea,null,'\t')"
           :autosize="{ minRows:5, maxRows: 10}"
         ></el-input>
       </div>
@@ -104,7 +105,7 @@
         <p>导入就送数据</p>
     </message-box>
     <div class="tt">
-      <button @click="test()">dianji</button>
+      <button @click="test()">确认</button>
     </div>
   </div>
 </template>
@@ -124,6 +125,7 @@ export default {
     return {
       
       messageboxStatus:false,
+      textareaCode:"",
       textarea: {        
         status: "0",
         msg: "操作成功",
@@ -233,10 +235,12 @@ export default {
     
 
     changeBottomColor(event, value) {
+      debugger;
       if (document.querySelector(".colorCode")) {
         document.querySelector(".colorCode").classList.remove("colorCode");
       }
       event.currentTarget.classList.add("colorCode");
+      debugger;
       console.log(this.bindCom);
       // if (this.bindCom=="data-com"){
       //   this.bindCom="header-com"
@@ -244,6 +248,7 @@ export default {
       //   this.bindCom="data-com"
       // }
       this.bindCom = value;
+      debugger;
     },
     changeBottomColor2(event, value) {
       if (document.querySelector(".colorCode2")) {
@@ -261,6 +266,9 @@ export default {
     test() {
       console.log(this.$refs.child.tableData);
     }
+  },
+  updated(){
+    this.textareaCode=JSON.stringify(this.textarea,null,4)
   }
 };
 </script>
@@ -299,8 +307,8 @@ export default {
   .top-el-form {
     display: flex;
     justify-content: space-between;
-    .top-eft {
-    }
+    // .top-eft {
+    // }
   }
 }
 .postData {

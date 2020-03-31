@@ -33,6 +33,7 @@
         </div>
         <div class="right-top-context">
           <div class="setting" @mouseenter="settingStatus=true" @mouseleave="settingStatus=false">
+          <!-- <div class="setting" @click="settingStatus=!settingStatus"> -->
             <div class="setting-context">
               <div class="settting-name">
                 <div class="setting-name-context">

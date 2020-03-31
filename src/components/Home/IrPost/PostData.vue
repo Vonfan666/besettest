@@ -51,7 +51,16 @@
           </el-select>
         </template>
       </el-table-column>
-
+      <el-table-column label="mock数据">
+        <template slot-scope="scope">
+          <input
+            type="text"
+            class="mock"
+            v-model="tableData[scope.$index].mock"
+            @input="aa(scope.$index,scope.row.name)"
+          />
+        </template>
+      </el-table-column>
       <el-table-column label="描述">
         <template slot-scope="scope">
           <input
@@ -82,12 +91,12 @@ export default {
       dragging: null,
       indent: [], //输入框的边距
       tableData: [
-        { cname: "a", isrequired: "ture", type: "ture", detail: "这是网站1" },
-        { cname: "b", isrequired: "ture", type: "ture", detail: "这是网站2" },
-        { cname: "c", isrequired: "ture", type: "ture", detail: "这是网站3" },
-        { cname: "d", isrequired: "ture", type: "ture", detail: "这是网站4" },
-        { cname: "e", isrequired: "ture", type: "ture", detail: "这是网站5" },
-        { cname: "f", isrequired: "ture", type: "ture", detail: "这是网站6" }
+        { cname: "a", isrequired: "ture", type: "ture",mock:"11", detail: "这是网站1" },
+        { cname: "b", isrequired: "ture", type: "ture",mock:"11", detail: "这是网站2" },
+        { cname: "c", isrequired: "ture", type: "ture",mock:"11", detail: "这是网站3" },
+        { cname: "d", isrequired: "ture", type: "ture", mock:"11",detail: "这是网站4" },
+        { cname: "e", isrequired: "ture", type: "ture",mock:"11", detail: "这是网站5" },
+        { cname: "f", isrequired: "ture", type: "ture",mock:"11", detail: "这是网站6" }
       ]
     };
   },
@@ -130,7 +139,8 @@ export default {
             console.log(endEle,"交换拖拽值")
             this.tableData.splice(startEleIndex,1,endEle)
             this.tableData.splice(endEleIndex,1,startEle)
-            this.dragging=null
+            // this.indent.splice(endEleIndex,1,startEle)
+            // this.dragging=null
       }
       
     //   const newItems = [...this.items];
@@ -153,8 +163,8 @@ export default {
       
       this.tableData.splice(index + 1, 0, {
         prop: "",
-        isrequired: null,
-        type: "",
+        isrequired: "true",
+        type: "true",
         detail: ""
       });
       var tt = this.indent[index];
@@ -163,8 +173,8 @@ export default {
     addTT(){
         this.tableData.push({
         prop: "",
-        isrequired: null,
-        type: "",
+        isrequired: "true",
+        type: "true",
         detail: ""
       });
       this.indent.push(0)
@@ -186,8 +196,8 @@ export default {
       if (this.tableData.length == 0) {
         this.$set(this.tableData, 0, {
           prop: "",
-          isrequired: null,
-          type: "",
+          isrequired: "true",
+          type: "true",
           detail: ""
         });
       }
@@ -224,7 +234,7 @@ export default {
   /* overflow:none !important; */
 }
 
-.hd-header .cname {
+.hd-header .cname ,.mock{
   position: relative;
   /* overflow: visible; */
   border: 1px solid #ffffff;
