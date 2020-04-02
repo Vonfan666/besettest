@@ -82,7 +82,7 @@
           </el-button>
         </span>
         <span class="apbt">
-          <el-button type="primary" size="small" @click="pushData()">
+          <el-button type="primary" size="small" @click="pushData($event)">
             <span class="el-icon-sort"></span> 导入json数据
           </el-button>
         </span>
@@ -94,9 +94,11 @@
 
 <script>
 export default {
+   props: ["msbox","indextp"],  //消息弹窗
   data() {
+    
     return {
-      prop: ["msbox"],
+     
       dragging: null,
       indent: [], //输入框的边距
       tableData: [
@@ -126,9 +128,9 @@ export default {
     };
   },
   methods: {
-    pushData() {
-      console.log(this.msbox);
-      return this.$emit("update:msbox", (this.msbox = !this.msbox));
+    pushData(a) {
+     console.log(this.indextp,"走postHeader")
+      return this.$emit("update:msbox", !this.msbox);
     },
     // draggable 属性规定元素是否可拖动
     // dragstart 事件在用户开始拖动元素或选择的文本时触发

@@ -68,22 +68,21 @@
 
     <div class="postData">
       <div class="pd-title">
-        <span @click="changeBottomColor($event,'header-com')" >请求头(header)</span>
+        <span @click="changeBottomColor($event,'header-com')">请求头(header)</span>
         <span @click="changeBottomColor($event,'data-com')" class="colorCode">请求参数(body)</span>
       </div>
       <div class="hd-com">
         <keep-alive>
-          <component :is="bindCom" ref="child"></component>
+          <component :is="bindCom" ref="child" :msbox.sync="messageboxStatus" :indextp="bindCom"></component>
         </keep-alive>
-        
       </div>
       <div class="pd-title">
-        <span @click="changeBottomColor2($event,'header-com')" >响应头(header)</span>
-        <span @click="changeBottomColor2($event,'data-com')" class="colorCode2" >响应参数(body)</span>
+        <span @click="changeBottomColor2($event,'header-com2')">响应头(header)</span>
+        <span @click="changeBottomColor2($event,'data-com2')" class="colorCode2">响应参数(body)</span>
       </div>
       <div class="hd-com">
         <keep-alive>
-          <component :is="bindCom2" ref="child" :msbox.sync="messageboxStatus"></component>
+          <component :is="bindCom2" ref="child" :msbox.sync="messageboxStatus" :indextp="bindCom2"></component>
         </keep-alive>
       </div>
       <div class="pd-title">
@@ -100,9 +99,24 @@
       </div>
     </div>
     <!-- 新建文件 -->
-
-    <message-box v-if="messageboxStatus" v-slot:postJsonData>
-        <p>导入就送数据</p>
+    
+    <message-box v-if="messageboxStatus" v-slot:postJsonData  :styleCode="styleCode">
+      <p>导入json数据</p>
+      <div class="slData">
+        <el-input
+          v-model="textareaCode"
+          type="textarea"
+          :rows="2"
+          placeholder="请输入内容"
+          :autosize="{ minRows:5, maxRows: 10}"
+        ></el-input>
+        <div>
+          <button  @click="messageboxStatus=false">取消</button>
+          <button>确认</button>
+        </div>
+        
+      </div>
+      
     </message-box>
     <div class="tt">
       <button @click="test()">确认</button>
@@ -119,14 +133,14 @@ export default {
     "data-com": () => import("./IrPost/PostData"),
     "header-com2": () => import("./IrPost/postHeader.vue"),
     "data-com2": () => import("./IrPost/PostData"),
-    "message-box":()=>import("../public/MessageBox.vue")
+    "message-box": () => import("../public/MessageBox.vue")
   },
   data() {
     return {
-      
-      messageboxStatus:false,
-      textareaCode:"",
-      textarea: {        
+      styleCode:"height:320px;width:500px",
+      messageboxStatus: false,
+      textareaCode: "",
+      textarea: {
         status: "0",
         msg: "操作成功",
         result: {
@@ -179,7 +193,7 @@ export default {
         responseStatus: "",
         infaterName: "",
         postAttr: "",
-        interDetail: "",
+        interDetail: ""
       },
       rules: {
         infaterName: [
@@ -187,8 +201,7 @@ export default {
         ],
         postAttr: [
           { required: true, message: "请输入请求地址", trigger: "blur" }
-        ],
-   
+        ]
       },
 
       //后台返回的数据
@@ -232,56 +245,53 @@ export default {
     };
   },
   methods: {
-    
-
     changeBottomColor(event, value) {
-      debugger;
       if (document.querySelector(".colorCode")) {
         document.querySelector(".colorCode").classList.remove("colorCode");
       }
       event.currentTarget.classList.add("colorCode");
-      debugger;
-      console.log(this.bindCom);
+      
       // if (this.bindCom=="data-com"){
       //   this.bindCom="header-com"
       // }else{
       //   this.bindCom="data-com"
       // }
       this.bindCom = value;
-      debugger;
+      console.log(this.bindCom);
     },
     changeBottomColor2(event, value) {
       if (document.querySelector(".colorCode2")) {
         document.querySelector(".colorCode2").classList.remove("colorCode2");
       }
       event.currentTarget.classList.add("colorCode2");
-      console.log(this.bindCom2);
+      
       // if (this.bindCom=="data-com"){
       //   this.bindCom="header-com"
       // }else{
       //   this.bindCom="data-com"
       // }
       this.bindCom2 = value;
+      console.log(this.bindCom2);
     },
     test() {
       console.log(this.$refs.child.tableData);
     }
   },
-  updated(){
-    this.textareaCode=JSON.stringify(this.textarea,null,4)
+  updated() {
+    this.textareaCode = JSON.stringify(this.textarea, null, 4);
   }
 };
 </script>
 
 <style lang="scss" scoped>
-.mbAddFiels{
+.mbAddFiels {
   margin: 10px;
-  .bt-botton{
+  .bt-botton {
     float: right;
     margin-top: 30px;
     margin-right: 20px;
   }
-  .bt-botton .bottom{
+  .bt-botton .bottom {
     margin-left: 20px;
   }
 }

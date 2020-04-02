@@ -2,7 +2,7 @@
   <div class="messageBox">
     <div class="ms-text"></div>
 
-    <div class="mb-text">
+    <div class="mb-text"  :style="styleCode">
       <slot name="addFiels">
       </slot>
       <slot name="postJsonData">
@@ -13,11 +13,17 @@
 
 <script>
 export default {
+  props:["styleCode"],
   data() {
     return {
       test: "ceshi"
+      
     };
-  }
+  },
+  // created(){
+  //   console.log(this.styleCode,"11111")
+  // }
+
 };
 </script>
 
@@ -36,8 +42,8 @@ export default {
 }
 .mb-text {
   position: fixed;
-  width: 500px;
-  height: 200px;
+  // width: 500px;
+  // height: 300px;
   background: white;
   z-index: 101;
   left: 0px;
