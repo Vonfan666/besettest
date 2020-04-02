@@ -5,7 +5,7 @@
 // dragover 当某被拖动的对象在另一对象容器范围内拖动时触发此事件
 // dragenter - 当被鼠标拖动的对象进入其容器范围内时触发此事件
     // dragend - 用户完成元素拖动后触发-->
-    <el-table :data="tableData" style="wight:100%" border>
+    <el-table :data="postData" style="wight:100%" border>
       <el-table-column label="操作">
         <template slot-scope="scope">
           <span class="el-icon-close" @click="removeTS(scope.$index)"></span>
@@ -28,7 +28,7 @@
           <input
             type="text"
             class="cname"
-            v-model="tableData[scope.$index].cname"
+            v-model="postData[scope.$index].cname"
             :style="{ 'text-indent':indent[scope.$index]+'px'}"
           />
         </template>
@@ -36,7 +36,7 @@
 
       <el-table-column label="是否必填" draggable="true">
         <template slot-scope="scope">
-          <el-select v-model="tableData[scope.$index].isrequired">
+          <el-select v-model="postData[scope.$index].isrequired">
             <el-option label="true" value="true"></el-option>
             <el-option label="false" value="false"></el-option>
           </el-select>
@@ -45,7 +45,7 @@
 
       <el-table-column label="类型">
         <template slot-scope="scope">
-          <el-select v-model="tableData[scope.$index].type">
+          <el-select v-model="postData[scope.$index].type">
             <el-option label="true" value="true"></el-option>
             <el-option label="false" value="false"></el-option>
           </el-select>
@@ -56,7 +56,7 @@
           <input
             type="text"
             class="mock"
-            v-model="tableData[scope.$index].mock"
+            v-model="postData[scope.$index].mock"
             @input="aa(scope.$index,scope.row.name)"
           />
         </template>
@@ -66,7 +66,7 @@
           <input
             type="text"
             class="cname"
-            v-model="tableData[scope.$index].detail"
+            v-model="postData[scope.$index].detail"
             @input="aa(scope.$index,scope.row.name)"
           />
         </template>
@@ -93,57 +93,57 @@
 
 <script>
 export default {
-  props:['msbox',"indextp"],
+  props:['msbox',"indextp","postData"],
   data() {
     
     return {
       
       dragging: null,
       indent: [], //输入框的边距
-      tableData: [
-        {
-          cname: "a",
-          isrequired: "ture",
-          type: "ture",
-          mock: "11",
-          detail: "这是网站1"
-        },
-        {
-          cname: "b",
-          isrequired: "ture",
-          type: "ture",
-          mock: "11",
-          detail: "这是网站2"
-        },
-        {
-          cname: "c",
-          isrequired: "ture",
-          type: "ture",
-          mock: "11",
-          detail: "这是网站3"
-        },
-        {
-          cname: "d",
-          isrequired: "ture",
-          type: "ture",
-          mock: "11",
-          detail: "这是网站4"
-        },
-        {
-          cname: "e",
-          isrequired: "ture",
-          type: "ture",
-          mock: "11",
-          detail: "这是网站5"
-        },
-        {
-          cname: "f",
-          isrequired: "ture",
-          type: "ture",
-          mock: "11",
-          detail: "这是网站6"
-        }
-      ]
+      // postData: [
+      //   {
+      //     cname: "a",
+      //     isrequired: "ture",
+      //     type: "ture",
+      //     mock: "11",
+      //     detail: "这是网站1"
+      //   },
+      //   {
+      //     cname: "b",
+      //     isrequired: "ture",
+      //     type: "ture",
+      //     mock: "11",
+      //     detail: "这是网站2"
+      //   },
+      //   {
+      //     cname: "c",
+      //     isrequired: "ture",
+      //     type: "ture",
+      //     mock: "11",
+      //     detail: "这是网站3"
+      //   },
+      //   {
+      //     cname: "d",
+      //     isrequired: "ture",
+      //     type: "ture",
+      //     mock: "11",
+      //     detail: "这是网站4"
+      //   },
+      //   {
+      //     cname: "e",
+      //     isrequired: "ture",
+      //     type: "ture",
+      //     mock: "11",
+      //     detail: "这是网站5"
+      //   },
+      //   {
+      //     cname: "f",
+      //     isrequired: "ture",
+      //     type: "ture",
+      //     mock: "11",
+      //     detail: "这是网站6"
+      //   }
+      // ]
     };
   },
   methods: {
@@ -177,17 +177,17 @@ export default {
       }
       console.log(e, item);
       console.log(this.dragging);
-      const startEleIndex = this.tableData.indexOf(this.dragging);
-      const endEleIndex = this.tableData.indexOf(item);
+      const startEleIndex = this.postData.indexOf(this.dragging);
+      const endEleIndex = this.postData.indexOf(item);
       console.log(startEleIndex, endEleIndex);
 
       if (this.dragging) {
-        var startEle = this.tableData[startEleIndex];
-        var endEle = this.tableData[endEleIndex];
+        var startEle = this.postData[startEleIndex];
+        var endEle = this.postData[endEleIndex];
         console.log(startEle, "初始拖拽值");
         console.log(endEle, "交换拖拽值");
-        this.tableData.splice(startEleIndex, 1, endEle);
-        this.tableData.splice(endEleIndex, 1, startEle);
+        this.postData.splice(startEleIndex, 1, endEle);
+        this.postData.splice(endEleIndex, 1, startEle);
         // this.indent.splice(endEleIndex,1,startEle)
         // this.dragging=null
       }
@@ -210,7 +210,7 @@ export default {
     addTS(index, event) {
       console.log(index);
 
-      this.tableData.splice(index + 1, 0, {
+      this.postData.splice(index + 1, 0, {
         prop: "",
         isrequired: "true",
         type: "true",
@@ -220,7 +220,7 @@ export default {
       this.indent.splice(index + 1, 0, 15 + tt);
     },
     addTT() {
-      this.tableData.push({
+      this.postData.push({
         prop: "",
         isrequired: "true",
         type: "true",
@@ -238,12 +238,14 @@ export default {
     },
     removeTS(index) {
       console.log(index);
-      this.tableData.splice(index, 1);
+      this.postData.splice(index, 1);
       this.indent.splice(index, 1);
     },
     isListData() {
-      if (this.tableData.length == 0) {
-        this.$set(this.tableData, 0, {
+      console.log( this.$parent.postDatasCode,"psiodas")
+     
+      if (this.postData.length == 0  && this.postData.length==undefined) {
+        this.$set(this.postData, 0, {
           prop: "",
           isrequired: "true",
           type: "true",
@@ -253,7 +255,8 @@ export default {
     },
 
     indentMarginLeft() {
-      this.tableData.forEach((item, index) => {
+      console.log(this.postData,"----")
+      this.postData.forEach((item, index) => {
         console.log(index, item);
         this.indent[index] = 0;
       });

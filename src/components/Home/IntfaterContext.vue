@@ -63,6 +63,9 @@
         <el-form-item label="接口描述" label-width="70px">
           <el-input v-model="model.interDetail" clearable placeholder="请输入接口描述"></el-input>
         </el-form-item>
+        <el-form-item label="mock地址" label-width="70px">
+          <el-input v-model="model.mockAttr" clearable placeholder="请确保接口路径填写正确后自动生成mock地址"  readonly=""></el-input>
+        </el-form-item>
       </el-form>
     </div>
 
@@ -73,7 +76,11 @@
       </div>
       <div class="hd-com">
         <keep-alive>
-          <component :is="bindCom" ref="child" :msbox.sync="messageboxStatus" :indextp="bindCom"></component>
+          <component :is="bindCom" ref="child" 
+          :msbox.sync="messageboxStatus" 
+          :indextp="bindCom" 
+          :tableData.sync="postheaders" 
+          :postData.sync="postDatas"></component>
         </keep-alive>
       </div>
       <div class="pd-title">
@@ -82,41 +89,54 @@
       </div>
       <div class="hd-com">
         <keep-alive>
-          <component :is="bindCom2" ref="child" :msbox.sync="messageboxStatus" :indextp="bindCom2"></component>
+          <component :is="bindCom2" ref="child" 
+          :msbox.sync="messageboxStatus" 
+          :indextp="bindCom2" 
+          :tableData.sync="resHeaders"
+          :postData.sync="resDatas"></component>
         </keep-alive>
       </div>
       <div class="pd-title">
         <span class="colorCode3">示例数据</span>
       </div>
       <div class="slData">
+               
+<!--  // this.jsonDemo1 = JSON.stringify(this.jsonDemo, null, 4); -->
         <el-input
-          v-model="textareaCode"
+          v-model="jsonDemo1"
           type="textarea"
           :rows="2"
-          placeholder="请输入内容"
+          
           :autosize="{ minRows:5, maxRows: 10}"
+          
         ></el-input>
       </div>
     </div>
     <!-- 新建文件 -->
-    
-    <message-box v-if="messageboxStatus" v-slot:postJsonData  :styleCode="styleCode">
-      <p>导入json数据</p>
+
+    <message-box v-if="messageboxStatus" v-slot:postJsonData :styleCode="styleCode">
+      <h3 style="text-align:center">导入json数据</h3>
       <div class="slData">
         <el-input
-          v-model="textareaCode"
+          v-model="postJson"
           type="textarea"
           :rows="2"
           placeholder="请输入内容"
-          :autosize="{ minRows:5, maxRows: 10}"
+          :autosize="{ minRows:10, maxRows: 10}"
+          resize=none
+          clearable
         ></el-input>
-        <div>
-          <button  @click="messageboxStatus=false">取消</button>
-          <button>确认</button>
+        <div
+          class="jsonButton"
+          style="
+    bottom: 10px;
+    position: absolute;
+    margin-left: 200px;"
+        >
+          <el-button type="primary" size="small" @click="messageboxStatus=false">取消</el-button>
+          <el-button type="primary" size="small">确认</el-button>
         </div>
-        
       </div>
-      
     </message-box>
     <div class="tt">
       <button @click="test()">确认</button>
@@ -137,10 +157,15 @@ export default {
   },
   data() {
     return {
-      styleCode:"height:320px;width:500px",
-      messageboxStatus: false,
-      textareaCode: "",
-      textarea: {
+      postJson: "", //导入json请求数据
+      returnJson: "", //返回json数据
+      styleCode: "height:340px;width:500px",  //弹出框大小
+      messageboxStatus: false,  //是否展示弹出框
+      // jsonDemoCode: {},  //示例数据
+     
+      // this.jsonDemo1=JSON.stringify(this.jsonDemo, null, 4),
+      jsonDemo:JSON.stringify(
+      {//示例数据
         status: "0",
         msg: "操作成功",
         result: {
@@ -183,17 +208,19 @@ export default {
             }
           ]
         }
-      },
-      bindCom: "data-com",
-      bindCom2: "data-com2",
-      model: {
-        postMethods: "",
-        postType: "",
-        resType: "",
-        responseStatus: "",
-        infaterName: "",
-        postAttr: "",
-        interDetail: ""
+      },null,4),
+      jsonDemo1:null,  //示例数据
+      bindCom: "data-com",  //动态组件名
+      bindCom2: "data-com2",//动态组件名
+      model: {    
+        postMethods: "",   //请求方法
+        postType: "",//请求类型
+        resType: "",//响应类型
+        responseStatus: "",// 固定状态
+        infaterName: "",// 接口名称
+        postAttr: "",//请求地址
+        interDetail: "",//接口描述
+        mockAttr:"", //mock地址
       },
       rules: {
         infaterName: [
@@ -241,22 +268,68 @@ export default {
           { id: 5, name: "IMAGE" },
           { id: 6, name: "BINARY" }
         ]
-      }
+      },
+
+      postheaders: [   //前端输入返回请求头字段
+        { cname: "aaa", isrequired: "ture", type: "ture", detail: "这是请求头1" },
+        { cname: "b", isrequired: "ture", type: "ture", detail: "这是请求头2" },
+        { cname: "c", isrequired: "ture", type: "ture", detail: "这是请求头3" },
+        { cname: "d", isrequired: "ture", type: "ture", detail: "这是请求头4" },
+        { cname: "e", isrequired: "ture", type: "ture", detail: "这是请求头5" },
+        { cname: "f", isrequired: "ture", type: "ture", detail: "这是请求头6" }
+      ],
+      postDatas:[  //输入请求参数
+        { cname: "a2", isrequired: "ture", type: "ture", detail: "这是请求参数1" },
+        { cname: "b2", isrequired: "ture", type: "ture" , detail: "这是请求参数2"},
+        { cname: "c2", isrequired: "ture", type: "ture", detail: "这是请求参数3" },
+        { cname: "d2", isrequired: "ture", type: "ture", detail: "这是请求参数4" },
+        { cname: "e2", isrequired: "ture", type: "ture", detail: "这是请求参数5" },
+        { cname: "f2", isrequired: "ture", type: "ture", detail: "这是请求参数6" }
+      ],
+      resHeaders:[   //后台返回请求头字段
+        { cname: "aaa", isrequired: "ture", type: "ture", detail: "这是响应头1" },
+        { cname: "b", isrequired: "ture", type: "ture", detail: "这是响应头2" },
+        { cname: "c", isrequired: "ture", type: "ture", detail: "这是响应头3" },
+        { cname: "d", isrequired: "ture", type: "ture", detail: "这是响应头4" },
+        { cname: "e", isrequired: "ture", type: "ture", detail: "这是响应头5" },
+        { cname: "f", isrequired: "ture", type: "ture", detail: "这是响应头6" }
+      ],
+      resDatas:[  //返回参数
+        { cname: "a2111", isrequired: "ture", type: "ture", detail: "这是返回参数1" },
+        { cname: "b2", isrequired: "ture", type: "ture" , detail: "这是返回参数2"},
+        { cname: "c2", isrequired: "ture", type: "ture", detail: "这是请返回参数3" },
+        { cname: "d2", isrequired: "ture", type: "ture", detail: "这是返回参数4" },
+        { cname: "e2", isrequired: "ture", type: "ture", detail: "这是返回参数5" },
+        { cname: "f2", isrequired: "ture", type: "ture", detail: "这是返回参数6" }
+      ],
+      
     };
   },
   methods: {
     changeBottomColor(event, value) {
+      this.bus.$emit("loading", true);
       if (document.querySelector(".colorCode")) {
         document.querySelector(".colorCode").classList.remove("colorCode");
       }
       event.currentTarget.classList.add("colorCode");
-      
+
       // if (this.bindCom=="data-com"){
       //   this.bindCom="header-com"
       // }else{
       //   this.bindCom="data-com"
       // }
+
+      // console.log(this.tableDataCode)
+      // if(value=="header-com"){
+      //   this.tableDataCode=this.postheaders
+      // }else if(value=="data-com"){
+      //   console.log(value,"va;uie")
+      //   this.postDatasCode=this.postDatas
+      // }
       this.bindCom = value;
+      
+      this.bus.$emit("loading", true);
+      // debugger
       console.log(this.bindCom);
     },
     changeBottomColor2(event, value) {
@@ -264,7 +337,11 @@ export default {
         document.querySelector(".colorCode2").classList.remove("colorCode2");
       }
       event.currentTarget.classList.add("colorCode2");
-      
+      // if(value=="header-com2"){
+      //   this.tableDataCode=this.resHeaders
+      // }else if(value=="data-com2"){
+      //   this.postDatasCode=this.resDatas
+      // }
       // if (this.bindCom=="data-com"){
       //   this.bindCom="header-com"
       // }else{
@@ -274,11 +351,22 @@ export default {
       console.log(this.bindCom2);
     },
     test() {
-      console.log(this.$refs.child.tableData);
+      console.log(this.postheaders);
+      console.log(this.postDatas);
+      console.log(this.resDatas)
+      
+    }
+  },
+  created(){
+    if(this.jsonDemo1){}else{
+      this.jsonDemo1=this.jsonDemo
     }
   },
   updated() {
-    this.textareaCode = JSON.stringify(this.textarea, null, 4);
+    // this.jsonDemo1=JSON.stringify(this.jsonDemo, null, 4),
+    // this.jsonDemo1=JSON.stringify(this.jsonDemo1, null, 4),
+    console.log(this.postheaders)
+    
   }
 };
 </script>

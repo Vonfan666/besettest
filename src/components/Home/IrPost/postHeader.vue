@@ -29,7 +29,7 @@
             type="text"
             class="cname"
             v-model="tableData[scope.$index].cname"
-            :style="{ 'text-indent':indent[scope.$index]+'px'}"
+            :style="{ 'text-indent':indent[scope.$index]+'px'}" 
           />
         </template>
       </el-table-column>
@@ -67,7 +67,7 @@
           <input
             type="text"
             class="mock"
-            v-model="tableData[scope.$index].mock"
+            v-model="tableData[scope.$index].detail"
             @input="aa(scope.$index,scope.row.name)"
           />
         </template>
@@ -94,37 +94,37 @@
 
 <script>
 export default {
-   props: ["msbox","indextp"],  //消息弹窗
+   props: ["msbox","indextp","tableData"],  //消息弹窗
   data() {
     
     return {
      
       dragging: null,
       indent: [], //输入框的边距
-      tableData: [
-        { cname: "a", isrequired: "ture", type: "ture", detail: "这是网站1" },
-        { cname: "b", isrequired: "ture", type: "ture", detail: "这是网站2" },
-        { cname: "c", isrequired: "ture", type: "ture", detail: "这是网站3" },
-        { cname: "d", isrequired: "ture", type: "ture", detail: "这是网站4" },
-        { cname: "e", isrequired: "ture", type: "ture", detail: "这是网站5" },
-        { cname: "f", isrequired: "ture", type: "ture", detail: "这是网站6" }
-      ],
-      postHeader: [
-        { cname: "a1", isrequired: "ture", type: "ture", detail: "这是网站1"},
-        { cname: "b1", isrequired: "ture", type: "ture", detail: "这是网站2" },
-        { cname: "c1", isrequired: "ture", type: "ture", detail: "这是网站3" },
-        { cname: "d1", isrequired: "ture", type: "ture", detail: "这是网站4"},
-        { cname: "e1", isrequired: "ture", type: "ture", detail: "这是网站5" },
-        { cname: "f1", isrequired: "ture", type: "ture", detail: "这是网站6"}
-      ],
-      postData: [
-        { cname: "a2", isrequired: "ture", type: "ture", detail: "这是网站1" },
-        { cname: "b2", isrequired: "ture", type: "ture" , detail: "这是网站2"},
-        { cname: "c2", isrequired: "ture", type: "ture", detail: "这是网站3" },
-        { cname: "d2", isrequired: "ture", type: "ture", detail: "这是网站4" },
-        { cname: "e2", isrequired: "ture", type: "ture", detail: "这是网站5" },
-        { cname: "f2", isrequired: "ture", type: "ture", detail: "这是网站6" }
-      ]
+      // tableData: [
+      //   { cname: "aaa", isrequired: "ture", type: "ture", detail: "这是请求头1" },
+      //   { cname: "b", isrequired: "ture", type: "ture", detail: "这是请求头2" },
+      //   { cname: "c", isrequired: "ture", type: "ture", detail: "这是请求头3" },
+      //   { cname: "d", isrequired: "ture", type: "ture", detail: "这是请求头4" },
+      //   { cname: "e", isrequired: "ture", type: "ture", detail: "这是请求头5" },
+      //   { cname: "f", isrequired: "ture", type: "ture", detail: "这是请求头6" }
+      // ],
+      // postHeader: [
+      //   { cname: "a1", isrequired: "ture", type: "ture", detail: "这是网站1"},
+      //   { cname: "b1", isrequired: "ture", type: "ture", detail: "这是网站2" },
+      //   { cname: "c1", isrequired: "ture", type: "ture", detail: "这是网站3" },
+      //   { cname: "d1", isrequired: "ture", type: "ture", detail: "这是网站4"},
+      //   { cname: "e1", isrequired: "ture", type: "ture", detail: "这是网站5" },
+      //   { cname: "f1", isrequired: "ture", type: "ture", detail: "这是网站6"}
+      // ],
+      // postData: [
+      //   { cname: "a2", isrequired: "ture", type: "ture", detail: "这是请求参数1" },
+      //   { cname: "b2", isrequired: "ture", type: "ture" , detail: "这是请求参数2"},
+      //   { cname: "c2", isrequired: "ture", type: "ture", detail: "这是请求参数3" },
+      //   { cname: "d2", isrequired: "ture", type: "ture", detail: "这是请求参数4" },
+      //   { cname: "e2", isrequired: "ture", type: "ture", detail: "这是请求参数5" },
+      //   { cname: "f2", isrequired: "ture", type: "ture", detail: "这是请求参数6" }
+      // ]
     };
   },
   methods: {
