@@ -11,3 +11,9 @@ export  const regist = (params) => {
     return postRequest('/users/registers/', params)
 }
 
+export  const login = (params) => {
+    return postRequest('/users/login/', params)
+}
+
+
+

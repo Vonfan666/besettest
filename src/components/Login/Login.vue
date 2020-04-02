@@ -37,7 +37,9 @@
 import valids from "@/libs/validate.js";
 // import Regist from "./regist";
 import forgetpassword from "./Forgetpassworf"
-import { department } from "@/axios/api.js"
+import { department,login } from "@/axios/api.js"
+import { Message } from "element-ui";
+import storage from "@/libs/storage.js"
 export default {
   data() {
     return {
@@ -64,6 +66,15 @@ export default {
     submit() {
       this.$refs.login.validate(valid => {
         if (valid) {
+            login(this.loginForm).then((res)=>{
+              console.log(res)
+              cookie.setCookie("name",this.userName)
+              cookie.setCookie("token",res.data.token,7)
+
+              this.$router.push({path:"/BesetTest/home"})
+            }).catch((error)=>{
+              Message.error("服务器错误")
+            })
         } else {
         }
       });

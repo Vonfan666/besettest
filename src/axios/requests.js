@@ -62,7 +62,8 @@ axios.interceptors.response.use(response=>{
 },(err) => {
     // 返回状态码不为200时候的错误处理
     console.log(err,"这个执行啥")
-    Message.error(err.toString());
+    // Message.error(err.toString());
+    Message.error("服务器错误");
     return Promise.resolve(err);
 })
 
