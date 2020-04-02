@@ -7,8 +7,10 @@
 </template>
 
 <script>
+import loading from "@/components/public/loading.vue"
 export default {
-  name: 'App'
+  name: 'App',
+  components:{loading}
 }
 </script>
 

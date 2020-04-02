@@ -39,10 +39,22 @@
                   <span :class="iconOpen[index]"></span>
                   <span class="name" :id="item.id">{{item.name}}</span>
                 </div>
-                <div class="addText" @click="addContext($event,item.id,index)">
-                  <div class="addtext-code">
+                <div class="addText">
+                  <!-- <div class="addtext-code">
                     <span class="el-icon-plus it-icon-addtext"></span>
-                  </div>
+                    <span class="it-box"  style="display:none">删除</span>
+                  </div>-->
+                  <el-dropdown class="it-text-pop" @command="FatherSet">
+                    <span class="el-dropdown-link">
+                      <i class="el-icon-arrow-down"></i>
+                    </span>
+                    <el-dropdown-menu slot="dropdown">
+                      <el-dropdown-item :command="['a',item.id,index]">添加</el-dropdown-item>
+                      <el-dropdown-item :command="['b',item.id,index]">重命名</el-dropdown-item>
+                      <!-- <el-dropdown-item :command="['c',item.id,index]">复制</el-dropdown-item> -->
+                      <el-dropdown-item :command="['c',item.id,index]">删除</el-dropdown-item>
+                    </el-dropdown-menu>
+                  </el-dropdown>
                 </div>
               </dt>
               <div v-if="directions[index]">
@@ -136,7 +148,7 @@ import InfaterContext from "./IntfaterContext.vue";
 export default {
   components: {
     "ir-con": InfaterContext,
-    "message-box":()=>import("../public/MessageBox.vue")
+    "message-box": () => import("../public/MessageBox.vue")
   },
   data() {
     return {
@@ -150,10 +162,14 @@ export default {
       iconStatus: false,
       searchName: "", //输入框输入内容
       updateFiels: {
-        updateFiels: "",//修改文件
+        updateFiels: "", //修改文件
         fielsName: "" //新增文件名称
       },
-    
+      // fatherFile:{
+      //   addFatherFile:"",      //新增文件夹的名称
+      //   updateFatherFile:"",
+      // },
+
       dialogTableVisible: false,
       dialogFormVisible: false,
       rules: {
@@ -214,6 +230,31 @@ export default {
     };
   },
   methods: {
+    open2(msg) {
+      this.$message({
+        showClose: true,
+        message: msg,
+        type: "success",
+        duration: "1000"
+      });
+    },
+    FatherSet(command) {
+      if (command[0] == "a") {
+        this.openAdd(command, "添加文件", "文件名称", "添加成功", "取消添加");
+        console.log(this.directions)
+        // this.directions[command[2]]=true
+        this.$set(this.directions,command[2],true)
+
+      }
+      if (command[0]=="b"){
+        this.openAdd(command, "修改文件名称", "文件名称", "修改成功", "取消修改");
+      }
+      if(command[0]=="c"){
+
+            this.list.splice(command[2],1)
+            this.open2("删除成功")
+      }
+    },
     addFielsSubmit() {
       this.$refs.refAddfiles.validate(valid => {
         if (valid) {
@@ -236,7 +277,7 @@ export default {
     addFiles() {
       this.mbFielsStutas = !this.mbFielsStutas;
     },
-    addContext(event, id, index) {
+    addContext(id, index) {
       //文件夹下添加接口
       var count = this.list[index].Clist.length;
       console.log(count, typeof count);
@@ -340,10 +381,16 @@ export default {
       //先请求接口--修改成功之后--在修改data
       console.log("请求接口修改名称");
       // this.list[lindex].Clist[cindex].name="11111"
-      console.log(command);
+      // console.log(command);
       if (command.type == "a") {
         //在if里面先提交后台修改名称成功之后--然后在执行--否则直接失败
-        var value = this.open3(command);
+        this.open3(
+          command,
+          "请输入您要修改的名称",
+          "修改接口名称",
+          "修改成功",
+          "取消修改"
+        );
       }
       if (command.type == "b") {
         //先提交后台修改名称成功之后--然后在执行--否则直接失败
@@ -380,26 +427,63 @@ export default {
         }
       });
     },
-    open3(command) {
-      this.$prompt("请输入您要修改的名称", "修改接口名称", {
+    open3(command, title1, title2, msgSucsess, msgFail) {
+      this.$prompt(title1, title2, {
         confirmButtonText: "确定",
         cancelButtonText: "取消"
       })
         .then(({ value }) => {
+          console.log(value);
           this.$message({
             type: "success",
-            message: "修改成功"
+            message: msgSucsess
           });
           this.list[command.index].Clist[command.index1].name = value;
         })
         .catch(() => {
           this.$message({
             type: "info",
-            message: "取消修改"
+            message: msgFail
           });
         });
-    }
+    },
+    //  添加文件夹调用该方法
+    openAdd(command, title1, title2, msgSucsess, msgFail) {
+      this.$prompt(title1, title2, {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消"
+      })
+        .then(({ value }) => {
+          this.$message({
+            type: "success",
+            message: msgSucsess
+          });
+          if(command[0]=="a"){
+            var count = this.list[command[2]].Clist.length;
+          console.log(this.list[command[2]])
+          this.$set(this.list[command[2]].Clist, count, {
+              id: count,
+              name: value
+            });
+          };
+          if(command[0]=="b"){
+            this.list[command[2]].name=value
+          }
+          
+
+          
+          
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: msgFail
+          });
+        });
+    },
+
   },
+
   created() {
     console.log(8888);
     this.aa();
@@ -421,18 +505,17 @@ export default {
 //     height: 100%;
 //     background: white;
 //   }
-.mbAddFiels{
+.mbAddFiels {
   margin: 10px;
-  .bt-botton{
+  .bt-botton {
     margin-top: 50px;
     margin-right: 20px;
     display: flex;
-    justify-content:center;
+    justify-content: center;
   }
-  .bt-botton .bottom{
+  .bt-botton .bottom {
     margin-left: 20px;
   }
- 
 }
 .backColor {
   background: grey;
@@ -558,7 +641,7 @@ export default {
   cursor: pointer;
 }
 .addText {
-  display: inline-block;
+  // display: inline-block;
   width: 10%;
   height: 100%;
   text-align: center;
@@ -634,8 +717,8 @@ dl {
   position: absolute;
   left: 10px;
 }
-.other .el-input--suffix {
-}
+/* .other .el-input--suffix {
+} */
 .other .el-form-item__label {
   color: black;
   margin-left: 10px;
@@ -652,7 +735,11 @@ dl {
   padding: 0;
   padding-top: 20px;
 }
- .mbAddFiels .el-form-item__label{
-    color: #606266
-  }
+.mbAddFiels .el-form-item__label {
+  color: #606266;
+}
+
+.addText:hover it-box {
+  display: block;
+}
 </style>
