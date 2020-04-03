@@ -129,6 +129,7 @@ export default {
   },
   methods: {
     pushData(a) {
+      this.$parent.postType=this.indextp
      console.log(this.indextp,"走postHeader")
       return this.$emit("update:msbox", !this.msbox);
     },

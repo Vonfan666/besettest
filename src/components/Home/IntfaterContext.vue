@@ -89,7 +89,7 @@
       </div>
       <div class="hd-com">
         <keep-alive>
-          <component :is="bindCom2" ref="child" 
+          <component :is="bindCom2" ref="child2" 
           :msbox.sync="messageboxStatus" 
           :indextp="bindCom2" 
           :tableData.sync="resHeaders"
@@ -129,12 +129,12 @@
         <div
           class="jsonButton"
           style="
-    bottom: 10px;
-    position: absolute;
-    margin-left: 200px;"
+            bottom: 10px;
+            position: absolute;
+            margin-left: 200px;"
         >
           <el-button type="primary" size="small" @click="messageboxStatus=false">取消</el-button>
-          <el-button type="primary" size="small">确认</el-button>
+          <el-button type="primary" size="small" @click="postJsonSubmit()">确认</el-button>
         </div>
       </div>
     </message-box>
@@ -157,8 +157,9 @@ export default {
   },
   data() {
     return {
-      postJson: "", //导入json请求数据
-      returnJson: "", //返回json数据
+      postType:"",  //在导入json数据时，通过子组件点击导入json数据时修改该值，从而确定导入json所属模块
+      postJson: "", //导入json数据
+      // returnJson: "", //返回json数据
       styleCode: "height:340px;width:500px",  //弹出框大小
       messageboxStatus: false,  //是否展示弹出框
       // jsonDemoCode: {},  //示例数据
@@ -207,7 +208,8 @@ export default {
               desc: "ddd"
             }
           ]
-        }
+        },
+        "cao":"1"
       },null,4),
       jsonDemo1:null,  //示例数据
       bindCom: "data-com",  //动态组件名
@@ -306,6 +308,68 @@ export default {
     };
   },
   methods: {
+      postJsonSubmit(){   //确认json数据提交
+        console.log(this.bindCom);
+        console.log(this.postType,"postType")
+        if(this.postType=="header-com"){
+          this.newJson(JSON.parse(this.postJson),this.postheaders)
+          
+        }
+      },
+
+    newJson(a,b){   //a是导入的数据   b是原来存在的数据
+
+      var listA=Object.keys(a)
+
+      var initLenght=this.$refs.child.indent.length   //初始长度
+      // var postheadersLenght=this.postheaders.length  //未新增之前最大长度
+      listA.forEach((item,index)=>{
+        var postheadersLenght=this.postheaders.length  //实时最大长度
+
+          //索引最大值
+          console.log("实时最大长度",postheadersLenght)
+        if(typeof(a[item]) ==  "object" ){     
+          var indexd=postheadersLenght
+
+          console.log(indexd,index,"dasdsas")
+          this.listFor(a[item],indexd)
+          // console.log(a[item],"whiqhweiqhwheuiewq")
+        }
+        this.$refs.child.indent.splice(postheadersLenght,0,0)
+
+        b.splice(postheadersLenght,0,{ "cname":item,"isrequired": "ture", "type": "ture"," detail":""})
+
+
+        
+      })
+      // console.log(this.$refs.child.indent)
+    },
+
+    listFor(data,indexd){
+      
+      // console.log(data,"daya")
+      // console.log(typeof data,"类型")
+      var  listB=Object.keys(data)
+      console.log(indexd,"-------------")
+      listB.forEach((item,index)=>{
+        // console.log(typeof(data[item]),"zheshi ")
+        console.log(item,index,indexd,"+++++++")
+        this.postheaders.splice(indexd+index,0,{ "cname":item,"isrequired": "ture", "type": "ture"," detail":""})  //在原来的基础上添加数据
+        console.log(indexd,"啥情况")
+        this.$refs.child.indent.splice(indexd+index,0,this.$refs.child.indent[indexd-index-1]+15)  //
+        
+        if(typeof(data[item]) ==  "object"){  //递归
+          var a =this.postheaders.length
+          console.log(data[item])
+          this.listFor(data[item],a)
+          console.log(indexd,"最后的打印indexd")
+
+        }
+
+      }
+      )
+    },
+
     changeBottomColor(event, value) {
       this.bus.$emit("loading", true);
       if (document.querySelector(".colorCode")) {
