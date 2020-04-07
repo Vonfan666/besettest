@@ -157,12 +157,19 @@ export default {
   },
   data() {
     return {
+      
       postType:"",  //在导入json数据时，通过子组件点击导入json数据时修改该值，从而确定导入json所属模块
-      postJson: "", //导入json数据
-      // returnJson: "", //返回json数据
+      postJson: "", //导入json数据,临时存储
+      returnJson: "", //返回json数据,临时存储
+      // treeList:[],  //定义一个空列表，将从第一个值开始一个个append到列表，从而得到一个树状
+      // treeDict:{},
       styleCode: "height:340px;width:500px",  //弹出框大小
       messageboxStatus: false,  //是否展示弹出框
       // jsonDemoCode: {},  //示例数据
+      postJHeader:"", //导入的请求头数据
+      postJData:"", //导入的请求参数
+      resJHeader:"",// 返回的请求头数据
+      resJData:"", // 返回的请求数据
      
       // this.jsonDemo1=JSON.stringify(this.jsonDemo, null, 4),
       jsonDemo:JSON.stringify(
@@ -273,7 +280,7 @@ export default {
       },
 
       postheaders: [   //前端输入返回请求头字段
-        { cname: "aaa", isrequired: "ture", type: "ture", detail: "这是请求头1" },
+        { cname: "aaa111", isrequired: "ture", type: "ture", detail: "这是请求头1" ,children:[]},
         { cname: "b", isrequired: "ture", type: "ture", detail: "这是请求头2" },
         { cname: "c", isrequired: "ture", type: "ture", detail: "这是请求头3" },
         { cname: "d", isrequired: "ture", type: "ture", detail: "这是请求头4" },
@@ -304,123 +311,165 @@ export default {
         { cname: "e2", isrequired: "ture", type: "ture", detail: "这是返回参数5" },
         { cname: "f2", isrequired: "ture", type: "ture", detail: "这是返回参数6" }
       ],
+      type:["string","number","boolean","object","array","file","null"]
       
     };
   },
   methods: {
-      postJsonSubmit(){   //确认json数据提交
-        console.log(this.bindCom);
-        console.log(this.postType,"postType")
+    postJsonSubmit(){   //确认json数据提交
+      console.log(this.bindCom);
+      console.log(this.postType,"postType");
+      try{
         if(this.postType=="header-com"){
-          this.newJson(JSON.parse(this.postJson),this.postheaders)
-          
+              this.postJHeader=JSON.parse(this.postJson)
+              console.log(typeof this.postJHeader)
+              // console.log(postJson)
+              if(this.postJHeader instanceof Array){
+                this.open3("数据格式不能是数组","warning")
+              }else if(this.postJHeader instanceof Object){
+                this.jsonMethod(JSON.parse(this.postJson),this.postheaders)
+                this.messageboxStatus=!this.messageboxStatus
+                this.open3("数据导入成功","success")
+              }else if(this.postJHeader==null || this.postJHeader==""){
+                this.open3("数据不能为空","warning")
+              }else{
+                this.open3("数据格式错误","warning")
+              }
+              
+
         }
-      },
-
-    newJson(a,b){   //a是导入的数据   b是原来存在的数据
-
-      var listA=Object.keys(a)
-
-      var initLenght=this.$refs.child.indent.length   //初始长度
-      // var postheadersLenght=this.postheaders.length  //未新增之前最大长度
-      listA.forEach((item,index)=>{
-        var postheadersLenght=this.postheaders.length  //实时最大长度
-
-          //索引最大值
-          console.log("实时最大长度",postheadersLenght)
-        if(typeof(a[item]) ==  "object" ){     
-          var indexd=postheadersLenght
-
-          console.log(indexd,index,"dasdsas")
-          this.listFor(a[item],indexd)
-          // console.log(a[item],"whiqhweiqhwheuiewq")
         }
-        this.$refs.child.indent.splice(postheadersLenght,0,0)
-
-        b.splice(postheadersLenght,0,{ "cname":item,"isrequired": "ture", "type": "ture"," detail":""})
-
-
-        
-      })
-      // console.log(this.$refs.child.indent)
+      catch(e){
+        console.log(e,"1111")
+        this.open3("数据格式有误,请认真检查后上传","warning")
+      };
+      
     },
 
-    listFor(data,indexd){
-      
-      // console.log(data,"daya")
-      // console.log(typeof data,"类型")
-      var  listB=Object.keys(data)
-      console.log(indexd,"-------------")
-      listB.forEach((item,index)=>{
-        // console.log(typeof(data[item]),"zheshi ")
-        console.log(item,index,indexd,"+++++++")
-        this.postheaders.splice(indexd+index,0,{ "cname":item,"isrequired": "ture", "type": "ture"," detail":""})  //在原来的基础上添加数据
-        console.log(indexd,"啥情况")
-        this.$refs.child.indent.splice(indexd+index,0,this.$refs.child.indent[indexd-index-1]+15)  //
-        
-        if(typeof(data[item]) ==  "object"){  //递归
-          var a =this.postheaders.length
-          console.log(data[item])
-          this.listFor(data[item],a)
-          console.log(indexd,"最后的打印indexd")
-
+    jsonMethod(newData,oldData){
+      var  falg=0
+      var fatherList=Object.keys(newData)
+      console.log(fatherList)
+      fatherList.forEach((item,index)=>{
+        console.log(item,index)
+        if(typeof newData[item]=="object"){
+          console.log("找到对象")
+          oldData.splice(oldData.length,0,{ cname: item, isrequired: "ture", type: typeof item, detail: "" })  //如果是对象则先把这个字段加入对应列表
+          this.$refs.child.indent.push(falg)   //如果是对象则先把这个字段加入对应的边距列表，
+          this.forE(newData[item],falg+15,oldData)  //然后继续遍历其下的内容
+        }else{
+          oldData.splice(oldData.length,0,{ cname: item, isrequired: "ture", type: typeof item, detail: "" })
+          this.$refs.child.indent.push(falg)
         }
+      })
+    },
+    forE(obj,falg,oldData){
+      // 三种情况  1 对象包含list  list包含对象   对象list并存
+      console.log("进入递归循环",falg)
+      if(obj instanceof Array){  //判断对象是否为列表
+          //如果是一个list--首先得记住他的父id或者是属于第几层循环
+          var n=obj.length-1
+          obj.splice(0,n)
+          //以上两句是去掉list几个其他的,list只需要一个字段就好了
+          obj.forEach((item,index)=>{
+            console.log(item,index)
+              if(typeof obj[index]=="object"){
+              // oldData.splice({ cname: item, isrequired: "ture", type: "ture", detail: "" })  //如果是对象则先把这个字段加入对应列表
+              // this.$refs.child.indent.push(falg) //如果是对象则先把这个字段加入对应的边距列表，
+              this.forE(obj[index],falg,oldData) //然后继续遍历其下的内容
 
+              }else{
+                oldData.splice(oldData.length,0,{ cname: item, isrequired: "ture", type: typeof item, detail: "" })
+              this.$refs.child.indent.push(falg)
+              }
+          })
+          
+          // this.forE(item,index)
+          console.log(1111)
+
+      }else{
+        Object.keys(obj).forEach((item,index)=>{
+          //如果里面包含字典
+          if(typeof obj[item]=="object"){
+            var typeCode=typeof obj[item]
+            if(obj[item] instanceof Array){
+              var typeCode="Array"
+            }
+            oldData.splice(oldData.length,0,{ cname: item, isrequired: "ture", type: typeCode, detail: "" })  //如果是对象则先把这个字段加入对应列表
+            this.$refs.child.indent.push(falg) //如果是对象则先把这个字段加入对应的边距列表，
+            this.forE(obj[item],falg+15,oldData) //然后继续遍历其下的内容
+            console.log("最后一次flag",falg)
+          }else{
+            //如果里面只有键值对
+            oldData.splice(oldData.length,0,{ cname: item, isrequired: "ture", type: typeof item, detail: "" })
+            this.$refs.child.indent.push(falg)
+          }
+          
+
+        })
       }
-      )
+      console.log(falg,"fall")
     },
 
     changeBottomColor(event, value) {
-      this.bus.$emit("loading", true);
-      if (document.querySelector(".colorCode")) {
-        document.querySelector(".colorCode").classList.remove("colorCode");
-      }
-      event.currentTarget.classList.add("colorCode");
+    this.bus.$emit("loading", true);
+    if (document.querySelector(".colorCode")) {
+      document.querySelector(".colorCode").classList.remove("colorCode");
+    }
+    event.currentTarget.classList.add("colorCode");
 
-      // if (this.bindCom=="data-com"){
-      //   this.bindCom="header-com"
-      // }else{
-      //   this.bindCom="data-com"
-      // }
+    // if (this.bindCom=="data-com"){
+    //   this.bindCom="header-com"
+    // }else{
+    //   this.bindCom="data-com"
+    // }
 
-      // console.log(this.tableDataCode)
-      // if(value=="header-com"){
-      //   this.tableDataCode=this.postheaders
-      // }else if(value=="data-com"){
-      //   console.log(value,"va;uie")
-      //   this.postDatasCode=this.postDatas
-      // }
-      this.bindCom = value;
-      
-      this.bus.$emit("loading", true);
-      // debugger
-      console.log(this.bindCom);
+    // console.log(this.tableDataCode)
+    // if(value=="header-com"){
+    //   this.tableDataCode=this.postheaders
+    // }else if(value=="data-com"){
+    //   console.log(value,"va;uie")
+    //   this.postDatasCode=this.postDatas
+    // }
+    this.bindCom = value;
+
+    this.bus.$emit("loading", true);
+    // debugger
+    console.log(this.bindCom);
     },
     changeBottomColor2(event, value) {
-      if (document.querySelector(".colorCode2")) {
-        document.querySelector(".colorCode2").classList.remove("colorCode2");
-      }
-      event.currentTarget.classList.add("colorCode2");
-      // if(value=="header-com2"){
-      //   this.tableDataCode=this.resHeaders
-      // }else if(value=="data-com2"){
-      //   this.postDatasCode=this.resDatas
-      // }
-      // if (this.bindCom=="data-com"){
-      //   this.bindCom="header-com"
-      // }else{
-      //   this.bindCom="data-com"
-      // }
-      this.bindCom2 = value;
-      console.log(this.bindCom2);
+    if (document.querySelector(".colorCode2")) {
+      document.querySelector(".colorCode2").classList.remove("colorCode2");
+    }
+    event.currentTarget.classList.add("colorCode2");
+    // if(value=="header-com2"){
+    //   this.tableDataCode=this.resHeaders
+    // }else if(value=="data-com2"){
+    //   this.postDatasCode=this.resDatas
+    // }
+    // if (this.bindCom=="data-com"){
+    //   this.bindCom="header-com"
+    // }else{
+    //   this.bindCom="data-com"
+    // }
+    this.bindCom2 = value;
+    console.log(this.bindCom2);
     },
     test() {
       console.log(this.postheaders);
       console.log(this.postDatas);
       console.log(this.resDatas)
       
-    }
+    },
+    open3(msg,status) {
+    this.$message({
+      message: msg,
+      type: status
+    })
   },
+
+  },
+  
   created(){
     if(this.jsonDemo1){}else{
       this.jsonDemo1=this.jsonDemo

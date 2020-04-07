@@ -130,7 +130,7 @@ export default {
   methods: {
     pushData(a) {
       this.$parent.postType=this.indextp
-     console.log(this.indextp,"走postHeader")
+      console.log(this.indextp,"走postHeader")
       return this.$emit("update:msbox", !this.msbox);
     },
     // draggable 属性规定元素是否可拖动
