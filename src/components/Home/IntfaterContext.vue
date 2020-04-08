@@ -139,7 +139,7 @@
                   class="inline-input"
                   v-model="selected[index]['keys']"
                   :fetch-suggestions="querySearch"
-                  placeholder="请输入内容"
+                  placeholder="请输入变量名"
                   :trigger-on-focus="false"
                   @select="handleSelect(item.keys,index)"
                 ></el-autocomplete>
@@ -147,10 +147,10 @@
               <div class="right">
                 <el-form :model="Environment">
                   <el-form-item label="value" label-width="70px">
-                    <el-input v-model="Environment.value[index]" clearable placeholder="请输入接口名称"></el-input>
+                    <el-input v-model="Environment.value[index]" clearable placeholder="自动返回变量的值"></el-input>
                   </el-form-item>
                   <div class="icon">
-                    <span class="el-icon-remove-outline" @click="removeEnvironment(index)"></span>
+                    <span class="el-icon-remove-outline" @click="removeEnvironment(index)" :disabled="disabled"></span>
 
                     <!-- el-icon-remove-outline -->
                     <span class="el-icon-circle-plus-outline" @click="addEnvironment(index)"></span>
@@ -222,6 +222,7 @@ export default {
   },
   data() {
     return {
+      disabled:false,
       Environment: {
         value: []
       },
@@ -230,7 +231,6 @@ export default {
       restaurants: [], //将对象所有key放到一个列表--先把后端返回的内容的key全部组成一个数组放到这里，
       selected: [
         { keys: "", value: "" },
-        { keys: "", value: "" }
       ],
       postType: "", //在导入json数据时，通过子组件点击导入json数据时修改该值，从而确定导入json所属模块
       postJson: "", //导入json数据,临时存储
@@ -366,11 +366,11 @@ export default {
           detail: "这是请求头1",
           children: []
         },
-        { cname: "b", isrequired: "ture", type: "ture", detail: "这是请求头2" },
-        { cname: "c", isrequired: "ture", type: "ture", detail: "这是请求头3" },
-        { cname: "d", isrequired: "ture", type: "ture", detail: "这是请求头4" },
-        { cname: "e", isrequired: "ture", type: "ture", detail: "这是请求头5" },
-        { cname: "f", isrequired: "ture", type: "ture", detail: "这是请求头6" }
+        { cname: "b", isrequired: "ture", type: "ture", detail: "这是请求头2" ,children: []},
+        { cname: "c", isrequired: "ture", type: "ture", detail: "这是请求头3" ,children: []},
+        { cname: "d", isrequired: "ture", type: "ture", detail: "这是请求头4" ,children: []},
+        { cname: "e", isrequired: "ture", type: "ture", detail: "这是请求头5" ,children: []},
+        { cname: "f", isrequired: "ture", type: "ture", detail: "这是请求头6" ,children: []}
       ],
       postDatas: [
         //输入请求参数
@@ -520,10 +520,31 @@ export default {
   },
   methods: {
     addEnvironment(index) {
-      this.selected.splice(index + 1, 0, { keys: "", value: "" });
-      console.log(this.selected, "zuihou");
+      
+      this.selected.splice(index + 1, 0, { keys: "e", value: "t" });
+      
+      this.Environment.value.splice(index+1,0,"t")
+      this.restaurants.splice(index+1,0,"")
+      this.valueStatus.splice(index+1,0,"")
+      console.log(this.selected, "selected");
+      console.log(this.selected, "Environment");
+      console.log(this.selected, "restaurants");
+      console.log(this.selected, "valueStatus");
     },
-    removeEnvironment(index) {},
+    removeEnvironment(index) {
+      if(this.selected.length==1){
+        console.log("--------------------")
+        // document.querySelector(".el-icon-remove-outline").style.color="#606266"
+        this.disabled="disabled"
+      }else{
+        this.selected.splice(index , 1);
+      this.Environment.value.splice(index,1)
+      this.restaurants.splice(index,1)
+      this.valueStatus.splice(index,1)
+      }
+      
+      
+    },
     querySearch(queryString, cb) {
       var restaurants = this.restaurants;
       var results = queryString
@@ -548,7 +569,20 @@ export default {
       });
       console.log(l);
       this.selected[index].value = this.valueStatus[l.indexOf(item)];
-      this.Environment.value.push(this.selected[index].value);
+      this.Environment.value.splice(index,1,this.selected[index].value);  
+    },
+    isValid(newObj,oldObj){
+          if (newObj instanceof Array) {
+            this.open3("数据格式不能是数组", "warning");
+          } else if (newObj instanceof Object) {
+            this.jsonMethod(newObj, oldObj);
+            this.messageboxStatus = !this.messageboxStatus;
+            this.open3("数据导入成功", "success");
+          } else if (newObj == null || newObj == "") {
+            this.open3("数据不能为空", "warning");
+          } else {
+            this.open3("数据格式错误", "warning");
+          }
     },
     postJsonSubmit() {
       //确认json数据提交
@@ -556,18 +590,19 @@ export default {
         if (this.postType == "header-com") {
           this.postJHeader = JSON.parse(this.postJson);
           console.log(typeof this.postJHeader);
+          this.isValid( this.postJHeader,this.postheaders)
           // console.log(postJson)
-          if (this.postJHeader instanceof Array) {
-            this.open3("数据格式不能是数组", "warning");
-          } else if (this.postJHeader instanceof Object) {
-            this.jsonMethod(JSON.parse(this.postJson), this.postheaders);
-            this.messageboxStatus = !this.messageboxStatus;
-            this.open3("数据导入成功", "success");
-          } else if (this.postJHeader == null || this.postJHeader == "") {
-            this.open3("数据不能为空", "warning");
-          } else {
-            this.open3("数据格式错误", "warning");
-          }
+          // if (this.postJHeader instanceof Array) {
+          //   this.open3("数据格式不能是数组", "warning");
+          // } else if (this.postJHeader instanceof Object) {
+          //   this.jsonMethod(this.postJHeader, this.postheaders);
+          //   this.messageboxStatus = !this.messageboxStatus;
+          //   this.open3("数据导入成功", "success");
+          // } else if (this.postJHeader == null || this.postJHeader == "") {
+          //   this.open3("数据不能为空", "warning");
+          // } else {
+          //   this.open3("数据格式错误", "warning");
+          // }
         }
       } catch (e) {
         console.log(e, "1111");
@@ -723,6 +758,12 @@ export default {
       this.restaurants.push({ value: item.cname });
       this.valueStatus.push(item.value);
     });
+    if(this.selected.length==1){
+        console.log("--------------------")
+        document.querySelector(".el-icon-remove-outline").style.color="#606266"
+        this.disabled="disabled"} else{
+          document.querySelector(".el-icon-remove-outline").style.color="#409eff"
+        }
   },
   mounted() {
     this.restaurants = [];
@@ -731,6 +772,11 @@ export default {
       this.restaurants.push({ value: item.cname });
       this.valueStatus.push(item.value);
     });
+    this.selected.forEach((item,index)=>{
+      this.Environment.value.push("")
+    })
+    
+
   }
 };
 </script>
@@ -802,52 +848,6 @@ export default {
   margin-top: 15px;
 }
 
-// .sub-title {
-//   width: 100%;
-//   height: 100%;
-//   position: relative;
-//   margin: auto 0;
-//   .el-form,
-//   .el-form-item {
-//     display: inline-block;
-//   }
-//   // .el-form-item__label{
-//   //   width: 30px;
-//   // }
-//   .el-form {
-//     width: 78%;
-//   }
-//   .el-form-item {
-//     // position:absolute ;
-//     right: 0px;
-//     width: 100%;
-
-//   }
-//   .icon{
-//       display: inline-block;
-//       position:absolute;
-//   }
-
-//   .el-input__inner {
-//     position: absolute;
-//     width: 100%;
-//   }
-//   .el-icon-circle-plus-outline,.el-icon-remove-outline {
-//     // position: absolute;
-//     font-size: 25px;
-//     line-height: 40px;
-//     margin-left: 10px;
-//     color: #409eff;
-//     cursor: pointer;
-//   }
-//   .el-icon-circle-plus-outline:hover,.el-icon-remove-outline:hover {
-//     color: rgb(128, 186, 252);
-//   }
-//   .el-autocomplete {
-//     width: 15%;
-//   }
-
-// }
 .sub-title {
   // display: inline-block;
   position: relative;
