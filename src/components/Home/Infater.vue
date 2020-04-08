@@ -126,7 +126,7 @@
       </div>
     </div>
     <!-- 新建文件 -->
-    <message-box v-if="mbFielsStutas" v-slot:addFiels>
+    <message-box v-if="mbFielsStutas" v-slot:addFiels  :styleCode="styleCode">
       <div class="mbAddFiels">
         <h3>新建文件夹</h3>
         <el-form :model="updateFiels" :rules="rules" ref="refAddfiles">
@@ -152,6 +152,7 @@ export default {
   },
   data() {
     return {
+      styleCode: "height:300px;width:500px",  //弹出框大小
       mbFielsStutas: false, //新增文件蒙层状态
       copeCode: {},
       searchStatus: false,
@@ -242,8 +243,6 @@ export default {
       if (command[0] == "a") {
         this.openAdd(command, "添加文件", "文件名称", "添加成功", "取消添加");
         console.log(this.directions)
-        // this.directions[command[2]]=true
-        this.$set(this.directions,command[2],true)
 
       }
       if (command[0]=="b"){
@@ -459,12 +458,17 @@ export default {
             message: msgSucsess
           });
           if(command[0]=="a"){
+            console.log(command)
             var count = this.list[command[2]].Clist.length;
-          console.log(this.list[command[2]])
-          this.$set(this.list[command[2]].Clist, count, {
-              id: count,
-              name: value
-            });
+            console.log(this.list[command[2]])
+            this.$set(this.directions, command[2], true);
+            this.$set(this.iconOpen, command[2], "el-icon-caret-bottom");
+
+
+            this.$set(this.list[command[2]].Clist, count, {
+                id: count,
+                name: value
+              });
           };
           if(command[0]=="b"){
             this.list[command[2]].name=value
@@ -508,10 +512,11 @@ export default {
 .mbAddFiels {
   margin: 10px;
   .bt-botton {
-    margin-top: 50px;
+    margin-top: 130px;
     margin-right: 20px;
     display: flex;
     justify-content: center;
+    
   }
   .bt-botton .bottom {
     margin-left: 20px;
@@ -737,6 +742,7 @@ dl {
 }
 .mbAddFiels .el-form-item__label {
   color: #606266;
+
 }
 
 .addText:hover it-box {
