@@ -346,6 +346,8 @@ export default {
           { id: 5, name: "IMAGE" },
           { id: 6, name: "BINARY" }
         ],
+
+
         resStatus: [
           { id: 1, name: "JSON" },
           { id: 2, name: "JSONP" },
@@ -364,13 +366,13 @@ export default {
           isrequired: "ture",
           type: "ture",
           detail: "这是请求头1",
-          children: []
+          children: [],id:0,parentId: 0
         },
-        { cname: "b", isrequired: "ture", type: "ture", detail: "这是请求头2" ,children: []},
-        { cname: "c", isrequired: "ture", type: "ture", detail: "这是请求头3" ,children: []},
-        { cname: "d", isrequired: "ture", type: "ture", detail: "这是请求头4" ,children: []},
-        { cname: "e", isrequired: "ture", type: "ture", detail: "这是请求头5" ,children: []},
-        { cname: "f", isrequired: "ture", type: "ture", detail: "这是请求头6" ,children: []}
+        { cname: "b", isrequired: "ture", type: "ture", detail: "这是请求头2" ,children: [],id:1,parentId: 0},
+        { cname: "c", isrequired: "ture", type: "ture", detail: "这是请求头3" ,children: [],id:2,parentId: 0},
+        { cname: "d", isrequired: "ture", type: "ture", detail: "这是请求头4" ,children: [],id:3,parentId: 0},
+        { cname: "e", isrequired: "ture", type: "ture", detail: "这是请求头5" ,children: [],id:4,parentId: 0},
+        { cname: "f", isrequired: "ture", type: "ture", detail: "这是请求头6" ,children: [],id:5,parentId: 0}
       ],
       postDatas: [
         //输入请求参数
@@ -608,33 +610,88 @@ export default {
         console.log(e, "1111");
         this.open3("数据格式有误,请认真检查后上传", "warning");
       }
+      console.log(JSON.stringify(this.postheaders))
+      var  postheadersCommit=[]
+      this.postheaders.forEach((item,index)=>{
+        if(item.parentId==0){
+          postheadersCommit.push(item)
+        }else{
+         
+         //   postheadersCommit[index-1].id      上次的id
+        //  //  postheadersCommit[postheadersCommit.length-1] 最后一个祖先对象
+        //   this.addObject(item ,  //   item.parentId  本次的对象
+        //                 postheadersCommit[postheadersCommit.length-1],   //目录层级
+        //                 postheadersCommit.length-1,   //祖先元素的索引-
+        //                 postheadersCommit)   //已添加到新列表对象的数据
+        this.addObject(currentObj,postheadersCommit,postheadersCommit.length)
+        }
+
+      })
+      console.log(JSON.stringify(postheadersCommit))
     },
+    addObject(currentObj,newArrayObj,newArrayObjIndex){
+      currentParentId=currentObj.parentId  //当前OBJ的父id
+      topObj         =newArrayObj[newArrayObjIndex]
+      topObjId       =topObj.id
+      if(topObjId==currentParentId){
+        topObj.push(currentObj)
+      }else{
+        
+      }
+
+
+      // var objCode=obj.children
+      // //objId==本次对象的parentId
+      // // obj 本次对象所在的祖先对象
+      // // index本次循环最上级的索引
+      // if(objI.parentId==obj.id){   //如果本次对象的parentId等于祖先id-则表明是二级对象-所以直接push到祖先的children就可以
+      //   obj.children.push(objI)
+      // }else{   // 操作三级
+      //     objCode.forEach((item,index1)=>{
+      //     if (objI.parentId==item.id){
+      //       objCode[index1].children.push(objI)
+      //       // objCode=obj[index1].children
+      //       // objCode[index1].children[index].children()
+      //     }
+      //     else{
+            
+      //       // this.addObject(objI,objCode,index,postheadersCommit)
+      //     }
+      //   })
+        
+      // }
+    },
+
+  
+
+
 
     jsonMethod(newData, oldData) {
       var falg = 0;
       var fatherList = Object.keys(newData);
       fatherList.forEach((item, index) => {
+        var id=this.postheaders.length
         if (typeof newData[item] == "object") {
           oldData.splice(oldData.length, 0, {
             cname: item,
             isrequired: "ture",
             type: typeof item,
-            detail: ""
+            detail: "",children: [],id:id,parentId:0
           }); //如果是对象则先把这个字段加入对应列表
           this.$refs.child.indent.push(falg); //如果是对象则先把这个字段加入对应的边距列表，
-          this.forE(newData[item], falg + 15, oldData); //然后继续遍历其下的内容
+          this.forE(newData[item], falg + 15, oldData,id); //然后继续遍历其下的内容
         } else {
           oldData.splice(oldData.length, 0, {
             cname: item,
             isrequired: "ture",
             type: typeof item,
-            detail: ""
+            detail: "",children: [],id:this.postheaders.length,parentId:0
           });
           this.$refs.child.indent.push(falg);
         }
       });
     },
-    forE(obj, falg, oldData) {
+    forE(obj, falg, oldData,parentId) {
       // 三种情况  1 对象包含list  list包含对象   对象list并存
       if (obj instanceof Array) {
         //判断对象是否为列表
@@ -646,13 +703,13 @@ export default {
           if (typeof obj[index] == "object") {
             // oldData.splice({ cname: item, isrequired: "ture", type: "ture", detail: "" })  //如果是对象则先把这个字段加入对应列表
             // this.$refs.child.indent.push(falg) //如果是对象则先把这个字段加入对应的边距列表，
-            this.forE(obj[index], falg, oldData); //然后继续遍历其下的内容
+            this.forE(obj[index], falg, oldData,this.postheaders.length-1); //然后继续遍历其下的内容
           } else {
             oldData.splice(oldData.length, 0, {
               cname: item,
               isrequired: "ture",
               type: typeof item,
-              detail: ""
+              detail: "",children: [],id:this.postheaders.length,parentId:parentId
             });
             this.$refs.child.indent.push(falg);
           }
@@ -665,21 +722,22 @@ export default {
             if (obj[item] instanceof Array) {
               var typeCode = "Array";
             }
+            var id=this.postheaders.length
             oldData.splice(oldData.length, 0, {
               cname: item,
               isrequired: "ture",
               type: typeCode,
-              detail: ""
+              detail: "",children: [],id:id,parentId:parentId
             }); //如果是对象则先把这个字段加入对应列表
             this.$refs.child.indent.push(falg); //如果是对象则先把这个字段加入对应的边距列表，
-            this.forE(obj[item], falg + 15, oldData); //然后继续遍历其下的内容
+            this.forE(obj[item], falg + 15, oldData,id); //然后继续遍历其下的内容
           } else {
             //如果里面只有键值对
             oldData.splice(oldData.length, 0, {
               cname: item,
               isrequired: "ture",
               type: typeof item,
-              detail: ""
+              detail: "",children: [],id:this.postheaders.length,parentId:parentId
             });
             this.$refs.child.indent.push(falg);
           }

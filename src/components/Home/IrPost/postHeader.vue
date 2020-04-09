@@ -199,17 +199,22 @@ export default {
         prop: "",
         isrequired: null,
         type: "",
-        detail: ""
+        detail: "",children: [],
+        id: this.$parent.postheaders.length,
+        parentId: this.$parent.postheaders[index].id
       });
       var tt = this.indent[index];
       this.indent.splice(index + 1, 0, 15 + tt);
+      console.log(this.$parent.postheaders)
     },
     addTT() {
       this.tableData.push({
         prop: "",
         isrequired: null,
         type: "",
-        detail: ""
+        detail: "",children: [],
+        id: this.$parent.postheaders.length,
+        parentId: 0
       });
       this.indent.push(0);
       this.open2();
