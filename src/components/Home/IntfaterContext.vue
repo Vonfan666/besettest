@@ -99,7 +99,7 @@
         <keep-alive>
           <component
             :is="bindCom2"
-            ref="child2"
+            ref="child"
             :msbox.sync="messageboxStatus"
             :indextp="bindCom2"
             :tableData.sync="resHeaders"
@@ -130,6 +130,39 @@
         <el-row class="demo-autocomplete">
           <div class="pd-title">
             <span class="colorCode3">新增环境变量</span>
+
+            <el-button type="primary" size="small" @click="clickEnvironment()">
+              <span></span> 环境变量
+            </el-button>
+            <environment-box
+              v-if="EnvironmentStatus"
+              v-slot:environment
+              :styleCode="environmentStyle"
+            >
+              <div class="enviromentClass">
+                <div class="environmenttitle">
+                  <h3>添加变量</h3>
+                </div>
+                <div class="environmentbody" style="margin:10px">
+                  <el-table :data="EnvironmentList" border style="width: 100%; margin-top: 20px">
+                    <el-table-column label width="50">
+                      
+                    </el-table-column>
+                    <el-table-column label="key" prop="key" height="25">
+                      <template slot-scope="scope">
+                        <input v-model="EnvironmentList[scope.$index].key">
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="value" prop="value" height="25">
+                      <template slot-scope="scope">
+                        <input v-model="EnvironmentList[scope.$index].value">
+                      </template>
+                    </el-table-column>
+                  </el-table>
+                </div>
+                <div class="environmentFoot"></div>
+              </div>
+            </environment-box>
           </div>
           <el-col :span="12">
             <div class="sub-title" v-for="(item,index) in selected" :key="index">
@@ -180,6 +213,7 @@
         ></el-input>
       </div>
     </div>
+
     <!-- 新建文件 -->
 
     <message-box v-if="messageboxStatus" v-slot:postJsonData :styleCode="styleCode">
@@ -222,7 +256,8 @@ export default {
     "data-com": () => import("./IrPost/PostData"),
     "header-com2": () => import("./IrPost/postHeader.vue"),
     "data-com2": () => import("./IrPost/PostData"),
-    "message-box": () => import("../public/MessageBox.vue")
+    "message-box": () => import("../public/MessageBox.vue"),
+    "environment-box": () => import("../public/MessageBox.vue")
   },
   data() {
     return {
@@ -230,6 +265,9 @@ export default {
       Environment: {
         value: []
       },
+      EnvironmentList: [{ key: "a", value: "aa" }],
+      EnvironmentStatus: false,
+      environmentStyle: "height:700px;width:700px",
       // EnvironmentAdd: [0],
       valueStatus: [], //存储环境变量临时值  [{"value":value}]
       restaurants: [], //将对象所有key放到一个列表--先把后端返回的内容的key全部组成一个数组放到这里，
@@ -359,7 +397,7 @@ export default {
           { id: 6, name: "BINARY" }
         ]
       },
-
+      //只有一级的数据包含id和parentId
       postheaders: [
         //前端输入返回请求头字段
         {
@@ -369,6 +407,7 @@ export default {
           detail: "这是请求头1",
           id: 0,
           parentId: 0,
+          mockValue: "11",
           children: []
         },
         {
@@ -378,6 +417,7 @@ export default {
           detail: "这是请求头2",
           id: 1,
           parentId: 0,
+          mockValue: "11",
           children: []
         },
         {
@@ -387,6 +427,7 @@ export default {
           detail: "这是请求头3",
           id: 2,
           parentId: 0,
+          mockValue: "11",
           children: []
         },
         {
@@ -396,6 +437,7 @@ export default {
           detail: "这是请求头4",
           id: 3,
           parentId: 0,
+          mockValue: "11",
           children: []
         },
         {
@@ -405,6 +447,7 @@ export default {
           detail: "这是请求头5",
           id: 4,
           parentId: 0,
+          mockValue: "11",
           children: []
         },
         {
@@ -414,6 +457,7 @@ export default {
           detail: "这是请求头6",
           id: 5,
           parentId: 0,
+          mockValue: "11",
           children: []
         }
       ],
@@ -423,37 +467,61 @@ export default {
           cname: "a2",
           isrequired: "ture",
           type: "ture",
-          detail: "这是请求参数1"
+          detail: "这是请求参数1",
+          id: 0,
+          parentId: 0,
+          mockValue: "11",
+          children: []
         },
         {
           cname: "b2",
           isrequired: "ture",
           type: "ture",
-          detail: "这是请求参数2"
+          detail: "这是请求参数2",
+          id: 1,
+          parentId: 0,
+          mockValue: "2",
+          children: []
         },
         {
           cname: "c2",
           isrequired: "ture",
           type: "ture",
-          detail: "这是请求参数3"
+          detail: "这是请求参数3",
+          id: 2,
+          parentId: 0,
+          mockValue: "3",
+          children: []
         },
         {
           cname: "d2",
           isrequired: "ture",
           type: "ture",
-          detail: "这是请求参数4"
+          detail: "这是请求参数4",
+          id: 3,
+          parentId: 0,
+          mockValue: "4",
+          children: []
         },
         {
           cname: "e2",
           isrequired: "ture",
           type: "ture",
-          detail: "这是请求参数5"
+          detail: "这是请求参数5",
+          id: 4,
+          parentId: 0,
+          mockValue: "5",
+          children: []
         },
         {
           cname: "f2",
           isrequired: "ture",
           type: "ture",
-          detail: "这是请求参数6"
+          detail: "这是请求参数6",
+          id: 5,
+          parentId: 0,
+          mockValue: "6",
+          children: []
         }
       ],
       resHeaders: [
@@ -462,13 +530,62 @@ export default {
           cname: "aaa",
           isrequired: "ture",
           type: "ture",
-          detail: "这是响应头1"
+          detail: "这是响应头1",
+          id: 0,
+          parentId: 0,
+          mockValue: "resHeaders",
+          children: []
         },
-        { cname: "b", isrequired: "ture", type: "ture", detail: "这是响应头2" },
-        { cname: "c", isrequired: "ture", type: "ture", detail: "这是响应头3" },
-        { cname: "d", isrequired: "ture", type: "ture", detail: "这是响应头4" },
-        { cname: "e", isrequired: "ture", type: "ture", detail: "这是响应头5" },
-        { cname: "f", isrequired: "ture", type: "ture", detail: "这是响应头6" }
+        {
+          cname: "b",
+          isrequired: "ture",
+          type: "ture",
+          detail: "这是响应头2",
+          id: 1,
+          parentId: 0,
+          mockValue: "11",
+          children: []
+        },
+        {
+          cname: "c",
+          isrequired: "ture",
+          type: "ture",
+          detail: "这是响应头3",
+          id: 2,
+          parentId: 0,
+          mockValue: "11",
+          children: []
+        },
+        {
+          cname: "d",
+          isrequired: "ture",
+          type: "ture",
+          detail: "这是响应头4",
+          id: 3,
+          parentId: 0,
+          mockValue: "11",
+          children: []
+        },
+        {
+          cname: "e",
+          isrequired: "ture",
+          type: "ture",
+          detail: "这是响应头5",
+          id: 4,
+          parentId: 0,
+          mockValue: "11",
+          children: []
+        },
+        {
+          cname: "f",
+          isrequired: "ture",
+          type: "ture",
+          detail: "这是响应头6",
+          id: 5,
+          parentId: 0,
+          mockValue: "11",
+          children: []
+        }
       ],
       resDatas: [
         //返回参数
@@ -477,46 +594,64 @@ export default {
           isrequired: "ture",
           type: "ture",
           detail: "这是返回参数1",
-          value: "11"
+          id: 0,
+          parentId: 0,
+          mockValue: "resDatas",
+          children: []
         },
         {
           cname: "b2",
           isrequired: "ture",
           type: "ture",
           detail: "这是返回参数2",
-          value: "11"
+          id: 1,
+          parentId: 0,
+          mockValue: "11",
+          children: []
         },
         {
           cname: "c2",
           isrequired: "ture",
           type: "ture",
           detail: "这是请返回参数3",
-          value: "11"
+          id: 2,
+          parentId: 0,
+          mockValue: "11",
+          children: []
         },
         {
           cname: "d2",
           isrequired: "ture",
           type: "ture",
           detail: "这是返回参数4",
-          value: "11"
+          id: 3,
+          parentId: 0,
+          mockValue: "11",
+          children: []
         },
         {
           cname: "e2",
           isrequired: "ture",
           type: "ture",
           detail: "这是返回参数5",
-          value: "11"
+          id: 4,
+          parentId: 0,
+          mockValue: "11",
+          children: []
         },
         {
           cname: "f2",
           isrequired: "ture",
           type: "ture",
           detail: "这是返回参数6",
-          value: "121"
+          id: 5,
+          parentId: 0,
+          mockValue: "11",
+          children: []
         }
       ],
       requestsResDatas: [
-        //返回参数
+        //  实际请求返回参数
         {
           cname: "a2111",
           isrequired: "ture",
@@ -570,14 +705,9 @@ export default {
       this.Environment.value.splice(index + 1, 0, "t");
       this.restaurants.splice(index + 1, 0, "");
       this.valueStatus.splice(index + 1, 0, "");
-      console.log(this.selected, "selected");
-      console.log(this.selected, "Environment");
-      console.log(this.selected, "restaurants");
-      console.log(this.selected, "valueStatus");
     },
     removeEnvironment(index) {
       if (this.selected.length == 1) {
-        console.log("--------------------");
         // document.querySelector(".el-icon-remove-outline").style.color="#606266"
         this.disabled = "disabled";
       } else {
@@ -604,16 +734,15 @@ export default {
       };
     },
     handleSelect(item, index) {
-      console.log(this.restaurants, "这是啥 ");
       var l = [];
       this.restaurants.forEach((item1, index1) => {
         l.push(item1.value);
       });
-      console.log(l);
       this.selected[index].value = this.valueStatus[l.indexOf(item)];
       this.Environment.value.splice(index, 1, this.selected[index].value);
     },
     isValid(newObj, oldObj) {
+      //导入数据格式校验
       if (newObj instanceof Array) {
         this.open3("数据格式不能是数组", "warning");
       } else if (newObj instanceof Object) {
@@ -627,39 +756,78 @@ export default {
       }
     },
     postJsonSubmit() {
-      //确认json数据提交
+      //确认json数据提交--判断是导入到什么参数
+      //  postType判断类型   postJson临时绑定上传的数据   postJHeader一级的请求头数据
       try {
-        if (this.postType == "header-com") {
-          this.postJHeader = JSON.parse(this.postJson);
-          console.log(typeof this.postJHeader);
-          this.isValid(this.postJHeader, this.postheaders);
+        switch (this.postType) {
+          case "header-com":
+            this.postJHeader = JSON.parse(this.postJson);
+            this.isValid(this.postJHeader, this.postheaders);
+            var dataCode = JSON.parse(JSON.stringify(this.postheaders));
+            var a = this.addObjectSatrt(dataCode); //该请求是在提交数据的时候才做处理  a是标准的json数据--
+            console.log(a);
+            break;
+          case "data-com":
+            this.postJData = JSON.parse(this.postJson);
+            this.isValid(this.postJData, this.postDatas); //this.postDatas老数据   postJData新数据
+            var dataCode = JSON.parse(JSON.stringify(this.postDatas));
+            var a = this.addObjectSatrt(dataCode);
+            console.log(a);
+            break;
+          case "header-com2":
+            this.resJHeader = JSON.parse(this.postJson);
+            this.isValid(this.resJHeader, this.resHeaders); //this.postDatas老数据   postJData新数据
+            var dataCode = JSON.parse(JSON.stringify(this.resHeaders));
+            var a = this.addObjectSatrt(dataCode);
+            console.log(a);
+            break;
+          case "data-com2":
+            this.resJData = JSON.parse(this.postJson);
+            this.isValid(this.resJData, this.resDatas); //this.postDatas老数据   postJData新数据
+            var dataCode = JSON.parse(JSON.stringify(this.resDatas));
+            var a = this.addObjectSatrt(dataCode);
+            break;
+          default:
+            open3("未知错误，请重新上传");
         }
+        // if (this.postType == "header-com") {
+        // this.postJHeader = JSON.parse(this.postJson);
+        // this.isValid(this.postJHeader, this.postheaders);
+        // var dataCode = JSON.parse(JSON.stringify(this.postheaders));
+        // var a = this.addObjectSatrt(dataCode); //该请求是在提交数据的时候才做处理  a是标准的json数据--
+        // console.log(a)
+
+        // }
+        // if (this.postType == "data-com") {
+        //   this.postJData = JSON.parse(this.postJson);
+        //   this.isValid(this.postJData, this.postDatas); //this.postDatas老数据   postJData新数据
+        //   var dataCode = JSON.parse(JSON.stringify(this.postDatas));
+        //   var a = this.addObjectSatrt(dataCode);
+        //   console.log(a)
+        // }
+        // if(this.postType == "data-com2"){
+        //   this.resJHeader = JSON.parse(this.postJson);
+        //   this.isValid(this.resJHeader, this.postDatas); //this.postDatas老数据   postJData新数据
+        //   var dataCode = JSON.parse(JSON.stringify(this.postDatas));
+        //   var a = this.addObjectSatrt(dataCode);
+        //   console.log(a)
+        // }
       } catch (e) {
-        console.log(e, "1111");
         this.open3("数据格式有误,请认真检查后上传", "warning");
       }
-
-      console.log(JSON.stringify(this.postheaders));
+    },
+    addObjectSatrt(dataCode) {
+      //在提交请求是将导入的数据处理成标准的json
       var postheadersCommit = [];
-      
-      var dataCode= JSON.parse(JSON.stringify(this.postheaders))
-      console.log("data拷贝",dataCode)
-      // var dataCode=[].concat(this.postheaders)
-      // console.log("data连续上唇有问题--另外拖拽有问题",JSON.stringify(data))
       for (var v = 0; v < dataCode.length; v++) {
+        //第一次遍历--将所有parentId==0的push到新列表-全是顶级
         if (dataCode[v].parentId == 0) {
           postheadersCommit.push(dataCode[v]);
           dataCode.splice(v, 1);
           v--;
         }
       }
-      console.log("data", JSON.stringify(dataCode));
-
-      this.addObject(dataCode, postheadersCommit);
-
-      console.log("postheaders", JSON.stringify(this.postheaders));
-
-      console.log("postheadersCommit最新值", JSON.stringify(postheadersCommit));
+      return this.addObject(dataCode, postheadersCommit); //push完了之后执行这个方法-dataCode原始数据（只有一级的）
     },
     addObject(data, postheadersCommit) {
       for (var m = 0; m < postheadersCommit.length; m++) {
@@ -668,20 +836,22 @@ export default {
             postheadersCommit[m].children.push(data[n]);
             data.splice(n, 1);
             n--;
-          } else {
-            if (postheadersCommit[m].children.length > 0) {
-              this.addObject(data, postheadersCommit[m].children);
-            }
           }
         }
+
+        if (postheadersCommit[m].children.length > 0) {
+          this.addObject(data, postheadersCommit[m].children);
+        }
       }
+      return postheadersCommit;
     },
 
     jsonMethod(newData, oldData) {
+      //newData传进来的json数据
       var falg = 0;
       var fatherList = Object.keys(newData);
       fatherList.forEach((item, index) => {
-        var id = this.postheaders.length;
+        var id = oldData.length; //改过
         if (typeof newData[item] == "object") {
           oldData.splice(oldData.length, 0, {
             cname: item,
@@ -693,14 +863,14 @@ export default {
             children: []
           }); //如果是对象则先把这个字段加入对应列表
           this.$refs.child.indent.push(falg); //如果是对象则先把这个字段加入对应的边距列表，
-          this.forE(newData[item], falg + 15, oldData, id); //然后继续遍历其下的内容
+          this.forE(newData[item], falg + 15, oldData, id); //然后继续遍历其下的内容  ---去掉newData参数
         } else {
           oldData.splice(oldData.length, 0, {
             cname: item,
             isrequired: "ture",
             type: typeof item,
             detail: "",
-            id: this.postheaders.length,
+            id: oldData.length, //改动
             parentId: 0,
             children: []
           });
@@ -709,25 +879,26 @@ export default {
       });
     },
     forE(obj, falg, oldData, parentId) {
+      //改动
       // 三种情况  1 对象包含list  list包含对象   对象list并存
       if (obj instanceof Array) {
         //判断对象是否为列表
         //如果是一个list--首先得记住他的父id或者是属于第几层循环
         var n = obj.length - 1;
         obj.splice(0, n);
-        //以上两句是去掉list几个其他的,list只需要一个字段就好了
+        //以上两句是   列表里面一般都是包含不同的对象--但是每个对象的字段名字都是一样的-我们只需要最后一个就得字段就可以了
         obj.forEach((item, index) => {
           if (typeof obj[index] == "object") {
             // oldData.splice({ cname: item, isrequired: "ture", type: "ture", detail: "" })  //如果是对象则先把这个字段加入对应列表
             // this.$refs.child.indent.push(falg) //如果是对象则先把这个字段加入对应的边距列表，
-            this.forE(obj[index], falg, oldData, this.postheaders.length - 1); //然后继续遍历其下的内容
+            this.forE(obj[index], falg, oldData, oldData.length - 1); //然后继续遍历其下的内容  gaihuo
           } else {
             oldData.splice(oldData.length, 0, {
               cname: item,
               isrequired: "ture",
               type: typeof item,
               detail: "",
-              id: this.postheaders.length,
+              id: oldData.length,
               parentId: parentId,
               children: []
             });
@@ -736,14 +907,18 @@ export default {
         });
       } else {
         Object.keys(obj).forEach((item, index) => {
+          //如果是非列表
           //如果里面包含字典
           if (typeof obj[item] == "object") {
-            var typeCode = typeof obj[item];
+            //是一个对象
+            var typeCode = typeof obj[item]; // 定义类型
             if (obj[item] instanceof Array) {
-              var typeCode = "Array";
+              //如果是列表
+              var typeCode = "Array"; //定义类型为列表
             }
-            var id = this.postheaders.length;
+            var id = oldData.length; //改过     id等于oldData也就是存解析数据列表的长度-也就是最大id+1
             oldData.splice(oldData.length, 0, {
+              //如果是对象则先把这个key加入对应列表
               cname: item,
               isrequired: "ture",
               type: typeCode,
@@ -751,17 +926,17 @@ export default {
               id: id,
               parentId: parentId,
               children: []
-            }); //如果是对象则先把这个字段加入对应列表
+            });
             this.$refs.child.indent.push(falg); //如果是对象则先把这个字段加入对应的边距列表，
             this.forE(obj[item], falg + 15, oldData, id); //然后继续遍历其下的内容
           } else {
-            //如果里面只有键值对
+            //如果里面只有键值对-则直接把每个key插入即可
             oldData.splice(oldData.length, 0, {
               cname: item,
               isrequired: "ture",
               type: typeof item,
               detail: "",
-              id: this.postheaders.length,
+              id: oldData.length,
               parentId: parentId,
               children: []
             });
@@ -772,6 +947,7 @@ export default {
     },
 
     changeBottomColor(event, value) {
+      this.postType = value;
       this.bus.$emit("loading", true);
       if (document.querySelector(".colorCode")) {
         document.querySelector(".colorCode").classList.remove("colorCode");
@@ -784,11 +960,9 @@ export default {
       //   this.bindCom="data-com"
       // }
 
-      // console.log(this.tableDataCode)
       // if(value=="header-com"){
       //   this.tableDataCode=this.postheaders
       // }else if(value=="data-com"){
-      //   console.log(value,"va;uie")
       //   this.postDatasCode=this.postDatas
       // }
       this.bindCom = value;
@@ -797,6 +971,8 @@ export default {
       // debugger
     },
     changeBottomColor2(event, value) {
+      this.postType = value;
+
       if (document.querySelector(".colorCode2")) {
         document.querySelector(".colorCode2").classList.remove("colorCode2");
       }
@@ -819,6 +995,10 @@ export default {
         message: msg,
         type: status
       });
+    },
+    clickEnvironment() {
+      //点击查看环境变量
+      this.EnvironmentStatus = !this.EnvironmentStatus;
     }
   },
 
@@ -831,7 +1011,6 @@ export default {
     // this.postheaders.forEach((item,index)=>{
     //   this.restaurants.push({"value":item.cname})
     // })
-    // console.log(this.restaurants,"111")
   },
   updated() {
     // this.jsonDemo1=JSON.stringify(this.jsonDemo, null, 4),
@@ -843,7 +1022,6 @@ export default {
       this.valueStatus.push(item.value);
     });
     if (this.selected.length == 1) {
-      console.log("--------------------");
       document.querySelector(".el-icon-remove-outline").style.color = "#606266";
       this.disabled = "disabled";
     } else {
@@ -986,6 +1164,32 @@ export default {
     }
   }
 }
+.pd-title .el-button {
+  float: right;
+}
+
+.environmentbody  .cell{
+    position: relative;
+    width: 100%;
+    height: 100%;
+    input{
+      // width: 100%;
+      border-color: #ffffff !important;
+      border: 1px solid #ffffff ;
+
+    }
+    input:hover{
+      background-color: #ffffff !important;
+    }
+}
+
+// .environmentbody  .cell input{
+//   // position: absolute ;
+  
+//   // margin: 0 2px;
+  
+//   // height: 100%;
+// }
 </style>
 <style>
 .IR .el-form-item__label {
@@ -997,4 +1201,10 @@ export default {
 .IR .el-input {
   margin-left: 5px;
 }
+ /* .environmentbody .cell{
+    position: relative;
+    width: 100%;
+    height: 100%;
+    
+} */
 </style>

@@ -7,6 +7,8 @@
       </slot>
       <slot name="postJsonData">
       </slot>
+      <slot name="environment">
+      </slot>
     </div>
   </div>
 </template>

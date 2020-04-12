@@ -56,7 +56,7 @@
           <input
             type="text"
             class="mock"
-            v-model="postData[scope.$index].mock"
+            v-model="postData[scope.$index].mockValue"
             @input="aa(scope.$index,scope.row.name)"
           />
         </template>
@@ -148,7 +148,8 @@ export default {
   },
   methods: {
     pushData() {
-      console.log(this.indextp)
+      this.$parent.postType = this.indextp;
+
       return this.$emit("update:msbox", !this.msbox);
     },
     // draggable 属性规定元素是否可拖动
@@ -158,11 +159,9 @@ export default {
     // dragend - 用户完成元素拖动后触发-->
     handleDragStart(e, item) {
       this.dragging = item;
-      console.log("ceshi1 ", item);
     },
     handleDragEnd(e, item) {
       this.dragging = null;
-      console.log("ceshi2 ");
     },
     //首先把div变成可以放置的元素，即重写dragenter/dragover
     // DataTransfer 对象用来保存，通过拖放动作，拖动到浏览器的数据。
@@ -175,25 +174,34 @@ export default {
       if (item === this.dragging) {
         return;
       }
-      console.log(e, item);
-      console.log(this.dragging);
+
       const startEleIndex = this.postData.indexOf(this.dragging);
       const endEleIndex = this.postData.indexOf(item);
-      console.log(startEleIndex, endEleIndex);
 
       if (this.dragging) {
         var startEle = this.postData[startEleIndex];
         var endEle = this.postData[endEleIndex];
-        console.log(startEle, "初始拖拽值");
-        console.log(endEle, "交换拖拽值");
+        var startParentId = this.postData[startEleIndex].parentId;
+        var startId = this.postData[startEleIndex].id;
+
+
+        var endParentId = this.postData[endEleIndex].parentId;
+        var endId = this.postData[endEleIndex].id;
+
+        this.postData[startEleIndex].parentId = endParentId;
+        this.postData[startEleIndex].id = endId;
+        this.postData[endEleIndex].parentId = startParentId;
+        this.postData[endEleIndex].id = startId;
+
+
         this.postData.splice(startEleIndex, 1, endEle);
         this.postData.splice(endEleIndex, 1, startEle);
         // this.indent.splice(endEleIndex,1,startEle)
         // this.dragging=null
+        
       }
 
       //   const newItems = [...this.items];
-      //   console.log(newItems);
       //   const src = newItems.indexOf(this.dragging);
       //   const dst = newItems.indexOf(item);
       //   // 替换
@@ -202,32 +210,52 @@ export default {
       //   this.items = newItems;
     },
     aa() {
-      console.log("按下");
     },
     bb() {
-      console.log("songkai");
     },
     addTS(index, event) {
-      console.log(index);
-
+      console.log(this.$parent.postType)
+       if(this.$parent.postType="data-com"){
+        var id=this.postData.length
+        var parentId=this.postData[index].id
+      }
+      if(this.$parent.postType="data-com2"){
+        var id=this.postData.length
+        var parentId=this.postData[index].id
+      }
       this.postData.splice(index + 1, 0, {
-        prop: "",
+        cname: "",
         isrequired: "true",
         type: "true",
-        detail: ""
+        detail: "",
+        id: id,
+        parentId: parentId,
+        mockValue:"22",
+        children: [],
       });
       var tt = this.indent[index];
       this.indent.splice(index + 1, 0, 15 + tt);
     },
     addTT() {
+      if(this.$parent.postType="data-com"){
+        var id=this.postData.length
+      }
+      if(this.$parent.postType="data-com2"){
+        var id=this.postData.length
+      }
       this.postData.push({
-        prop: "",
+        cname: "",
         isrequired: "true",
         type: "true",
-        detail: ""
+        detail: "",
+        id: id,
+        parentId: 0,
+        mockValue:"22",
+        children: [],
       });
       this.indent.push(0);
       this.open2();
+
     },
     open2() {
       this.$message({
@@ -237,12 +265,28 @@ export default {
       });
     },
     removeTS(index) {
-      console.log(index);
+      var id = this.postData[index].id
+
       this.postData.splice(index, 1);
       this.indent.splice(index, 1);
+      this.findChild(id)
+
+    },
+    findChild(id){
+      
+      for(var n=0;n<this.postData.length;n++){
+
+         if(this.postData[n].parentId==id){
+          this.findChild(this.postData[n].id) //如果找到和删除id相关的之后-继续遍历以找到的这个，直到找完位置
+
+          this.postData.splice(n, 1);  //找完之后再做删除--先做删除索引会变
+          this.indent.splice(n, 1);
+          n--
+        }
+      }
+
     },
     isListData() {
-      console.log( this.$parent.postDatasCode,"psiodas")
      
       if (this.postData.length == 0  && this.postData.length==undefined) {
         this.$set(this.postData, 0, {
@@ -255,9 +299,7 @@ export default {
     },
 
     indentMarginLeft() {
-      console.log(this.postData,"----")
       this.postData.forEach((item, index) => {
-        console.log(index, item);
         this.indent[index] = 0;
       });
     }
@@ -265,10 +307,8 @@ export default {
   created() {
     this.isListData(), //如果列表为空则自动添加一个
       this.indentMarginLeft();
-    console.log(this.indent);
   },
   updated() {
-    console.log(this.indent);
   }
 };
 </script>

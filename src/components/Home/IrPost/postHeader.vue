@@ -29,7 +29,7 @@
             type="text"
             class="cname"
             v-model="tableData[scope.$index].cname"
-            :style="{ 'text-indent':indent[scope.$index]+'px'}" 
+            :style="{ 'text-indent':indent[scope.$index]+'px'}"
           />
         </template>
       </el-table-column>
@@ -51,16 +51,16 @@
           </el-select>
         </template>
       </el-table-column>
-      <!-- <el-table-column label="mock数据">
+      <el-table-column label="mock数据">
         <template slot-scope="scope">
           <input
             type="text"
-            class="cname"
-            v-model="tableData[scope.$index].detail"
+            class="mock"
+            v-model="tableData[scope.$index].mockValue"
             @input="aa(scope.$index,scope.row.name)"
           />
         </template>
-      </el-table-column> -->
+      </el-table-column>
 
       <el-table-column label="描述">
         <template slot-scope="scope">
@@ -94,13 +94,11 @@
 
 <script>
 export default {
-   props: ["msbox","indextp","tableData"],  //消息弹窗
+  props: ["msbox", "indextp", "tableData"], //消息弹窗
   data() {
-    
     return {
-     
       dragging: null,
-      indent: [], //输入框的边距
+      indent: [] //输入框的边距
       // tableData: [
       //   { cname: "aaa", isrequired: "ture", type: "ture", detail: "这是请求头1" },
       //   { cname: "b", isrequired: "ture", type: "ture", detail: "这是请求头2" },
@@ -129,8 +127,7 @@ export default {
   },
   methods: {
     pushData(a) {
-      this.$parent.postType=this.indextp
-      console.log(this.indextp,"走postHeader")
+      this.$parent.postType = this.indextp;
       return this.$emit("update:msbox", !this.msbox);
     },
     // draggable 属性规定元素是否可拖动
@@ -140,11 +137,9 @@ export default {
     // dragend - 用户完成元素拖动后触发-->
     handleDragStart(e, item) {
       this.dragging = item; // 元素
-      console.log("ceshi1 ", item);
     },
     handleDragEnd(e, item) {
       this.dragging = null;
-      console.log("ceshi2 ");
     },
     //首先把div变成可以放置的元素，即重写dragenter/dragover
     // DataTransfer 对象用来保存，通过拖放动作，拖动到浏览器的数据。
@@ -157,29 +152,37 @@ export default {
       if (item === this.dragging) {
         return;
       }
-      console.log(e, item);
-      console.log(this.dragging, "dragging");
       const startEleIndex = this.tableData.indexOf(this.dragging); // 开始的元素位置索引
 
       const endEleIndex = this.tableData.indexOf(item); // 现在元素位置
-      console.log(startEleIndex, endEleIndex, "元素位置");
 
+      //交换父级id
       if (this.dragging) {
+        
         var startEle = this.tableData[startEleIndex];
         var endEle = this.tableData[endEleIndex];
-        console.log(startEle, "初始拖拽值");
-        console.log(endEle, "交换拖拽值");
-        console.log(this.tableData, "this.table");
+        var startParentId = this.tableData[startEleIndex].parentId;
+        var startId = this.tableData[startEleIndex].id;
+
+        var endParentId = this.tableData[endEleIndex].parentId;
+        var endId = this.tableData[endEleIndex].id;
+        //交换拖拽前后的parentId和Id  一定要在替换整个元素前做处理
+        this.tableData[startEleIndex].parentId = endParentId;
+        this.tableData[startEleIndex].id = endId;
+        this.tableData[endEleIndex].parentId = startParentId;
+        this.tableData[endEleIndex].id = startId;
+
         this.tableData.splice(startEleIndex, 1, endEle); //删除初始位置的元素--并向现在所属位置添加初始位置的元素
         // this.indent.splice(startEleIndex,1,this.indent[startEleIndex])
 
         this.tableData.splice(endEleIndex, 1, startEle); // 删除光标现在所在位置的值---并添加上次光标所在位置的值
         // this.indent.splice(endEleIndex,1,this.indent[endEleIndex])
         // this.dragging = null;
+        console.log(this.tableData)
+        
       }
 
       //   const newItems = [...this.items];
-      //   console.log(newItems);
       //   const src = newItems.indexOf(this.dragging);
       //   const dst = newItems.indexOf(item);
       //   // 替换
@@ -188,36 +191,52 @@ export default {
       //   this.items = newItems;
     },
     aa() {
-      // console.log("按下");
     },
     bb() {
-      // console.log("songkai");
     },
-    addTS(index, event) {
-      console.log(index);
+    addTS(index, event) {  //添加子级请求头
+      if(this.$parent.postType="header-com"){
+        var id=this.tableData.length
+        var parentId=this.tableData[index].id
+      }
+      if(this.$parent.postType="header-com2"){
+        var id=this.tableData.length
+        var parentId=this.tableData[index].id
+      }
       this.tableData.splice(index + 1, 0, {
-        prop: "",
+        cname: "",
         isrequired: null,
         type: "",
-        detail: "",children: [],
-        id: this.$parent.postheaders.length,
-        parentId: this.$parent.postheaders[index].id
+        detail: "",
+        id: id,
+        parentId: parentId,
+        mockValue:"11",
+        children: [],
       });
       var tt = this.indent[index];
       this.indent.splice(index + 1, 0, 15 + tt);
-      console.log(this.$parent.postheaders)
+
     },
-    addTT() {
+    addTT() {  //添加请求头顶级
+      if(this.$parent.postType="header-com"){
+        var id=this.tableData.length
+      }
+      if(this.$parent.postType="header-com2"){
+        var id=this.tableData.length
+      }
       this.tableData.push({
-        prop: "",
+        cname: "",
         isrequired: null,
         type: "",
-        detail: "",children: [],
-        id: this.$parent.postheaders.length,
-        parentId: 0
+        detail: "",
+        id: id,
+        parentId: 0,
+        mockValue:"11",
+        children: [],
       });
       this.indent.push(0);
       this.open2();
+
     },
     open2() {
       this.$message({
@@ -227,9 +246,36 @@ export default {
       });
     },
     removeTS(index) {
-      console.log(index);
+
+      
+      // if(this.$parent.postType="header-com"){
+        
+      // }
+      // if(this.$parent.postType="header-com2"){
+
+      // }
+
+      var id = this.tableData[index].id
       this.tableData.splice(index, 1);
       this.indent.splice(index, 1);
+      //这里删除需要坐下处理--如果删除的类容有下级则删除所有下级
+      this.findChild(id)
+    },
+//0, 0, 0, 0, 0, 0, 15, 30,
+    //循环遍历查找下级
+    findChild(id){
+      
+      for(var n=0;n<this.tableData.length;n++){
+
+         if(this.tableData[n].parentId==id){
+          this.findChild(this.tableData[n].id) //如果找到和删除id相关的之后-继续遍历以找到的这个，直到找完位置
+
+          this.tableData.splice(n, 1);  //找完之后再做删除--先做删除索引会变
+          this.indent.splice(n, 1);
+          n--
+        }
+      }
+
     },
     isListData() {
       if (this.tableData.length == 0) {
@@ -244,7 +290,6 @@ export default {
 
     indentMarginLeft() {
       this.tableData.forEach((item, index) => {
-        console.log(index, item);
         this.indent[index] = 0;
       });
     }
@@ -252,15 +297,15 @@ export default {
   created() {
     this.isListData(), //如果列表为空则自动添加一个
       this.indentMarginLeft();
-    console.log(this.indent);
   },
   updated() {
-    console.log(this.indent);
   }
 };
+
 </script>
 
 <style lang="scss" scoped>
+
 </style>
 
 <style>
