@@ -8,7 +8,9 @@
       <slot name="postJsonData">
       </slot>
       <slot name="environment">
+        <!-- 变量 -->
       </slot>
+
     </div>
   </div>
 </template>

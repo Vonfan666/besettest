@@ -131,36 +131,73 @@
           <div class="pd-title">
             <span class="colorCode3">新增环境变量</span>
 
-            <el-button type="primary" size="small" @click="clickEnvironment()">
-              <span></span> 环境变量
+            <el-button type="primary" size="small"  @click="clickEnvironment()">
+              <span>添加变量</span> 
             </el-button>
+
+            
+
+
             <environment-box
-              v-if="EnvironmentStatus"
-              v-slot:environment
+              v-slot:environment 
               :styleCode="environmentStyle"
+              v-if="EnvironmentStatus"
             >
-              <div class="enviromentClass">
-                <div class="environmenttitle">
-                  <h3>添加变量</h3>
+              <div class="environments" v-if="environments">
+
+                <div class="environmentsHeader" style="text-align:center">
+                  <h2>添加环境</h2>
                 </div>
-                <div class="environmentbody" style="margin:10px">
-                  <el-table :data="EnvironmentList" border style="width: 100%; margin-top: 20px">
-                    <el-table-column label width="50">
-                      
-                    </el-table-column>
+                <div class="environmentsbody">
+                  <div class="environmentName" v-for="(item,index) in Environments" :key="index">
+                    <span class="name"  @click="addEnrivonment(item,index)">{{item.name}}</span>
+                    <span class="name"></span>
+                  </div>
+                </div>
+
+                <div class="environmentsFoot">
+                   <el-button type="primary" class="environmentBottom" size="small" @click="environments=false;EnvironmentStatused=true;EnvironmentStatus=true">添加</el-button>
+                    <el-button type="primary" class="environmentBottom" size="small" @click="environments=false;EnvironmentStatused=true;EnvironmentStatus=true,environmentType=1">全局变量</el-button>
+                   <el-button type="primary" class="environmentBottom" size="small" @click="EnvironmentStatus=false;environments=false">关闭</el-button>
+
+                </div>
+              </div>
+
+              <div class="enviromentClass"  v-if="EnvironmentStatused" >
+
+
+                <div class="environmenttitle" style="text-align:center">
+                  <h2 style="margin: 19px 30px;"  v-if="environmentType==0" >环境变量</h2>
+                  <h2 style="margin: 19px 30px;" v-if="environmentType==1" >全局变量</h2>
+                </div>
+                <div  class="addEnvironmentName">
+                  <div>Environment Name</div>
+                  <div>
+                    <input  class="addEnvironmentInput">
+                  </div>
+                </div>
+                <div class="environmentbody" >
+                  <el-table :data="EnvironmentList" border  height="550" style="width: 100%; margin-top: 20px">
+                    <el-table-column label width="50"></el-table-column>
                     <el-table-column label="key" prop="key" height="25">
                       <template slot-scope="scope">
-                        <input v-model="EnvironmentList[scope.$index].key">
+                        <input class="input" v-model="EnvironmentList[scope.$index].key" />
                       </template>
                     </el-table-column>
                     <el-table-column label="value" prop="value" height="25">
                       <template slot-scope="scope">
-                        <input v-model="EnvironmentList[scope.$index].value">
+                        <input v-model="EnvironmentList[scope.$index].value" />
                       </template>
                     </el-table-column>
                   </el-table>
                 </div>
-                <div class="environmentFoot"></div>
+                <div class="environmentFoot">
+                  <el-button type="primary" class="environmentBottom" size="small">更新</el-button>
+                    <el-button type="primary" class="environmentBottom" size="small" @click="EnvironmentStatus=true;EnvironmentStatused=false;environments=true">返回</el-button>
+                   <el-button type="primary" class="environmentBottom" size="small" @click="environments=false;EnvironmentStatused=false;EnvironmentStatus=false">关闭</el-button>
+                    
+
+                </div>
               </div>
             </environment-box>
           </div>
@@ -257,16 +294,35 @@ export default {
     "header-com2": () => import("./IrPost/postHeader.vue"),
     "data-com2": () => import("./IrPost/PostData"),
     "message-box": () => import("../public/MessageBox.vue"),
-    "environment-box": () => import("../public/MessageBox.vue")
+    "environment-box": () => import("../public/MessageBox.vue"),
   },
   data() {
     return {
       disabled: false,
+      environmentType:1,  //0是环境变量  1是全局变量
       Environment: {
         value: []
       },
-      EnvironmentList: [{ key: "a", value: "aa" }],
+      environments:false,
+      Environments:[  //环境名称
+        {name:"测试环境",id:1,type:0,value:"https://www.baidu.com"},
+      
+
+      ],
+      EnvironmentList: [
+        { key: "a", value: "aa" },
+        { key: "a", value: "aa" },
+        { key: "a", value: "aa" },{ key: "a", value: "aa" },
+        { key: "a", value: "aa" },{ key: "a", value: "aa" },
+        { key: "a", value: "aa" },{ key: "a", value: "aa" },
+        { key: "a", value: "aa" },{ key: "a", value: "aa" },
+        { key: "a", value: "aa" },{ key: "a", value: "aa" },
+        { key: "a", value: "aa" },{ key: "a", value: "aa" },
+        { key: "a", value: "aa" },{ key: "a", value: "aa" },
+        { key: "a", value: "aa" },{ key: "a", value: "aa" }
+      ],
       EnvironmentStatus: false,
+      EnvironmentStatused:false,
       environmentStyle: "height:700px;width:700px",
       // EnvironmentAdd: [0],
       valueStatus: [], //存储环境变量临时值  [{"value":value}]
@@ -999,6 +1055,7 @@ export default {
     clickEnvironment() {
       //点击查看环境变量
       this.EnvironmentStatus = !this.EnvironmentStatus;
+      this.environments= !this.environments
     }
   },
 
@@ -1168,28 +1225,64 @@ export default {
   float: right;
 }
 
-.environmentbody  .cell{
-    position: relative;
-    width: 100%;
-    height: 100%;
-    input{
-      // width: 100%;
-      border-color: #ffffff !important;
-      border: 1px solid #ffffff ;
-
-    }
-    input:hover{
-      background-color: #ffffff !important;
-    }
-}
-
 // .environmentbody  .cell input{
 //   // position: absolute ;
-  
+
 //   // margin: 0 2px;
-  
+
 //   // height: 100%;
 // }
+.environments{
+  margin: 0 30px;
+}
+.environmentsHeader{
+  border-bottom: 1px solid #c9b2b2;
+}
+.environmentsbody{
+  height: 550px;
+  border-bottom: 1px solid #c9b2b2;
+  overflow-y:auto;
+}
+.environmentsFoot{
+  margin: 30px 0;
+  .environmentBottom{
+    margin-left: 10px;
+  }
+}
+.environmentsbody .environmentName .name{
+  font-size: 15px;
+
+}
+.environmentsbody .environmentName{
+  cursor: pointer;
+  border-bottom: 1px solid #c9b2b2;
+  padding: 10px 0;
+
+}
+
+.environmentsbody .environmentName:hover >.name{
+  color: #409eff;
+}
+.enviromentClass{
+  margin: 0 30px;
+
+}
+
+.environmentFoot{
+  margin: 30px 0;
+
+}
+.environmentFoot .environmentBottom{
+  margin-left: 10px;
+}
+
+.addEnvironmentInput{
+  width: 100%;
+    height: 20px;
+    margin-top: 10px;
+    border-radius: 2px;
+    border: 2px solid #EBEEF5;
+}
 </style>
 <style>
 .IR .el-form-item__label {
@@ -1201,10 +1294,74 @@ export default {
 .IR .el-input {
   margin-left: 5px;
 }
- /* .environmentbody .cell{
+/* .environmentbody .cell{
     position: relative;
     width: 100%;
     height: 100%;
     
 } */
+.environmentbody
+  .el-table
+  .el-table__body-wrapper
+  .el-table__body
+  tbody
+  tr:hover
+  > td {
+  background-color: #ffffff !important;
+}
+
+/* .environmentbody .el-table .el-table__body-wrapper .el-table__body .el-table__row  {
+  position: relative;
+  height: 100%;
+} */
+
+.environmentbody
+
+  .el-table__header
+  .has-gutter
+  .is-leaf
+  .cell{
+    text-align: center;
+  }
+
+  .environmentbody
+  .el-table
+  .el-table__body-wrapper
+  .el-table__body
+  .el-table__row
+  .cell
+  input {
+  width: 93%;
+  height: 95%;
+  top: 0px;
+  outline: none;
+  border-color: #ffffff !important;
+  border-style:none; 
+
+
+}
+
+.environmentbody
+  .el-table
+  .el-table__body-wrapper
+  .el-table__body
+  tbody
+  .el-table__row
+  .cell {
+
+  width: 100%;
+  top: 0px;
+  
+}
+
+/* .environmentbody
+  .el-table
+  .el-table__body-wrapper
+  .el-table__body
+  .el-table__row
+  .el-table_3_column_14  {
+    position: relative;
+  } */
+
+
 </style>
