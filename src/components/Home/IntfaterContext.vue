@@ -131,54 +131,92 @@
           <div class="pd-title">
             <span class="colorCode3">新增环境变量</span>
 
-            <el-button type="primary" size="small"  @click="clickEnvironment()">
-              <span>添加变量</span> 
+            <el-button type="primary" size="small" @click="clickEnvironment()">
+              <span>添加变量</span>
             </el-button>
 
-            
-
-
             <environment-box
-              v-slot:environment 
+              v-slot:environment
               :styleCode="environmentStyle"
               v-if="EnvironmentStatus"
             >
               <div class="environments" v-if="environments">
-
                 <div class="environmentsHeader" style="text-align:center">
                   <h2>添加环境</h2>
                 </div>
                 <div class="environmentsbody">
-                  <div class="environmentName" v-for="(item,index) in Environments" :key="index">
-                    <span class="name"  @click="addEnrivonment(item,index)">{{item.name}}</span>
-                    <span class="name"></span>
+                  <div class="environmentsName" v-for="(item,index) in Environments" :key="index">
+                    <span
+                      class="name"
+                      @click="EnvironmentsMethod(item.children,item.name);addStatus=1;EnvironmentsIndex=index"
+                    >{{item.name}}</span>
+                    <div class="EnvironmentsFloat">
+                      <span class="environmentsType" v-if="item.type==0 ">环境变量</span>
+                      <span class="environmentsType" v-else>全局变量</span>
+                      <span
+                        class="environmentsDelete el-icon-close"
+                        @click="environmentsDelete(index)"
+                      ></span>
+                    </div>
                   </div>
                 </div>
 
                 <div class="environmentsFoot">
-                   <el-button type="primary" class="environmentBottom" size="small" @click="environments=false;EnvironmentStatused=true;EnvironmentStatus=true">添加</el-button>
-                    <el-button type="primary" class="environmentBottom" size="small" @click="environments=false;EnvironmentStatused=true;EnvironmentStatus=true,environmentType=1">全局变量</el-button>
-                   <el-button type="primary" class="environmentBottom" size="small" @click="EnvironmentStatus=false;environments=false">关闭</el-button>
-
+                  <el-button
+                    type="primary"
+                    class="environmentsBottom"
+                    size="small"
+                    @click="environments=false;
+                    EnvironmentStatused=true;
+                    EnvironmentStatus=true;
+                    environmentType=0;
+                    addStatus=0
+                    "
+                  >添加</el-button>
+                  <el-button
+                    type="primary"
+                    class="environmentsBottom"
+                    size="small"
+                    @click="environments=false;
+                    EnvironmentStatused=true;
+                    EnvironmentStatus=true;
+                    environmentType=1;
+                    addStatus=0
+                    "
+                  >全局变量</el-button>
+                  <el-button
+                    type="primary"
+                    class="environmentsBottom"
+                    size="small"
+                    @click="EnvironmentStatus=false;
+                    environments=false;
+                    EnvironmentClear();
+                    "
+                  >关闭</el-button>
                 </div>
               </div>
 
-              <div class="enviromentClass"  v-if="EnvironmentStatused" >
-
-
+              <div class="enviromentClass" v-if="EnvironmentStatused">
                 <div class="environmenttitle" style="text-align:center">
-                  <h2 style="margin: 19px 30px;"  v-if="environmentType==0" >环境变量</h2>
-                  <h2 style="margin: 19px 30px;" v-if="environmentType==1" >全局变量</h2>
+                  <h2 style="margin: 19px 30px;" v-if="environmentType==0">环境变量</h2>
+                  <h2 style="margin: 19px 30px;" v-if="environmentType==1">全局变量</h2>
                 </div>
-                <div  class="addEnvironmentName">
+                <div class="addEnvironmentName">
                   <div>Environment Name</div>
                   <div>
-                    <input  class="addEnvironmentInput">
+                    <input class="addEnvironmentInput" v-model="Environmentname" />
                   </div>
                 </div>
-                <div class="environmentbody" >
-                  <el-table :data="EnvironmentList" border  height="550" style="width: 100%; margin-top: 20px">
-                    <el-table-column label width="50"></el-table-column>
+                <div class="environmentbody">
+                  <el-table :data="EnvironmentList" border  style="width: 100%; margin-top: 20px">
+                    <el-table-column label width="59" height="50">
+                      <template slot-scope="scope">
+                        <span
+                          class="environmentDelete el-icon-close"
+                          @click="environmentDelete(scope.$index)"
+                        ></span>
+                      </template>
+                    </el-table-column>
                     <el-table-column label="key" prop="key" height="25">
                       <template slot-scope="scope">
                         <input class="input" v-model="EnvironmentList[scope.$index].key" />
@@ -192,11 +230,44 @@
                   </el-table>
                 </div>
                 <div class="environmentFoot">
-                  <el-button type="primary" class="environmentBottom" size="small">更新</el-button>
-                    <el-button type="primary" class="environmentBottom" size="small" @click="EnvironmentStatus=true;EnvironmentStatused=false;environments=true">返回</el-button>
-                   <el-button type="primary" class="environmentBottom" size="small" @click="environments=false;EnvironmentStatused=false;EnvironmentStatus=false">关闭</el-button>
-                    
-
+                  <el-button
+                    v-if="addStatus==0"
+                    type="primary"
+                    class="environmentBottom"
+                    size="small"
+                    @click="EnvironmentUpdate()"
+                  >添加</el-button>
+                  <el-button
+                    v-if="addStatus==1"
+                    type="primary"
+                    class="environmentBottom"
+                    size="small"
+                    @click="EnvironmentUpdate()"
+                  >更新</el-button>
+                  <el-button
+                    type="primary"
+                    class="environmentBottom"
+                    size="small"
+                    @click="EnvironmentInsert()"
+                  >新增</el-button>
+                  <el-button
+                    type="primary"
+                    class="environmentBottom"
+                    size="small"
+                    @click="EnvironmentStatus=true;
+                    EnvironmentStatused=false;
+                    environments=true;
+                    EnvironmentClear()"
+                  >返回</el-button>
+                  <el-button
+                    type="primary"
+                    class="environmentBottom"
+                    size="small"
+                    @click="environments=false;
+                    EnvironmentStatused=false;
+                    EnvironmentStatus=false;
+                    EnvironmentClear()"
+                  >关闭</el-button>
                 </div>
               </div>
             </environment-box>
@@ -294,35 +365,114 @@ export default {
     "header-com2": () => import("./IrPost/postHeader.vue"),
     "data-com2": () => import("./IrPost/PostData"),
     "message-box": () => import("../public/MessageBox.vue"),
-    "environment-box": () => import("../public/MessageBox.vue"),
+    "environment-box": () => import("../public/MessageBox.vue")
   },
   data() {
     return {
       disabled: false,
-      environmentType:1,  //0是环境变量  1是全局变量
+      environmentType: 1, //0是环境变量  1是全局变量
       Environment: {
         value: []
       },
-      environments:false,
-      Environments:[  //环境名称
-        {name:"测试环境",id:1,type:0,value:"https://www.baidu.com"},
-      
+      addStatus: null, //判断是新增还是更新 0为新增 1为更新  返回或者关闭改为null
+      environments: false, //环境名
+      Environmentname: "",
+      EnvironmentsIndex:null,  //点击名称进入变量列表时的index
+      Environments: [
+        //环境名称
+        {
+          name: "测试环境",
+          id: 1,
+          type: 1,
+          value: "https://www.baidu.com",
+          children: [
+            {
+              key: "key",
+              value: "value"
+            },
+            {
+              key: "key",
+              value: "value"
+            }
+          ]
+        },
 
+        {
+          name: "测试环境",
+          id: 2,
+          type: 0,
+          value: "https://www.baidu.com",
+          children: [
+            {
+              key: "key",
+              value: "value"
+            }
+          ]
+        },
+        {
+          name: "测试环境",
+          id: 3,
+          type: 0,
+          value: "https://www.baidu.com",
+          children: [
+            {
+              key: "key",
+              value: "value"
+            }
+          ]
+        },
+        {
+          name: "测试环境",
+          id: 4,
+          type: 0,
+          value: "https://www.baidu.com",
+          children: [
+            {
+              key: "key",
+              value: "value"
+            }
+          ]
+        },
+        {
+          name: "测试环境",
+          id: 5,
+          type: 0,
+          value: "https://www.baidu.com",
+          children: [
+            {
+              key: "key",
+              value: "value"
+            }
+          ]
+        },
+        {
+          name: "测试环境",
+          id: 6,
+          type: 0,
+          value: "https://www.baidu.com",
+          children: [
+            {
+              key: "key",
+              value: "value"
+            }
+          ]
+        },
+        {
+          name: "测试环境",
+          id: 7,
+          type: 0,
+          value: "https://www.baidu.com",
+          children: [
+            {
+              key: "key",
+              value: "value"
+            }
+          ]
+        }
       ],
-      EnvironmentList: [
-        { key: "a", value: "aa" },
-        { key: "a", value: "aa" },
-        { key: "a", value: "aa" },{ key: "a", value: "aa" },
-        { key: "a", value: "aa" },{ key: "a", value: "aa" },
-        { key: "a", value: "aa" },{ key: "a", value: "aa" },
-        { key: "a", value: "aa" },{ key: "a", value: "aa" },
-        { key: "a", value: "aa" },{ key: "a", value: "aa" },
-        { key: "a", value: "aa" },{ key: "a", value: "aa" },
-        { key: "a", value: "aa" },{ key: "a", value: "aa" },
-        { key: "a", value: "aa" },{ key: "a", value: "aa" }
-      ],
+      EnvironmentList: [],
       EnvironmentStatus: false,
-      EnvironmentStatused:false,
+      EnvironmentStatused: false,
       environmentStyle: "height:700px;width:700px",
       // EnvironmentAdd: [0],
       valueStatus: [], //存储环境变量临时值  [{"value":value}]
@@ -846,28 +996,6 @@ export default {
           default:
             open3("未知错误，请重新上传");
         }
-        // if (this.postType == "header-com") {
-        // this.postJHeader = JSON.parse(this.postJson);
-        // this.isValid(this.postJHeader, this.postheaders);
-        // var dataCode = JSON.parse(JSON.stringify(this.postheaders));
-        // var a = this.addObjectSatrt(dataCode); //该请求是在提交数据的时候才做处理  a是标准的json数据--
-        // console.log(a)
-
-        // }
-        // if (this.postType == "data-com") {
-        //   this.postJData = JSON.parse(this.postJson);
-        //   this.isValid(this.postJData, this.postDatas); //this.postDatas老数据   postJData新数据
-        //   var dataCode = JSON.parse(JSON.stringify(this.postDatas));
-        //   var a = this.addObjectSatrt(dataCode);
-        //   console.log(a)
-        // }
-        // if(this.postType == "data-com2"){
-        //   this.resJHeader = JSON.parse(this.postJson);
-        //   this.isValid(this.resJHeader, this.postDatas); //this.postDatas老数据   postJData新数据
-        //   var dataCode = JSON.parse(JSON.stringify(this.postDatas));
-        //   var a = this.addObjectSatrt(dataCode);
-        //   console.log(a)
-        // }
       } catch (e) {
         this.open3("数据格式有误,请认真检查后上传", "warning");
       }
@@ -1001,6 +1129,87 @@ export default {
         });
       }
     },
+    EnvironmentsMethod(item, name) {
+      console.log(name)
+      //将环境大列表的类容push到环境列表
+      console.log(JSON.stringify(item));
+      this.EnvironmentList.splice(0, this.EnvironmentList.length);
+      this.Environmentname = name;
+      item.forEach((item1, idnex) => {
+        this.EnvironmentList.push(item1);
+      });
+      // this.EnvironmentList.push({ key: "", value: "" });
+      this.environments = false;
+      this.EnvironmentStatused = true;
+    },
+    EnvironmentInsert() {
+      this.EnvironmentList.push({ key: "", value: "" });
+    },
+    EnvironmentUpdate() {
+      console.log("this.addStatus",this.addStatus)
+      console.log("this.EnvironmentList",this.EnvironmentList)
+      //新增变量-更新到主Environments并提交到后端保存
+      if (this.Environmentname == "") {
+        // this.addStatus=0
+        this.open3("名称不能为空", "warning");
+
+      } else {
+        if (this.addStatus == 0) {  //状态等于0就是新增环境以及对应变量
+          var name = this.Environmentname;
+          var indexCode = this.Environments.length;
+          //现在环境列表插入父级
+          this.Environments.push({
+            name: name,
+            id: indexCode,
+            type: this.environmentType,
+            children: []
+          });
+          // console.log(JSON.stringify(this.EnvironmentList),"---")
+          this.EnvironmentList.forEach((item, index) => {
+            console.log(item,indexCode,this.Environments.length)
+            this.Environments[indexCode].children.push(item);
+          });
+          this.open3("添加成功", "success");
+          this.Environmentname=""  //名称置空
+          this.EnvironmentStatused=false;  //隐藏变量页面
+          this.environments=true  //打开环境页面
+          this.EnvironmentList.splice(0,this.EnvironmentList.length) //置空EnvironmentList
+          this.addStatus=null   //重置添加类型
+          console.log(this.Environments);
+        }
+      }
+      if(this.addStatus == 1){  //状态等于1就是在原有的基础上更新  首先直接提交给后台-页面处理-先删除环境列表原来的-然后在
+          //提交请求成功之后
+          var name=this.Environmentname
+          this.Environments[this.EnvironmentsIndex].name=name
+          //以上是如果用户修改环境名称
+          this.EnvironmentList.forEach((item,index) => {
+            this.Environments[this.EnvironmentsIndex].children.splice(index,1,item)
+          }); 
+          
+          console.log(this.Environments)
+          this.open3("更新成功", "success");
+          this.Environmentname=""
+          this.EnvironmentStatused=false;
+          this.environments=true
+          this.EnvironmentList.splice(0,this.EnvironmentList.length)
+          this.addStatus=null 
+      }
+    
+    },
+    EnvironmentClear(){
+      this.addStatus=null
+      this.Environmentname=""
+      this.EnvironmentList.splice(0,this.EnvironmentList.length)
+    },
+    environmentDelete(index) {
+      //删除变量
+      this.EnvironmentList.splice(index, 1);
+    },
+    environmentsDelete(index) {
+      //删除环境
+      this.Environments.splice(index, 1);
+    },
 
     changeBottomColor(event, value) {
       this.postType = value;
@@ -1045,7 +1254,9 @@ export default {
       // }
       this.bindCom2 = value;
     },
-    test() {},
+    test() {
+      console.log(1);
+    },
     open3(msg, status) {
       this.$message({
         message: msg,
@@ -1055,7 +1266,7 @@ export default {
     clickEnvironment() {
       //点击查看环境变量
       this.EnvironmentStatus = !this.EnvironmentStatus;
-      this.environments= !this.environments
+      this.environments = !this.environments;
     }
   },
 
@@ -1232,57 +1443,80 @@ export default {
 
 //   // height: 100%;
 // }
-.environments{
+.environments {
   margin: 0 30px;
 }
-.environmentsHeader{
+.environmentsHeader {
   border-bottom: 1px solid #c9b2b2;
 }
-.environmentsbody{
+.environmentsbody {
   height: 550px;
   border-bottom: 1px solid #c9b2b2;
-  overflow-y:auto;
+  overflow-y: auto;
 }
-.environmentsFoot{
+.environmentsFoot {
   margin: 30px 0;
-  .environmentBottom{
+  .environmentsBottom {
     margin-left: 10px;
   }
 }
-.environmentsbody .environmentName .name{
+.environmentsbody .environmentsName .name {
   font-size: 15px;
-
 }
-.environmentsbody .environmentName{
+.environmentsbody .environmentsName {
   cursor: pointer;
   border-bottom: 1px solid #c9b2b2;
-  padding: 10px 0;
-
+  padding: 15px 0;
+  position: relative;
 }
 
-.environmentsbody .environmentName:hover >.name{
+.environmentsbody .environmentsName:hover > .name {
   color: #409eff;
 }
-.enviromentClass{
+.EnvironmentsFloat {
+  display: inline-block;
+  right: 0px;
+  position: absolute;
+  top: 0px;
+}
+.environmentsType {
+  padding: 16px 0px !important;
+  margin-right: 0px !important;
+  color: rgb(196, 193, 193);
+}
+.environmentsDelete {
+  padding: 16px 0px !important;
+  margin-right: 0px !important;
+  margin-left: 10px !important;
+}
+
+
+.enviromentClass {
   margin: 0 30px;
-
 }
-
-.environmentFoot{
+.environmentbody {
+  margin: 10px 0;
+  height: 470px;
+  overflow-y: auto;
+  border-bottom: 1px solid #c9b2b2;
+  border-top: 1px solid #c9b2b2;
+}
+.environmentFoot {
   margin: 30px 0;
-
 }
-.environmentFoot .environmentBottom{
+.environmentFoot .environmentBottom {
   margin-left: 10px;
 }
 
-.addEnvironmentInput{
+.addEnvironmentInput {
   width: 100%;
-    height: 20px;
-    margin-top: 10px;
-    border-radius: 2px;
-    border: 2px solid #EBEEF5;
+  height: 20px;
+  margin-top: 10px;
+  border-radius: 2px;
+  border: 2px solid #ebeef5;
 }
+
+
 </style>
 <style>
 .IR .el-form-item__label {
@@ -1309,50 +1543,48 @@ export default {
   > td {
   background-color: #ffffff !important;
 }
+/* .environmentbody
+  .el-table
+  .el-table__body-wrapper
+  .el-table__body
+  tbody tr .el-table_3_column_14  {
+    padding: none !important;
+  } */
 
 /* .environmentbody .el-table .el-table__body-wrapper .el-table__body .el-table__row  {
   position: relative;
   height: 100%;
 } */
 
+.environmentbody .el-table__header .has-gutter .is-leaf .cell {
+  text-align: center;
+}
+
 .environmentbody
-
-  .el-table__header
-  .has-gutter
-  .is-leaf
-  .cell{
-    text-align: center;
-  }
-
-  .environmentbody
   .el-table
   .el-table__body-wrapper
   .el-table__body
   .el-table__row
   .cell
   input {
-  width: 93%;
-  height: 95%;
-  top: 0px;
+  width: 100%;
+  /* height: 95%;
+  top: 0px; */
   outline: none;
   border-color: #ffffff !important;
-  border-style:none; 
-
-
+  border-style: none;
 }
 
-.environmentbody
+/* .environmentbody
   .el-table
   .el-table__body-wrapper
   .el-table__body
   tbody
   .el-table__row
   .cell {
-
   width: 100%;
   top: 0px;
-  
-}
+} */
 
 /* .environmentbody
   .el-table
@@ -1362,6 +1594,5 @@ export default {
   .el-table_3_column_14  {
     position: relative;
   } */
-
 
 </style>
