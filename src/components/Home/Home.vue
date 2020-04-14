@@ -60,11 +60,12 @@
     <add-project :styleCode="styleCode" v-slot:project v-if="addProjectStatus">
       <div class="addProject">
         <div class="addProjectHeaderTitle">
-          <h3 v-if="projectProductStatus">项目列表</h3>
-          <h3 v-else>添加项目</h3>
+          <h3 v-if="projectProductStatus==1">项目列表</h3>
+          <h3 v-if="projectProductStatus==2">添加项目</h3>
+          <h3 v-if="projectProductStatus==3">编辑项目</h3>
         </div>
 
-        <div class="addProjectBody" v-if="projectProductStatus">
+        <div class="addProjectBody" v-if="projectProductStatus==1">
           <el-table :data="projectList" border style="width: 100%" height="650">
             <el-table-column prop="id" label="Id" width="120"></el-table-column>
             <el-table-column prop="name" label="项目名称" width="120"></el-table-column>
@@ -76,66 +77,86 @@
 
             <el-table-column fixed="right" label="操作" width="100">
               <template slot-scope="scope">
-                <el-button @click="handleClick(scope.row,scope.$index);" type="text" size="small">编辑</el-button>
-                <el-button type="text" size="small">删除</el-button>
+                <el-button @click="addProjectEdit(scope.row,scope.$index);projectProductStatus=3" type="text" size="small">编辑</el-button>
+                <el-button type="text" size="small" @click="addProjectRemove(scope.row,scope.$index)">删除</el-button>
                 <el-button type="text" size="small">添加成员</el-button>
               </template>
             </el-table-column>
           </el-table>
         </div>
-        <div class="addProjectBodyEdit" v-else>
-          <div class="addProjectBodyEditClass">
+        <div class="addProjectBodyEdit" v-if="projectProductStatus==3 || projectProductStatus==2">
+          <!-- <div class="addProjectBodyEditClass">
             <span class="addProjectBodyEditName">项目名称：</span>
             <span class="addProjectBodyEditInput">
               <input />
             </span>
-          </div>
-          <div class="addProjectAttr">
-            <span class="addProjectAttrs">开发地址：</span>
+          </div> -->
+          <div class="addProjectAttr" style="corlor:#606266">
+            <!-- <span class="addProjectAttrs">开发地址：</span>
             <span class="addProjectAttrInput">
               <input />
-            </span>
-            <el-form :model="addProjectObj" >
-              <el-form-item label="名称" prop="infaterName" label-width="70px">
-                <el-input v-model="addProjectObj.infaterName" clearable placeholder="请输入接口名称"></el-input>
+            </span> -->
+            <el-form :model="addProjectObj"  :rules="rules" >
+              <el-form-item label="项目名称" prop="name" label-width="70px">
+                <el-input v-model="addProjectObj.name" clearable placeholder="请输入项目名称" ></el-input>
+              </el-form-item>
+              <el-form-item label="开发地址" prop="devAttr" label-width="70px">
+                <el-input v-model="addProjectObj.devAttr" clearable placeholder="请输入开发环境地址"></el-input>
+              </el-form-item>
+              <el-form-item label="测试地址" prop="productAttr" label-width="70px">
+                <el-input v-model="addProjectObj.testAttr" clearable placeholder="请输入测试环境地址"></el-input>
+              </el-form-item>
+              <el-form-item label="生产地址" prop="infaterName" label-width="70px">
+                <el-input v-model="addProjectObj.productAttr" clearable placeholder="请输入生产环境地址"></el-input>
               </el-form-item>
             </el-form>
-            <el-form :model="addProjectObj" >
-              <el-form-item label="接口名称" prop="infaterName" label-width="70px">
-                <el-input v-model="addProjectObj.infaterName" clearable placeholder="请输入接口名称"></el-input>
-              </el-form-item>
-            </el-form>
+            <!-- <el-form :model="addProjectObj" >
+              
+            </el-form> -->
 
-            <span class="addProjectAttrs">测试地址：</span>
+            <!-- <span class="addProjectAttrs">测试地址：</span>
             <span class="addProjectAttrInput">
               <input />
-            </span>
+            </span> -->
 
-            <span class="addProjectAttrs">生产地址：</span>
+            <!-- <span class="addProjectAttrs">生产地址：</span>
             <span class="addProjectAttrInput">
               <input />
-            </span>
+            </span> -->
           </div>
         </div>
         <div class="addProjectFoot">
           <el-button
             type="primary"
             size="small"
-            @click="addProjectStatus=false"
+            @click="addProjectStatus=false;projectProductStatus=1;addProjectObj={}"
             v-if="projectProductStatus"
           >关闭</el-button>
           <el-button
             type="primary"
             size="small"
-            @click="projectProductStatus=!projectProductStatus"
-            v-if="!projectProductStatus"
-          >确认添加</el-button>
+            @click="projectProductStatus=1;addProjectObj={}"
+            v-if="projectProductStatus==2 || projectProductStatus==3"
+          >返回</el-button>
+          
+          <el-button
+            type="primary"
+            size="small"
+            @click="addProjectOk()"
+            v-if="projectProductStatus==2 || projectProductStatus==3"
+          >更新</el-button>
+          <el-button
+            type="primary"
+            size="small"
+            @click="projectProductStatus=2"
+            v-if="projectProductStatus==1"
+          >添加</el-button>
           <el-button
             type="primary"
             size="small"
             @click="addProjectSubmit()"
-            v-if="projectProductStatus"
-          >确认</el-button>
+            v-if="projectProductStatus==1"
+          >提交</el-button>
         </div>
       </div>
     </add-project>
@@ -151,7 +172,9 @@ export default {
   },
   data() {
     return {
-      projectProductStatus: true,
+      projectIndex:null,
+      projectProductStatus: 1,  // 1项目列表  2添加项目 3编辑项目 4添加成功
+      addProjectStatus: 0, //弹窗是否展示 
       settingStatus: false,
       leftStatus: true,
       projectid: null,
@@ -160,16 +183,14 @@ export default {
         project: "" //用户选择的项目，
       },
       styleCode: "height: 800px;width: 1000px;",
-      addProjectStatus: false, //添加项目弹窗
       addProjectObj:{
-          id: 1,
-          name: "测试项目1",
-          devAttr: "",
-          testAttr: "",
-          productAttr: "",
-          boss: "谁添加就是谁",
-          createTime: ""
+        
         },
+      rules:{
+        name:[
+          {required:true,message:"项目名称不能为空",trigger: "blur"}
+        ]
+      },
       projectList: [
         //后台返回的项目列表
         {
@@ -329,13 +350,32 @@ export default {
       }
     },
     addProject() {
-      this.addProjectStatus = true;
+      this.addProjectStatus = 1;
     },
     addProjectSubmit() {},
-    addProjectEdit() {},
-    handleClick(item, index) {
-      this.projectProductStatus = false;
-      console.log(item, index);
+    addProjectOk() {
+      console.log(this.projectProductStatus)
+      if(this.projectProductStatus==2){
+         console.log(this.addProjectObj)
+      //将数据传给后台--后台返回生成id之后再添加进去
+      this.projectList.unshift(this.addProjectObj)
+      //这里单独封装一个js弹窗成功或者失败的方法
+        this.projectProductStatus=1;
+        this.addProjectObj={}
+      }
+      if(this.projectProductStatus==3){
+        this.projectList[this.projectIndex]=this.addProjectObj
+        this.projectProductStatus=1;
+        this.addProjectObj={}
+      }
+     
+    },
+    addProjectEdit(item, index) {
+      this.addProjectObj=item
+      this.projectIndex=index
+    },
+    addProjectRemove(item,index){
+      this.projectList.splice(index,1)
     }
   },
 
@@ -500,7 +540,7 @@ export default {
   }
   .addProjectBody {
     width: 100%;
-    border: 1px solid red;
+    // border: 1px solid red;
     overflow-y: auto;
     margin-top: 20px;
   }
@@ -511,14 +551,19 @@ export default {
     text-align: center;
   }
 }
-.addProjectAttr {
+// .addProjectAttr {
+// }
+// .addProjectBodyEditClass {
+//   text-align: left;
+//   input {
+//     width: 400px;
+//   }
+// }
+.addProjectAttr{
+  margin: 50px 0;
+ 
 }
-.addProjectBodyEditClass {
-  text-align: left;
-  input {
-    width: 400px;
-  }
-}
+
 </style>
 <style>
 .el-form-item__label {
@@ -528,4 +573,7 @@ export default {
 .active {
   display: none;
 }
+.addProjectAttr .el-form  .el-form-item .el-form-item__label{
+    color: black !important;
+  }
 </style>
