@@ -7,7 +7,7 @@
             <el-select v-model="data.project" @change="changeProject()">
               <el-option
                 ref="eloption"
-                v-for="(item,index) in  model"
+                v-for="(item,index) in  projectList"
                 :key="index"
                 :value="item.id"
                 :label="item.name"
@@ -16,14 +16,13 @@
             </el-select>
           </el-form-item>
         </el-form>
-        <span class="icon el-icon-circle-plus-outline"></span>
+        <span class="icon el-icon-circle-plus-outline" @click="addProject()"></span>
       </div>
 
       <div class="nav">
-        <div class="nav-context" >
+        <div class="nav-context">
           <nav-list :listCode="nav" ref="navList"></nav-list>
         </div>
-        
       </div>
     </div>
     <div class="right">
@@ -33,7 +32,7 @@
         </div>
         <div class="right-top-context">
           <div class="setting" @mouseenter="settingStatus=true" @mouseleave="settingStatus=false">
-          <!-- <div class="setting" @click="settingStatus=!settingStatus"> -->
+            <!-- <div class="setting" @click="settingStatus=!settingStatus"> -->
             <div class="setting-context">
               <div class="settting-name">
                 <div class="setting-name-context">
@@ -55,9 +54,91 @@
       </div>
 
       <div class="right-context">
-          <router-view></router-view>
+        <router-view></router-view>
       </div>
     </div>
+    <add-project :styleCode="styleCode" v-slot:project v-if="addProjectStatus">
+      <div class="addProject">
+        <div class="addProjectHeaderTitle">
+          <h3 v-if="projectProductStatus">项目列表</h3>
+          <h3 v-else>添加项目</h3>
+        </div>
+
+        <div class="addProjectBody" v-if="projectProductStatus">
+          <el-table :data="projectList" border style="width: 100%" height="650">
+            <el-table-column prop="id" label="Id" width="120"></el-table-column>
+            <el-table-column prop="name" label="项目名称" width="120"></el-table-column>
+            <el-table-column prop="devAttr" label="开发地址" width="120"></el-table-column>
+            <el-table-column prop="testAttr" label="测试地址" width="120"></el-table-column>
+            <el-table-column prop="productAttr" label="生产地址" width="120"></el-table-column>
+            <el-table-column prop="createTime" label="创建时间" width="120"></el-table-column>
+            <el-table-column prop="boss" label="创建人" width="120"></el-table-column>
+
+            <el-table-column fixed="right" label="操作" width="100">
+              <template slot-scope="scope">
+                <el-button @click="handleClick(scope.row,scope.$index);" type="text" size="small">编辑</el-button>
+                <el-button type="text" size="small">删除</el-button>
+                <el-button type="text" size="small">添加成员</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+        <div class="addProjectBodyEdit" v-else>
+          <div class="addProjectBodyEditClass">
+            <span class="addProjectBodyEditName">项目名称：</span>
+            <span class="addProjectBodyEditInput">
+              <input />
+            </span>
+          </div>
+          <div class="addProjectAttr">
+            <span class="addProjectAttrs">开发地址：</span>
+            <span class="addProjectAttrInput">
+              <input />
+            </span>
+            <el-form :model="addProjectObj" >
+              <el-form-item label="名称" prop="infaterName" label-width="70px">
+                <el-input v-model="addProjectObj.infaterName" clearable placeholder="请输入接口名称"></el-input>
+              </el-form-item>
+            </el-form>
+            <el-form :model="addProjectObj" >
+              <el-form-item label="接口名称" prop="infaterName" label-width="70px">
+                <el-input v-model="addProjectObj.infaterName" clearable placeholder="请输入接口名称"></el-input>
+              </el-form-item>
+            </el-form>
+
+            <span class="addProjectAttrs">测试地址：</span>
+            <span class="addProjectAttrInput">
+              <input />
+            </span>
+
+            <span class="addProjectAttrs">生产地址：</span>
+            <span class="addProjectAttrInput">
+              <input />
+            </span>
+          </div>
+        </div>
+        <div class="addProjectFoot">
+          <el-button
+            type="primary"
+            size="small"
+            @click="addProjectStatus=false"
+            v-if="projectProductStatus"
+          >关闭</el-button>
+          <el-button
+            type="primary"
+            size="small"
+            @click="projectProductStatus=!projectProductStatus"
+            v-if="!projectProductStatus"
+          >确认添加</el-button>
+          <el-button
+            type="primary"
+            size="small"
+            @click="addProjectSubmit()"
+            v-if="projectProductStatus"
+          >确认</el-button>
+        </div>
+      </div>
+    </add-project>
   </div>
 </template>
 
@@ -65,10 +146,12 @@
 import Nav from "./Nav.vue";
 export default {
   components: {
-    "nav-list": Nav
+    "nav-list": Nav,
+    "add-project": () => import("../public/MessageBox")
   },
   data() {
     return {
+      projectProductStatus: true,
       settingStatus: false,
       leftStatus: true,
       projectid: null,
@@ -76,28 +159,129 @@ export default {
       data: {
         project: "" //用户选择的项目，
       },
-      model: [
+      styleCode: "height: 800px;width: 1000px;",
+      addProjectStatus: false, //添加项目弹窗
+      addProjectObj:{
+          id: 1,
+          name: "测试项目1",
+          devAttr: "",
+          testAttr: "",
+          productAttr: "",
+          boss: "谁添加就是谁",
+          createTime: ""
+        },
+      projectList: [
         //后台返回的项目列表
-        { id: 1, name: "测试项目1" },
-        { id: 2, name: "测试项目2" },
-        { id: 3, name: "测试项目3" },
-        { id: 4, name: "测试项目4" },
-        { id: 5, name: "测试项目5" },
-        { id: 6, name: "测试项目6" },
-        { id: 1, name: "测试项目1" },
-        { id: 2, name: "测试项目2" },
-        { id: 3, name: "测试项目3" },
-        { id: 4, name: "测试项目4" },
-        { id: 5, name: "测试项目5" },
-        { id: 6, name: "测试项目6" },
-        { id: 1, name: "测试项目1" },
-        { id: 2, name: "测试项目2" },
-        { id: 3, name: "测试项目3" },
-        { id: 4, name: "测试项目4" },
-        { id: 5, name: "测试项目5" },
-        { id: 6, name: "测试项目6测" },
-        { id: 10086, name: "查看更多……" }
+        {
+          id: 1,
+          name: "测试项目1",
+          devAttr: "",
+          testAttr: "",
+          productAttr: "",
+          boss: "谁添加就是谁",
+          createTime: ""
+        },
+        {
+          id: 2,
+          name: "测试项目2",
+          devAttr: "",
+          testAttr: "",
+          productAttr: "",
+          boss: "谁添加就是谁",
+          createTime: ""
+        },
+        {
+          id: 3,
+          name: "测试项目3",
+          devAttr: "",
+          testAttr: "",
+          productAttr: "",
+          boss: "谁添加就是谁",
+          createTime: ""
+        },
+        {
+          id: 4,
+          name: "测试项目4",
+          devAttr: "",
+          testAttr: "",
+          productAttr: "",
+          boss: "谁添加就是谁",
+          createTime: ""
+        },
+        {
+          id: 5,
+          name: "测试项目5",
+          devAttr: "",
+          testAttr: "",
+          productAttr: "",
+          boss: "谁添加就是谁",
+          createTime: ""
+        },
+        {
+          id: 6,
+          name: "测试项目6",
+          devAttr: "",
+          testAttr: "",
+          productAttr: "",
+          boss: "谁添加就是谁",
+          createTime: ""
+        },
+        {
+          id: 6,
+          name: "测试项目6",
+          devAttr: "",
+          testAttr: "",
+          productAttr: "",
+          boss: "谁添加就是谁",
+          createTime: ""
+        },
+        {
+          id: 6,
+          name: "测试项目6",
+          devAttr: "",
+          testAttr: "",
+          productAttr: "",
+          boss: "谁添加就是谁",
+          createTime: ""
+        },
+        {
+          id: 6,
+          name: "测试项目6",
+          devAttr: "",
+          testAttr: "",
+          productAttr: "",
+          boss: "谁添加就是谁",
+          createTime: ""
+        },
+        {
+          id: 6,
+          name: "测试项目6",
+          devAttr: "",
+          testAttr: "",
+          productAttr: "",
+          boss: "谁添加就是谁",
+          createTime: ""
+        },
+        {
+          id: 6,
+          name: "测试项目6",
+          devAttr: "",
+          testAttr: "",
+          productAttr: "",
+          boss: "谁添加就是谁",
+          createTime: ""
+        },
+        {
+          id: 6,
+          name: "测试项目6",
+          devAttr: "",
+          testAttr: "",
+          productAttr: "",
+          boss: "谁添加就是谁",
+          createTime: ""
+        }
       ],
+
       rules: {},
       nav: [
         //左侧导航
@@ -118,7 +302,10 @@ export default {
         {
           id: "6",
           name: "系统配置",
-          list: [{ id: "61", name: "角色管理" }, { id: "62", name: "账号管理" }]
+          list: [
+            { id: "61", name: "角色管理" },
+            { id: "62", name: "账号管理" }
+          ]
         }
       ]
     };
@@ -140,18 +327,24 @@ export default {
       } else {
         self.srcElement.innerHTML = "&#xe65e;";
       }
+    },
+    addProject() {
+      this.addProjectStatus = true;
+    },
+    addProjectSubmit() {},
+    addProjectEdit() {},
+    handleClick(item, index) {
+      this.projectProductStatus = false;
+      console.log(item, index);
     }
   },
+
   mounted() {
     console.log(111);
     if (this.chioceProject != "") {
       this.data.project = this.chioceProject;
     }
-
-    
-  },
-
-
+  }
 };
 </script>
 
@@ -242,10 +435,9 @@ export default {
         margin-top: -25px;
         margin-left: 20px;
         background: #141414;
-        z-index: 100
-        
+        z-index: 100;
       }
-      .setting-open-context{
+      .setting-open-context {
         margin-left: 5px;
       }
 
@@ -255,15 +447,77 @@ export default {
       }
     }
   }
-.right-context{
-  position: absolute;
-  margin-top: 20px;
-  width: 100%;
-  top: 60px;
-  background: red;
-  bottom: 0px;
-  left: 0px;
+  .right-context {
+    position: absolute;
+    margin-top: 20px;
+    width: 100%;
+    top: 60px;
+    background: red;
+    bottom: 0px;
+    left: 0px;
+  }
 }
+.addProject {
+  margin: 0 20px 20px 20px;
+  // border: 1px solid red;
+  .addProjectHeaderTitle {
+    border-bottom: 1px solid #c9b2b2;
+  }
+
+  .addProjectHeader {
+    margin-top: 20px;
+    position: relative;
+    height: 100%;
+    width: 100%;
+    margin-bottom: 10px;
+    .addProjectHeaderName {
+      line-height: 30px;
+      position: absolute;
+      left: 0px;
+      height: 100%;
+      display: block;
+    }
+    .addProjectHeaderInput {
+      // position: absolute;
+      left: 0px;
+      line-height: 30px;
+      margin-left: 100px;
+      height: 100%;
+      float: left;
+      input {
+        width: 400px;
+        height: 20px;
+        border-radius: 4px;
+      }
+    }
+
+    .addProjectHeaderSubmitName,
+    .addProjectHeaderSubmitAttr {
+      position: absolute;
+      margin-left: 57px;
+      top: -1px;
+    }
+  }
+  .addProjectBody {
+    width: 100%;
+    border: 1px solid red;
+    overflow-y: auto;
+    margin-top: 20px;
+  }
+  .addProjectFoot {
+    width: 100%;
+    position: absolute;
+    bottom: 20px;
+    text-align: center;
+  }
+}
+.addProjectAttr {
+}
+.addProjectBodyEditClass {
+  text-align: left;
+  input {
+    width: 400px;
+  }
 }
 </style>
 <style>
