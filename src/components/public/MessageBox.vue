@@ -10,6 +10,9 @@
       <slot name="environment">
         <!-- 变量 -->
       </slot>
+      <slot name="project">
+        
+      </slot>
 
     </div>
   </div>

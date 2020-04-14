@@ -630,12 +630,13 @@ export default {
 .it-left-context {
   position: relative;
   margin-top: 60px;
+  font-size: 13px;
 }
 
 .it-father {
   position: relative;
   width: 100%;
-  padding: 10px 0;
+  padding: 7px 0;
 }
 
 .it-direction {
@@ -665,7 +666,7 @@ export default {
   position: relative;
   width: 90%;
   display: inline-block;
-  padding: 10px 0;
+  padding: 9px 0;
   cursor: pointer;
   .ddName {
     position: relative;

@@ -131,8 +131,8 @@
           <div class="pd-title">
             <span class="colorCode3">新增环境变量</span>
 
-            <el-button type="primary" size="small" @click="clickEnvironment()">
-              <span>添加变量</span>
+            <el-button type="primary" size="small" @click="clickEnvironment()" class="addCode">
+              <span >添加变量</span>
             </el-button>
 
             <environment-box
@@ -181,7 +181,7 @@
                     EnvironmentStatused=true;
                     EnvironmentStatus=true;
                     environmentType=1;
-                    addStatus=0
+                    ifEnvironment()
                     "
                   >全局变量</el-button>
                   <el-button
@@ -190,7 +190,7 @@
                     size="small"
                     @click="EnvironmentStatus=false;
                     environments=false;
-                    EnvironmentClear();
+                    ;
                     "
                   >关闭</el-button>
                 </div>
@@ -209,7 +209,7 @@
                 </div>
                 <div class="environmentbody">
                   <el-table :data="EnvironmentList" border  style="width: 100%; margin-top: 20px">
-                    <el-table-column label width="59" height="50">
+                    <el-table-column label width="59" >
                       <template slot-scope="scope">
                         <span
                           class="environmentDelete el-icon-close"
@@ -217,12 +217,12 @@
                         ></span>
                       </template>
                     </el-table-column>
-                    <el-table-column label="key" prop="key" height="25">
+                    <el-table-column label="key" prop="key" >
                       <template slot-scope="scope">
                         <input class="input" v-model="EnvironmentList[scope.$index].key" />
                       </template>
                     </el-table-column>
-                    <el-table-column label="value" prop="value" height="25">
+                    <el-table-column label="value" prop="value">
                       <template slot-scope="scope">
                         <input v-model="EnvironmentList[scope.$index].value" />
                       </template>
@@ -350,7 +350,8 @@
     </message-box>
 
     <div class="tt">
-      <button @click="test()">确认</button>
+        <el-button type="primary" size="small" @click="Submit()">确认</el-button>
+
     </div>
   </div>
 </template>
@@ -374,14 +375,14 @@ export default {
       Environment: {
         value: []
       },
-      addStatus: null, //判断是新增还是更新 0为新增 1为更新  返回或者关闭改为null
+      addStatus: 0, //判断是新增还是更新 0为新增 1为更新  返回或者关闭改为null
       environments: false, //环境名
       Environmentname: "",
       EnvironmentsIndex:null,  //点击名称进入变量列表时的index
-      Environments: [
-        //环境名称
+      Environments: [ 
+        //环境变量列表
         {
-          name: "测试环境",
+          name: "测试环境1",
           id: 1,
           type: 1,
           value: "https://www.baidu.com",
@@ -398,7 +399,7 @@ export default {
         },
 
         {
-          name: "测试环境",
+          name: "测试环境2",
           id: 2,
           type: 0,
           value: "https://www.baidu.com",
@@ -410,7 +411,7 @@ export default {
           ]
         },
         {
-          name: "测试环境",
+          name: "测试环境3",
           id: 3,
           type: 0,
           value: "https://www.baidu.com",
@@ -422,7 +423,7 @@ export default {
           ]
         },
         {
-          name: "测试环境",
+          name: "测试环境4",
           id: 4,
           type: 0,
           value: "https://www.baidu.com",
@@ -434,7 +435,7 @@ export default {
           ]
         },
         {
-          name: "测试环境",
+          name: "测试环境5",
           id: 5,
           type: 0,
           value: "https://www.baidu.com",
@@ -446,7 +447,7 @@ export default {
           ]
         },
         {
-          name: "测试环境",
+          name: "测试环境6",
           id: 6,
           type: 0,
           value: "https://www.baidu.com",
@@ -458,7 +459,7 @@ export default {
           ]
         },
         {
-          name: "测试环境",
+          name: "测试环境7",
           id: 7,
           type: 0,
           value: "https://www.baidu.com",
@@ -470,6 +471,7 @@ export default {
           ]
         }
       ],
+      globalVariables:[],  //提交时把Environments里type=1的独立出来---返回时加入进去
       EnvironmentList: [],
       EnvironmentStatus: false,
       EnvironmentStatused: false,
@@ -1197,14 +1199,48 @@ export default {
       }
     
     },
+    ifEnvironment(){
+      var  l=[]
+      this.Environments.forEach((item,index)=>{
+        l.push(item.type)
+      })
+      console.log(l)
+      if(l.indexOf(1)>=0){
+        console.log("_______________")
+        this.addStatus=1
+        this.EnvironmentsIndex=l.indexOf(1)
+        var item=this.Environments[this.EnvironmentsIndex].children
+        var name=this.Environments[this.EnvironmentsIndex].name
+        this.EnvironmentList.splice(0, this.EnvironmentList.length);
+        this.Environmentname = name;
+        item.forEach((item1, idnex) => {
+          this.EnvironmentList.push(item1);
+        });
+        // this.EnvironmentList.push({ key: "", value: "" });
+        this.environments = false;
+        this.EnvironmentStatused = true;
+
+      }else{
+         console.log("++++++++")
+        this.addStatus=0
+      }
+      
+      console.log(this.addStatus)
+    },
     EnvironmentClear(){
       this.addStatus=null
       this.Environmentname=""
       this.EnvironmentList.splice(0,this.EnvironmentList.length)
+      
     },
     environmentDelete(index) {
       //删除变量
+      var  indexCode=this.EnvironmentsIndex
+      console.log(indexCode)
+      console.log(index,this.Environments[this.EnvironmentsIndex])
       this.EnvironmentList.splice(index, 1);
+      this.Environments[indexCode].children.splice(index,1)
+      //删除环境中的key
     },
     environmentsDelete(index) {
       //删除环境
@@ -1267,6 +1303,10 @@ export default {
       //点击查看环境变量
       this.EnvironmentStatus = !this.EnvironmentStatus;
       this.environments = !this.environments;
+    },
+    Submit(){
+      data={}
+      
     }
   },
 
@@ -1435,7 +1475,10 @@ export default {
 .pd-title .el-button {
   float: right;
 }
-
+.pd-title .addCode{
+  position: relative;
+    top: -10px;
+}
 // .environmentbody  .cell input{
 //   // position: absolute ;
 
