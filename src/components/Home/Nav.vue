@@ -18,6 +18,7 @@
 </template>
 
 <script>
+import storage from '../../libs/storage';
 export default {
   name: "nav-child",
   props: ["listCode"],
@@ -65,7 +66,7 @@ export default {
       if (!this.navChildStatus[index]) 
         { 
           switch(value){
-            case "11":this.$router.push("/BesetTest/home/infater/text");break;
+            case "11":this.$router.push({name:"infaterText",query:{"projectId":storage.get("projectId")}});break;
             case "12":this.$router.push("/BesetTest/home/infater/projectPop");break;
             case "13":this.$router.push("/BesetTest/home/infater/globalVariables");break;
             case "14":this.$router.push("/BesetTest/home/infater/history");break;
@@ -125,7 +126,15 @@ export default {
       ele.classList.add("h1");
       
     });
-  }
+    this.projectId=storage.get("projectId")
+  },
+  watch:{
+    
+    projectId(newValue,oldVlue) {
+      console.log(newValue,oldVlue,"---")
+    }
+  },
+  
 };
 </script>
 

@@ -29,7 +29,11 @@ export default new Router({
       path:"/BesetTest/home",
       component:()=>import("@/components/Home/Home"),
       children:[
-        {path:"/BesetTest/home/infater/text",component:()=>import("@/components/Home/Infater")},
+        {name:"infaterText",path:"/BesetTest/home/infater/text",component:()=>import("@/components/Home/Infater"),
+        children:[
+          {name:"infaterTextFile",path:"/BesetTest/home/infater/file",component:()=>import("@/components/Home/IntfaterContext")}
+        ]
+      },
         {path:"/BesetTest/home/infater/projectPop",component:()=>import("@/components/Home/ProjectPop")},
         {path:"/BesetTest/home/infater/globalVariables",component:()=>import("@/components/Home/GlobalVar")},
         {path:"/BesetTest/home/infater/history",component:()=>import("@/components/Home/History")}

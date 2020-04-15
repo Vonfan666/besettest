@@ -23,6 +23,7 @@
               <span>新建文件夹</span>
             </div>
           </div>
+          <!-- 搜索 -->
           <div class="searchPopOver" v-if="searchStatus">
             <div class="search-context">
               <p
@@ -39,6 +40,7 @@
                   <span :class="iconOpen[index]"></span>
                   <span class="name" :id="item.id">{{item.name}}</span>
                 </div>
+                <!-- 父级目录的操作项 -->
                 <div class="addText">
                   <!-- <div class="addtext-code">
                     <span class="el-icon-plus it-icon-addtext"></span>
@@ -63,8 +65,9 @@
                   :key="index1"
                   class="it-con-text"
                   :id="'s'+item1.id"
-                  @click="changeBack($event)"
+                  @click="changeBack($event,item.id,item1.id)"
                 >
+                <!-- 这里点击右边文档需要重新请求 -->
                   <!-- <div class="ddtext"> -->
                   <div class="ddName-father">
                     <span class="ddName">{{item1.name}}</span>
@@ -126,7 +129,7 @@
       </div>
     </div>
     <!-- 新建文件 -->
-    <message-box v-if="mbFielsStutas" v-slot:addFiels  :styleCode="styleCode">
+    <message-box v-if="mbFielsStutas" v-slot:addFiels :styleCode="styleCode">
       <div class="mbAddFiels">
         <h3>新建文件夹</h3>
         <el-form :model="updateFiels" :rules="rules" ref="refAddfiles">
@@ -145,6 +148,7 @@
 
 <script>
 import InfaterContext from "./IntfaterContext.vue";
+import storage from '../../libs/storage';
 export default {
   components: {
     "ir-con": InfaterContext,
@@ -152,7 +156,7 @@ export default {
   },
   data() {
     return {
-      styleCode: "height:300px;width:500px",  //弹出框大小
+      styleCode: "height:300px;width:500px", //弹出框大小
       mbFielsStutas: false, //新增文件蒙层状态
       copeCode: {},
       searchStatus: false,
@@ -242,16 +246,20 @@ export default {
     FatherSet(command) {
       if (command[0] == "a") {
         this.openAdd(command, "添加文件", "文件名称", "添加成功", "取消添加");
-        console.log(this.directions)
-
+        console.log(this.directions);
       }
-      if (command[0]=="b"){
-        this.openAdd(command, "修改文件名称", "文件名称", "修改成功", "取消修改");
+      if (command[0] == "b") {
+        this.openAdd(
+          command,
+          "修改文件名称",
+          "文件名称",
+          "修改成功",
+          "取消修改"
+        );
       }
-      if(command[0]=="c"){
-
-            this.list.splice(command[2],1)
-            this.open2("删除成功")
+      if (command[0] == "c") {
+        this.list.splice(command[2], 1);
+        this.open2("删除成功");
       }
     },
     addFielsSubmit() {
@@ -345,35 +353,16 @@ export default {
         }
       });
     },
-    changeBack(envet) {
+    //跳转--并传fileId给到下一个接口
+    changeBack(envet,fatherId,childId) {
+      // console.log(indexFather,indexChild)
+      console.log(this.$route.query)
       if (document.querySelector(".backColor")) {
         document.querySelector(".backColor").classList.remove("backColor");
       }
       envet.currentTarget.classList.add("backColor");
+      this.$router.push({name:"infaterTextFile",query:{projectId:storage.get("projectId"),fileId:childId}})
 
-      // console.log(className, typeof className);
-      // if (className != "ddName-father") {
-      //   console.log(111111111)
-      //   if (className == "ddName") {
-      //     var ele = envet.srcElement.parentElement;
-      //     console.log(222222222)
-      //   } else if (className == "el-icon-arrow-down") {
-      //     console.log(33333333333)
-      //     var ele =
-      //       envet.srcElement.parentElement.parentElement.parentElement
-      //         .parentElement;
-      //   }
-      // } else {
-      //   console.log(444444444);
-      //   var ele = event.srcElement;
-
-      // }
-      // if (document.querySelector(".backColor")) {
-      //   document.querySelector(".backColor").classList.remove("backColor");
-      //   ele.classList.add("backColor");
-      // } else {
-      //   ele.classList.add("backColor");
-      // }
     },
     reName(command) {
       //修改文件名称
@@ -457,26 +446,21 @@ export default {
             type: "success",
             message: msgSucsess
           });
-          if(command[0]=="a"){
-            console.log(command)
+          if (command[0] == "a") {
+            console.log(command);
             var count = this.list[command[2]].Clist.length;
-            console.log(this.list[command[2]])
+            console.log(this.list[command[2]]);
             this.$set(this.directions, command[2], true);
             this.$set(this.iconOpen, command[2], "el-icon-caret-bottom");
 
-
             this.$set(this.list[command[2]].Clist, count, {
-                id: count,
-                name: value
-              });
-          };
-          if(command[0]=="b"){
-            this.list[command[2]].name=value
+              id: count,
+              name: value
+            });
           }
-          
-
-          
-          
+          if (command[0] == "b") {
+            this.list[command[2]].name = value;
+          }
         })
         .catch(() => {
           this.$message({
@@ -484,21 +468,60 @@ export default {
             message: msgFail
           });
         });
-    },
-
+    }
+  },
+  created(){
+    this.aa()
   },
 
-  created() {
-    console.log(8888);
-    this.aa();
-    console.log(this.directions);
+  watch: {
+    $route: {
+      handler: function(val, oldVal) {
+        console.log(val.query.projectId, oldVal.query.projectId);
+        if (val.query.projectId != oldVal.query.projectId) {
+          console.log("假装请求接口",val,typeof val)
+          if(val.query.projectId==1){
+            console.log("更改list")
+            this.list.splice(0,this.list.length, {
+          id: 1,
+          name: "首页",
+          Clist: [
+            {
+              id: 11,
+              name:
+                "1111"
+            },
+            { id: 12, name: "11" },
+            { id: 13, name: "获取商111家评论" }
+          ]
+        },
+        {
+          id: 2,
+          name:
+            "获3家列表获取商家列表获取商家列表获取商家列表",
+          Clist: [
+            {
+              id: 21,
+              name:
+                "获取商家列表获取商家列表获取商家列表获取商家列表获取商家列表获取商家列表"
+            },
+            { id: 22, name: "获取用户所在城市" },
+            { id: 23, name: "获取用户收货地址" },
+            { id: 24, name: "优惠券" }
+          ]
+        },
+        {
+          id: 3,
+          name: "个人中心",
+          Clist: []
+        })
+          }
+        }
+      },
+      // 深度观察监听
+      deep: true
+    }
   }
-
-  // updated(){
-  //   console.log(999)
-  //   this.aa()
-  //   console.log(this.directions)
-  // }
 };
 </script>
 
@@ -516,7 +539,6 @@ export default {
     margin-right: 20px;
     display: flex;
     justify-content: center;
-    
   }
   .bt-botton .bottom {
     margin-left: 20px;
@@ -743,7 +765,6 @@ dl {
 }
 .mbAddFiels .el-form-item__label {
   color: #606266;
-
 }
 
 .addText:hover it-box {

@@ -561,7 +561,12 @@ export default {
         infaterName: [
           { required: true, message: "请输入接口名称", trigger: "blur" }
         ],
-        postAttr: [
+        postAttr: 
+        
+        
+        
+        
+        [
           { required: true, message: "请输入请求地址", trigger: "blur" }
         ]
       },
@@ -1144,7 +1149,7 @@ export default {
       this.environments = false;
       this.EnvironmentStatused = true;
     },
-    EnvironmentInsert() {
+    EnvironmentInsert() { //sasa
       this.EnvironmentList.push({ key: "", value: "" });
     },
     EnvironmentUpdate() {
@@ -1249,7 +1254,7 @@ export default {
 
     changeBottomColor(event, value) {
       this.postType = value;
-      this.bus.$emit("loading", true);
+      // this.bus.$emit("loading", true);
       if (document.querySelector(".colorCode")) {
         document.querySelector(".colorCode").classList.remove("colorCode");
       }
@@ -1268,7 +1273,7 @@ export default {
       // }
       this.bindCom = value;
 
-      this.bus.$emit("loading", true);
+      // this.bus.$emit("loading", true);
       // debugger
     },
     changeBottomColor2(event, value) {
@@ -1305,7 +1310,7 @@ export default {
       this.environments = !this.environments;
     },
     Submit(){
-      data={}
+      console.log("请求接口")
       
     }
   },
@@ -1315,6 +1320,8 @@ export default {
     } else {
       this.jsonDemo1 = this.jsonDemo;
     }
+    console.log(this.$router.query,"---")
+
     // this.restaurants=[]
     // this.postheaders.forEach((item,index)=>{
     //   this.restaurants.push({"value":item.cname})
@@ -1346,6 +1353,16 @@ export default {
     this.selected.forEach((item, index) => {
       this.Environment.value.push("");
     });
+    console.log(this.$route,"---")
+  },
+
+  watch:{
+    $route:{
+      handler:function(newValue,oldValue){
+        console.log(newValue.query,oldValue.query,"----")
+      },
+      deep:true
+    }
   }
 };
 </script>

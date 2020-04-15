@@ -4,7 +4,7 @@
       <div class="project">
         <el-form :model="data" :rules="rules" ref="projectref">
           <el-form-item prop="project" label="项目" label-width="40px">
-            <el-select v-model="data.project" @change="changeProject()">
+            <el-select v-model="data.project" @change="changeProject(data.project)">
               <el-option
                 ref="eloption"
                 v-for="(item,index) in  projectList"
@@ -60,82 +60,106 @@
     <add-project :styleCode="styleCode" v-slot:project v-if="addProjectStatus">
       <div class="addProject">
         <div class="addProjectHeaderTitle">
-          <h3 v-if="projectProductStatus">项目列表</h3>
-          <h3 v-else>添加项目</h3>
+          <h3 v-if="projectProductStatus==1">项目列表</h3>
+          <h3 v-if="projectProductStatus==2">添加项目</h3>
+          <h3 v-if="projectProductStatus==3">编辑项目</h3>
         </div>
 
-        <div class="addProjectBody" v-if="projectProductStatus">
+        <div class="addProjectBody" v-if="projectProductStatus==1">
           <el-table :data="projectList" border style="width: 100%" height="650">
-            <el-table-column prop="id" label="Id" width="120"></el-table-column>
+            <el-table-column prop="id" label="Id" width="70"></el-table-column>
             <el-table-column prop="name" label="项目名称" width="120"></el-table-column>
-            <el-table-column prop="devAttr" label="开发地址" width="120"></el-table-column>
-            <el-table-column prop="testAttr" label="测试地址" width="120"></el-table-column>
-            <el-table-column prop="productAttr" label="生产地址" width="120"></el-table-column>
+            <el-table-column prop="devAttr" label="开发地址" width="150"></el-table-column>
+            <el-table-column prop="testAttr" label="测试地址" width="150"></el-table-column>
+            <el-table-column prop="productAttr" label="生产地址" width="150"></el-table-column>
             <el-table-column prop="createTime" label="创建时间" width="120"></el-table-column>
             <el-table-column prop="boss" label="创建人" width="120"></el-table-column>
 
-            <el-table-column fixed="right" label="操作" width="100">
+            <el-table-column fixed="right" label="操作" width="120">
               <template slot-scope="scope">
-                <el-button @click="handleClick(scope.row,scope.$index);" type="text" size="small">编辑</el-button>
-                <el-button type="text" size="small">删除</el-button>
+                <el-button
+                  @click="addProjectEdit(scope.row,scope.$index);projectProductStatus=3"
+                  type="text"
+                  size="small"
+                >编辑</el-button>
+                <el-button
+                  type="text"
+                  size="small"
+                  @click="addProjectRemove(scope.row,scope.$index)"
+                >删除</el-button>
                 <el-button type="text" size="small">添加成员</el-button>
               </template>
             </el-table-column>
           </el-table>
         </div>
-        <div class="addProjectBodyEdit" v-else>
-          <div class="addProjectBodyEditClass">
+        <div class="addProjectBodyEdit" v-if="projectProductStatus==3 || projectProductStatus==2">
+          <!-- <div class="addProjectBodyEditClass">
             <span class="addProjectBodyEditName">项目名称：</span>
             <span class="addProjectBodyEditInput">
               <input />
             </span>
-          </div>
-          <div class="addProjectAttr">
-            <span class="addProjectAttrs">开发地址：</span>
+          </div>-->
+          <div class="addProjectAttr" style="corlor:#606266">
+            <!-- <span class="addProjectAttrs">开发地址：</span>
             <span class="addProjectAttrInput">
               <input />
-            </span>
-            <el-form :model="addProjectObj" >
-              <el-form-item label="名称" prop="infaterName" label-width="70px">
-                <el-input v-model="addProjectObj.infaterName" clearable placeholder="请输入接口名称"></el-input>
+            </span>-->
+            <el-form :model="addProjectObj" :rules="rules" ref="addProjectObj">
+              <el-form-item label="项目名称" prop="name" label-width="80px">
+                <el-input v-model="addProjectObj.name" clearable placeholder="请输入项目名称"></el-input>
+              </el-form-item>
+              <el-form-item label="开发地址" prop="devAttr" label-width="80px">
+                <el-input v-model="addProjectObj.devAttr" clearable placeholder="请输入开发环境地址"></el-input>
+              </el-form-item>
+              <el-form-item label="测试地址" prop="productAttr" label-width="80px">
+                <el-input v-model="addProjectObj.testAttr" clearable placeholder="请输入测试环境地址"></el-input>
+              </el-form-item>
+              <el-form-item label="生产地址" prop="infaterName" label-width="80px">
+                <el-input v-model="addProjectObj.productAttr" clearable placeholder="请输入生产环境地址"></el-input>
               </el-form-item>
             </el-form>
-            <el-form :model="addProjectObj" >
-              <el-form-item label="接口名称" prop="infaterName" label-width="70px">
-                <el-input v-model="addProjectObj.infaterName" clearable placeholder="请输入接口名称"></el-input>
-              </el-form-item>
-            </el-form>
+            <!-- <el-form :model="addProjectObj" >
+              
+            </el-form>-->
 
-            <span class="addProjectAttrs">测试地址：</span>
+            <!-- <span class="addProjectAttrs">测试地址：</span>
             <span class="addProjectAttrInput">
               <input />
-            </span>
+            </span>-->
 
-            <span class="addProjectAttrs">生产地址：</span>
+            <!-- <span class="addProjectAttrs">生产地址：</span>
             <span class="addProjectAttrInput">
               <input />
-            </span>
+            </span>-->
           </div>
         </div>
         <div class="addProjectFoot">
           <el-button
             type="primary"
             size="small"
-            @click="addProjectStatus=false"
+            @click="addProjectStatus=false;projectProductStatus=1;addProjectObj={}"
             v-if="projectProductStatus"
           >关闭</el-button>
           <el-button
             type="primary"
             size="small"
-            @click="projectProductStatus=!projectProductStatus"
-            v-if="!projectProductStatus"
-          >确认添加</el-button>
+            @click="projectProductStatus=1;addProjectObj={}"
+            v-if="projectProductStatus==2 || projectProductStatus==3"
+          >返回</el-button>
+
           <el-button
             type="primary"
             size="small"
-            @click="addProjectSubmit()"
-            v-if="projectProductStatus"
-          >确认</el-button>
+            @click="addProjectOk()"
+            v-if=" projectProductStatus==3"
+          >更新</el-button>
+          <el-button
+            type="primary"
+            size="small"
+            @click="addProjectAdd()"
+            v-if="projectProductStatus==2 ||projectProductStatus==1"
+          >添加</el-button>
+        
         </div>
       </div>
     </add-project>
@@ -144,6 +168,7 @@
 
 <script>
 import Nav from "./Nav.vue";
+import storage from "../../libs/storage.js"
 export default {
   components: {
     "nav-list": Nav,
@@ -152,6 +177,9 @@ export default {
   data() {
     return {
       projectProductStatus: true,
+      projectIndex: null,
+      projectProductStatus: 1, // 1项目列表  2添加项目 3编辑项目 4添加成功
+      addProjectStatus: 0, //弹窗是否展示
       settingStatus: false,
       leftStatus: true,
       projectid: null,
@@ -160,16 +188,18 @@ export default {
         project: "" //用户选择的项目，
       },
       styleCode: "height: 800px;width: 1000px;",
-      addProjectStatus: false, //添加项目弹窗
-      addProjectObj:{
-          id: 1,
-          name: "测试项目1",
-          devAttr: "",
-          testAttr: "",
-          productAttr: "",
-          boss: "谁添加就是谁",
-          createTime: ""
-        },
+      addProjectObj: {
+        id: "",
+        name: "",
+        devAttr: "",
+        testAttr: "",
+        productAttr: "",
+        boss: "",
+        createTime: ""
+      },
+      rules: {
+        name: [{ required: true, message: "项目名称不能为空", trigger: "blur" }]
+      },
       projectList: [
         //后台返回的项目列表
         {
@@ -227,7 +257,7 @@ export default {
           createTime: ""
         },
         {
-          id: 6,
+          id: 9,
           name: "测试项目6",
           devAttr: "",
           testAttr: "",
@@ -236,7 +266,7 @@ export default {
           createTime: ""
         },
         {
-          id: 6,
+          id: 11,
           name: "测试项目6",
           devAttr: "",
           testAttr: "",
@@ -245,7 +275,7 @@ export default {
           createTime: ""
         },
         {
-          id: 6,
+          id: 13,
           name: "测试项目6",
           devAttr: "",
           testAttr: "",
@@ -254,7 +284,7 @@ export default {
           createTime: ""
         },
         {
-          id: 6,
+          id: 14,
           name: "测试项目6",
           devAttr: "",
           testAttr: "",
@@ -263,7 +293,7 @@ export default {
           createTime: ""
         },
         {
-          id: 6,
+          id: 12,
           name: "测试项目6",
           devAttr: "",
           testAttr: "",
@@ -272,7 +302,7 @@ export default {
           createTime: ""
         },
         {
-          id: 6,
+          id: 17,
           name: "测试项目6",
           devAttr: "",
           testAttr: "",
@@ -282,7 +312,6 @@ export default {
         }
       ],
 
-      rules: {},
       nav: [
         //左侧导航
         {
@@ -312,11 +341,12 @@ export default {
   },
   methods: {
     changeProject(a) {
-      console.log(this.projectid, typeof this.projectid);
-      console.log(a, typeof a);
-      console.log(this.data.project, "11");
+      storage.set("projectId",a)
+      // console.log(this.data.project, "11");
+      // console.log(this.data)
+      this.$router.push({query:{"projectId":storage.get("projectId")}});
       if (this.data.project === 10086) {
-        this.$router.push({ path: "/BesetTest/login" });
+        this.$router.push({query:{"projectId":storage.get("projectId")}});
       }
     },
     openIcon(self) {
@@ -329,13 +359,53 @@ export default {
       }
     },
     addProject() {
-      this.addProjectStatus = true;
+      this.addProjectStatus = 1;
     },
-    addProjectSubmit() {},
-    addProjectEdit() {},
-    handleClick(item, index) {
-      this.projectProductStatus = false;
-      console.log(item, index);
+    addProjectSubmit() {
+      console.log(this.addProjectObj);
+      //将数据传给后台--后台返回生成id之后再添加进去
+      this.projectList.unshift(this.addProjectObj);
+      //这里单独封装一个js弹窗成功或者失败的方法
+      this.projectProductStatus = 1;
+      this.addProjectObj = {};
+    },
+    addProjectAdd() {
+      //projectProductStatus=2||3时展示添加按钮。。
+      //从项目列表点击添加---只是projectProductStatus=2
+
+      if (this.projectProductStatus == 1) {
+        this.projectProductStatus = 2;
+      } else {
+        if (this.projectProductStatus == 2) {
+          this.$refs.addProjectObj.validate(valid => {
+            if (valid) {
+              console.log(this.addProjectObj);
+              //将数据传给后台--后台返回生成id之后再添加进去
+              this.projectList.unshift(this.addProjectObj);
+              //这里单独封装一个js弹窗成功或者失败的方法
+              this.projectProductStatus = 1;
+              this.addProjectObj = {};
+            }
+          });
+        }
+      }
+    },
+    addProjectOk() {
+      //编辑 更新
+      console.log(this.projectProductStatus);
+
+      if (this.projectProductStatus == 3) {
+        this.projectList[this.projectIndex] = this.addProjectObj;
+        this.projectProductStatus = 1;
+        this.addProjectObj = {};
+      }
+    },
+    addProjectEdit(item, index) {
+      this.addProjectObj = item;
+      this.projectIndex = index;
+    },
+    addProjectRemove(item, index) {
+      this.projectList.splice(index, 1);
     }
   },
 
@@ -344,6 +414,7 @@ export default {
     if (this.chioceProject != "") {
       this.data.project = this.chioceProject;
     }
+    //默认记录用户上次访问的id后台返回-然后第一次直接projectId=用户最后一次访问的id
   }
 };
 </script>
@@ -500,7 +571,7 @@ export default {
   }
   .addProjectBody {
     width: 100%;
-    border: 1px solid red;
+    // border: 1px solid red;
     overflow-y: auto;
     margin-top: 20px;
   }
@@ -511,13 +582,17 @@ export default {
     text-align: center;
   }
 }
+
+// .addProjectAttr {
+// }
+// .addProjectBodyEditClass {
+//   text-align: left;
+//   input {
+//     width: 400px;
+//   }
+// }
 .addProjectAttr {
-}
-.addProjectBodyEditClass {
-  text-align: left;
-  input {
-    width: 400px;
-  }
+  margin: 50px 0;
 }
 </style>
 <style>
@@ -527,5 +602,11 @@ export default {
 
 .active {
   display: none;
+}
+.addProjectAttr .el-form .el-form-item .el-form-item__label {
+  color: black !important;
+}
+.addProjectAttr .el-form .el-form-item .el-form-item__content {
+  margin-left: 80px;
 }
 </style>
