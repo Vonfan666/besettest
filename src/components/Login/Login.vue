@@ -6,11 +6,17 @@
     <div class="context">
       <div class="context-form">
         <el-form :model="loginForm" :rules="rules" style="width:300px" ref="login">
-          <el-form-item label="账号" prop="phone" label-width="50px">
-            <el-input v-model="loginForm.phone" clearable placeholder="请输入您的账号"></el-input>
+          <el-form-item label="账号" prop="mobil" label-width="50px">
+            <el-input v-model="loginForm.mobil" clearable placeholder="请输入您的账号"></el-input>
           </el-form-item>
           <el-form-item label="密码" prop="password" label-width="50px">
-            <el-input v-model="loginForm.password" clearable  show-password class="passwordInput" placeholder="请输入您的密码"></el-input>
+            <el-input
+              v-model="loginForm.password"
+              clearable
+              show-password
+              class="passwordInput"
+              placeholder="请输入您的密码"
+            ></el-input>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" :disabled="disabled" @click="submit()" class="button">登录</el-button>
@@ -23,11 +29,11 @@
         </div>
       </div>
     </div>
-    <div class="regist-child active" >
+    <div class="regist-child active">
       <!--通过active决定子组件是否展示-->
-      <Regist :departmentlist="departmentList"  ref="regists"></Regist>
+      <Regist :departmentlist="departmentList" ref="regists"></Regist>
     </div>
-    <div class="forgetPw-child active" >
+    <div class="forgetPw-child active">
       <forget-pw></forget-pw>
     </div>
   </div>
@@ -36,21 +42,21 @@
 <script>
 import valids from "@/libs/validate.js";
 // import Regist from "./regist";
-import forgetpassword from "./Forgetpassworf"
-import { department,login } from "@/axios/api.js"
+import forgetpassword from "./Forgetpassworf";
+import { department, login } from "@/axios/api.js";
 import { Message } from "element-ui";
-import storage from "@/libs/storage.js"
+import storage from "@/libs/storage.js";
 export default {
   data() {
     return {
       res: null,
       disabled: false,
       loginForm: {
-        phone: "",
+        mobil: "",
         password: ""
       },
       rules: {
-        phone: [
+        mobil: [
           { required: true, message: "账号不能为空" },
           { validator: valids.phoneValidate, trigger: "blur" }
         ],
@@ -59,48 +65,47 @@ export default {
           { validator: valids.passwordValidate, trigger: "blur" }
         ]
       },
-      departmentList:[]
+      departmentList: []
     };
   },
   methods: {
     submit() {
       this.$refs.login.validate(valid => {
         if (valid) {
-            login(this.loginForm).then((res)=>{
-              console.log(res)
-              cookie.setCookie("name",this.userName)
-              cookie.setCookie("token",res.data.token,7)
-
-              this.$router.push({path:"/BesetTest/home"})
-            }).catch((error)=>{
-              Message.error("服务器错误")
+          login(this.loginForm)
+            .then(res => {
+              console.log(res);
+              if (res.status == 200) {
+                this.$router.push({ path: "/BesetTest/home" });
+              } else {
+                Message.error(res.message);
+              }
             })
+            .catch(error => {
+              Message.error("服务器错误");
+            });
         } else {
         }
       });
     },
     removeClass() {
       document.querySelector(".regist-child").classList.remove("active");
-      department().then(res=>{
-        this.departmentList=res
-        console.log(this.departmentList,"修改过后departmentList的值")
-        this.$refs.regists.data.list=res.results
-      }
-        
-      )
-
+      department().then(res => {
+        this.departmentList = res;
+        console.log(this.departmentList, "修改过后departmentList的值");
+        this.$refs.regists.data.list = res.results;
+      });
     },
-    forgetpassword(){
+    forgetpassword() {
       document.querySelector(".forgetPw-child").classList.remove("active");
     }
   },
   components: {
-    "Regist":()=>import("./regist"),
-    "forget-pw":forgetpassword
+    Regist: () => import("./regist"),
+    "forget-pw": forgetpassword
   },
-  mounted(){
-    this.loginForm.phone="",
-    this.loginForm.password=""
+  mounted() {
+    (this.loginForm.mobil = ""), (this.loginForm.password = "");
   }
 };
 </script>

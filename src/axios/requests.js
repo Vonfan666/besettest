@@ -9,12 +9,12 @@ import storage from "@/libs/storage"
 
 //请求拦截器
 axios.interceptors.request.use(config => {
-    console.log(config,"请求拦截器")
+    // console.log(config,"请求拦截器")
     
     return config
 }, err => {
     Message.error('请求超时');
-    return Promise.resolve(err);
+    return Promise.reject(err);
 });
 
 //后端返回数据拦截
@@ -31,10 +31,11 @@ axios.interceptors.response.use(response=>{
                
             break;
         
-        case 401:
+        case 401: //一般这个是未登录
             console.log("返回状态码是401");
             if (data.message !== null) {
                 Message.error(data.message);
+                this.$router.push({name:"login"})  //跳转登录页面
             } else {
                 Message.error("未知错误");
             }
@@ -63,7 +64,7 @@ axios.interceptors.response.use(response=>{
     // 返回状态码不为200时候的错误处理
     console.log(err,"这个执行啥")
     // Message.error(err.toString());
-    Message.error("服务器错误");
+    // Message.error("服务器错误");
     return Promise.resolve(err);
 })
 

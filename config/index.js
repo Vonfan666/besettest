@@ -12,7 +12,7 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/users': {
-       target: 'http://localhost:8089',
+       target: 'http://localhost:8081',
        changeOrigin: true,
        pathRewrite: {
         '^/users': '/users' // pathRewrite方法重写url, 这样配置出来的url为http://localhost:8081/api/seller
