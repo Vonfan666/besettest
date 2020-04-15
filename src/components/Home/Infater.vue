@@ -353,8 +353,8 @@ export default {
         }
       });
     },
-    //跳转--并传fileId给到下一个接口
-    changeBack(envet,fatherId,childId) {
+    
+    changeBack(envet,fatherId,childId) {//跳转--并传fileId给到下一个接口
       // console.log(indexFather,indexChild)
       console.log(this.$route.query)
       if (document.querySelector(".backColor")) {
