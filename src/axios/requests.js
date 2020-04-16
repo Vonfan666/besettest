@@ -65,7 +65,7 @@ axios.interceptors.response.use(response=>{
     console.log(err,"这个执行啥")
     // Message.error(err.toString());
     // Message.error("服务器错误");
-    return Promise.resolve(err);
+    return Promise.reject(err);
 })
 
 
@@ -73,7 +73,7 @@ axios.interceptors.response.use(response=>{
 
 export const getRequest = (url, params) => {
     let accessToken = storage.get('accessToken');
-    console.log("请求开始",params)
+    // console.log("请求开始",params)
     return axios({
         method: 'get',
         url: `${url}`,
@@ -89,8 +89,8 @@ export const getRequest = (url, params) => {
 export const postRequest = (url, params) => {
     // console.log(qs.stringify(params),"aadsads")
     let accessToken = storage.get("accessToken");
-    console.log("accessToken",accessToken)
-    console.log(typeof params)
+    // console.log("accessToken",accessToken)
+    // console.log(typeof params)
     // let accessToken = getStore("accessToken");
 
     return axios({

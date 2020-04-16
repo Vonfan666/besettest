@@ -31,7 +31,7 @@
     </div>
     <div class="regist-child active">
       <!--通过active决定子组件是否展示-->
-      <Regist :departmentlist="departmentList" ref="regists"></Regist>
+      <Regist :departmentlist.sync="departmentList" ref="regists"></Regist>
     </div>
     <div class="forgetPw-child active">
       <forget-pw></forget-pw>
@@ -91,9 +91,18 @@ export default {
     removeClass() {
       document.querySelector(".regist-child").classList.remove("active");
       department().then(res => {
-        this.departmentList = res;
-        console.log(this.departmentList, "修改过后departmentList的值");
-        this.$refs.regists.data.list = res.results;
+        console.log("11121212121")
+        console.log(res.results)
+        if(res.status==200){
+          this.departmentList.splice(0,this.departmentList.length)  
+          res.results.forEach((item) => {
+            this.departmentList.push(item)
+          });
+          console.log(JSON.stringify(this.departmentList),"departmentList")
+        }else{
+          console.log(11111)
+          Message.error(res.message)
+        }
       });
     },
     forgetpassword() {

@@ -12,10 +12,10 @@
         <el-form-item label="所属部门" prop="department" label-width="100px">
           <el-select v-model="regist.department" placeholder="请选择所属部门">
             <el-option
-              v-for="(item,index) in data.list"
+              v-for="(item,index) in departmentlist"
               :key="index"
-              :label="item.d_name"
-              :value="item.d_id"
+              :label="item.name"
+              :value="item.department_id"
             ></el-option>
           </el-select>
         </el-form-item>
@@ -56,7 +56,7 @@ import {
 import  storage from "@/libs/storage.js"
 export default {
   // props: ["style"],  
-  prop:["departmentlist"],
+  props:["departmentlist"],
   data() {
      var validatePass = (rule, value, callback) => {
         if  (value !== this.regist.password) {
@@ -144,9 +144,13 @@ export default {
     }
   },
   watch:{
-    'departmentlist'(newVvalue,oldValue){
+    departmentlist(newVvalue,oldValue){
         console.log(newVvalue,oldValue,"cao")
+        
     }
+  },
+  mounted(){
+    console.log(this.departmentlist,"==")
   }
 
 };
