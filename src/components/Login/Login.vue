@@ -6,8 +6,8 @@
     <div class="context">
       <div class="context-form">
         <el-form :model="loginForm" :rules="rules" style="width:300px" ref="login">
-          <el-form-item label="账号" prop="mobil" label-width="50px">
-            <el-input v-model="loginForm.mobil" clearable placeholder="请输入您的账号"></el-input>
+          <el-form-item label="账号" prop="username" label-width="50px">
+            <el-input v-model="loginForm.username" clearable placeholder="请输入您的账号"></el-input>
           </el-form-item>
           <el-form-item label="密码" prop="password" label-width="50px">
             <el-input
@@ -31,7 +31,7 @@
     </div>
     <div class="regist-child active">
       <!--通过active决定子组件是否展示-->
-      <Regist :departmentlist="departmentList" ref="regists"></Regist>
+      <Regist :departmentlist.sync="departmentList" ref="regists"></Regist>
     </div>
     <div class="forgetPw-child active">
       <forget-pw></forget-pw>
@@ -52,11 +52,11 @@ export default {
       res: null,
       disabled: false,
       loginForm: {
-        mobil: "",
+        username: "",
         password: ""
       },
       rules: {
-        mobil: [
+        username: [
           { required: true, message: "账号不能为空" },
           { validator: valids.phoneValidate, trigger: "blur" }
         ],
@@ -74,15 +74,16 @@ export default {
         if (valid) {
           login(this.loginForm)
             .then(res => {
-              console.log(res);
+              console.log(res,"进入")
               if (res.status == 200) {
-                this.$router.push({ path: "/BesetTest/home" });
-              } else {
-                Message.error(res.message);
-              }
+                this.$router.push({name:"Home"});
+                 Message.success(res.msg)
+              } 
             })
             .catch(error => {
-              Message.error("服务器错误");
+              console.log("error",error)
+              console.log("333333fengfa");
+              Message.error("网络异常");
             });
         } else {
         }
@@ -91,9 +92,14 @@ export default {
     removeClass() {
       document.querySelector(".regist-child").classList.remove("active");
       department().then(res => {
-        this.departmentList = res;
-        console.log(this.departmentList, "修改过后departmentList的值");
-        this.$refs.regists.data.list = res.results;
+        if(res.status==200){
+          this.departmentList.splice(0,this.departmentList.length)
+          res.results.forEach((item) => {
+            this.departmentList.push(item)
+          });
+          
+        }
+
       });
     },
     forgetpassword() {
@@ -105,7 +111,7 @@ export default {
     "forget-pw": forgetpassword
   },
   mounted() {
-    (this.loginForm.mobil = ""), (this.loginForm.password = "");
+    (this.loginForm.username = ""), (this.loginForm.password = "");
   }
 };
 </script>

@@ -14,6 +14,7 @@ export default new Router({
     },
     {
       path:"/BesetTest/login",
+      name:"Login",
       component:()=>import("@/components/Login/login")
 
     },
@@ -27,6 +28,7 @@ export default new Router({
     // }
     {
       path:"/BesetTest/home",
+      name:"Home",
       component:()=>import("@/components/Home/Home"),
       children:[
         {name:"infaterText",path:"/BesetTest/home/infater/text",component:()=>import("@/components/Home/Infater"),

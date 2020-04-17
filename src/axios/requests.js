@@ -2,7 +2,7 @@ import axios from "axios";
 import Qs from "qs";
 import { Message } from "element-ui";
 import storage from "@/libs/storage"
-
+import router from  "@/router"
 // axios.defaults.timeout = 15000;
 
 
@@ -14,58 +14,39 @@ axios.interceptors.request.use(config => {
     return config
 }, err => {
     Message.error('请求超时');
-    return Promise.reject(err);
+    return Promise.resolve(err);
 });
 
 //后端返回数据拦截
 axios.interceptors.response.use(response=>{
     const data=response.data
-    console.log(response,"返回拦截器")
-    console.log(response.data)
+    console.log("这是返回的值",response.data)
     switch(data.status){
-        
         case 200:
-            if (data.message){
-                Message.success(data.message)
-            }
-               
             break;
-        
-        case 401: //一般这个是未登录
-            console.log("返回状态码是401");
-            if (data.message !== null) {
-                Message.error(data.message);
-                this.$router.push({name:"login"})  //跳转登录页面
-            } else {
-                Message.error("未知错误");
-            }
+        case 401: //一般这个是未登录或者登录失效
+            Message.error(data.msg);
+            router.replace({   //重定向到登录页面
+                name:"Login",
+            })
             break;
         case 403:
             console.log("返回状态码是403");
-            if (data.message !== null) {
-                Message.error(data.message);
-            } else {
-                Message.error("未知错误");
-            }
+            Message.error(data.msg);
             break;
         case 500:
-            console.log("返回状态码500")
-            if (data.message !== null) {
-                console.log("这个执行了吗啊")
-                Message.error(data.message);
-            } else {
-                Message.error("未知错误");
-            }
+            console.log("返回状态码500");
+            Message.error(data.msg);
         default: return data
     }
     console.log(data,"zuih")
     return data
-},(err) => {
-    // 返回状态码不为200时候的错误处理
+},err => {  //异常处理
+    
     console.log(err,"这个执行啥")
     // Message.error(err.toString());
-    // Message.error("服务器错误");
-    return Promise.resolve(err);
+    Message.error("服务器错误");
+    return Promise.reject(err);
 })
 
 

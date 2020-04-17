@@ -9,13 +9,13 @@
         
       </div>
       <el-form :model="regist" :rules="rules" class="regist-form" ref="elForm">
-        <el-form-item label="所属部门" prop="department" label-width="100px">
-          <el-select v-model="regist.department" placeholder="请选择所属部门">
+        <el-form-item label="所属部门" prop="det" label-width="100px">
+          <el-select v-model="regist.det" placeholder="请选择所属部门">
             <el-option
-              v-for="(item,index) in data.list"
+              v-for="(item,index) in departmentlist"
               :key="index"
-              :label="item.d_name"
-              :value="item.d_id"
+              :label="item.name"
+              :value="item.department_id"
             ></el-option>
           </el-select>
         </el-form-item>
@@ -24,8 +24,8 @@
           <el-input v-model="regist.readlyName" clearable placeholder="请输入姓名以便找回密码"></el-input>
         </el-form-item>
 
-        <el-form-item prop="phone" label="账号" label-width="100px">
-          <el-input v-model="regist.phone" clearable placeholder="请输入6-18位账号"></el-input>
+        <el-form-item prop="username" label="账号" label-width="100px">
+          <el-input v-model="regist.username" clearable placeholder="请输入6-18位账号"></el-input>
         </el-form-item>
 
         <el-form-item prop="password" label="密码" label-width="100px">
@@ -53,10 +53,10 @@ import {
   regist,
 } from "@/axios/api"
 
-import  storage from "@/libs/storage.js"
+import  storage from "@/libs/storage.js" 
 export default {
   // props: ["style"],  
-  prop:["departmentlist"],
+  props:["departmentlist"],
   data() {
      var validatePass = (rule, value, callback) => {
         if  (value !== this.regist.password) {
@@ -68,9 +68,9 @@ export default {
       
       message: "",
       regist: {
-        department: "",
+        det: null,
         readlyName:"",
-        phone: "",
+        username: "",
         password: "",
         forgetPassword: "",
         
@@ -80,10 +80,10 @@ export default {
         readlyName:[
           {required:true,message:"请输入真实姓名",trigger: "blur"}
         ],
-        department: [
+        det: [
           { required: true, message: "必须选择所属部门", trigger: "change" }
         ],
-        phone: [
+        username: [
           { required: true, message: "账号不能为空",trigger:"blur" },
           { validator: validator.phoneValidate,trigger:"blur" }
         ],
@@ -125,11 +125,13 @@ export default {
             
             regist({
                 name:this.regist.readlyName,
-                department:this.regist.department,
-                mobil:this.regist.phone,
+                det:parseInt(this.regist.det),
+                username:this.regist.username,
                 password:this.regist.password,
               }).then(res=>{
                 console.log(res,"操作成功")
+                Message.success(data.msg)
+
               }).catch(res=>{
                 console.log(res)
               })
