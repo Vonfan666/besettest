@@ -146,9 +146,13 @@ export default {
     }
   },
   watch:{
-    'departmentlist'(newVvalue,oldValue){
+    departmentlist(newVvalue,oldValue){
         console.log(newVvalue,oldValue,"cao")
+        
     }
+  },
+  mounted(){
+    console.log(this.departmentlist,"==")
   }
 
 };

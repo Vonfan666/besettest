@@ -54,7 +54,7 @@ axios.interceptors.response.use(response=>{
 
 export const getRequest = (url, params) => {
     let accessToken = storage.get('accessToken');
-    console.log("请求开始",params)
+    // console.log("请求开始",params)
     return axios({
         method: 'get',
         url: `${url}`,
@@ -70,8 +70,8 @@ export const getRequest = (url, params) => {
 export const postRequest = (url, params) => {
     // console.log(qs.stringify(params),"aadsads")
     let accessToken = storage.get("accessToken");
-    console.log("accessToken",accessToken)
-    console.log(typeof params)
+    // console.log("accessToken",accessToken)
+    // console.log(typeof params)
     // let accessToken = getStore("accessToken");
 
     return axios({
