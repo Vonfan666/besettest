@@ -77,13 +77,14 @@ export default {
               console.log(res,"进入")
               if (res.status == 200) {
                 this.$router.push({name:"Home"});
+                storage.set('name',res.results.name)
+                storage.set('token',res.token)
+                storage.set('userId',res.results.user_id)
                  Message.success(res.msg)
               } 
             })
-            .catch(error => {
-              console.log("error",error)
-              console.log("333333fengfa");
-              Message.error("网络异常");
+            .catch(res => {
+              console.log(res);
             });
         } else {
         }

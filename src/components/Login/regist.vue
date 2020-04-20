@@ -1,12 +1,11 @@
 <template>
   <div class="registbody">
     <div class="registcontext">
-      <div >
+      <div>
         <h2>
           <span>注册</span>
-          <i class="el-icon-circle-close registtitle"  @click="bb()"></i>
-          </h2>
-        
+          <i class="el-icon-circle-close registtitle" @click="bb()"></i>
+        </h2>
       </div>
       <el-form :model="regist" :rules="rules" class="regist-form" ref="elForm">
         <el-form-item label="所属部门" prop="det" label-width="100px">
@@ -20,7 +19,7 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item prop="readlyName" label="姓名" label-width="100px" >
+        <el-form-item prop="readlyName" label="姓名" label-width="100px">
           <el-input v-model="regist.readlyName" clearable placeholder="请输入姓名以便找回密码"></el-input>
         </el-form-item>
 
@@ -49,55 +48,50 @@
 
 <script>
 import validator from "@/libs/validate.js";
-import {
-  regist,
-} from "@/axios/api"
+import { regist } from "@/axios/api";
 
-import  storage from "@/libs/storage.js" 
+import storage from "@/libs/storage.js";
+import { Message } from "element-ui";
 export default {
-  // props: ["style"],  
-  props:["departmentlist"],
+  // props: ["style"],
+  props: ["departmentlist"],
   data() {
-     var validatePass = (rule, value, callback) => {
-        if  (value !== this.regist.password) {
-          callback(new Error('两次输入密码不一致!'));
-        } else {
-          callback();
-        }};
+    var validatePass = (rule, value, callback) => {
+      if (value !== this.regist.password) {
+        callback(new Error("两次输入密码不一致!"));
+      } else {
+        callback();
+      }
+    };
     return {
-      
       message: "",
       regist: {
         det: null,
-        readlyName:"",
+        readlyName: "",
         username: "",
         password: "",
-        forgetPassword: "",
-        
-        
+        forgetPassword: ""
       },
       rules: {
-        readlyName:[
-          {required:true,message:"请输入真实姓名",trigger: "blur"}
+        readlyName: [
+          { required: true, message: "请输入真实姓名", trigger: "blur" }
         ],
         det: [
           { required: true, message: "必须选择所属部门", trigger: "change" }
         ],
         username: [
-          { required: true, message: "账号不能为空",trigger:"blur" },
-          { validator: validator.phoneValidate,trigger:"blur" }
+          { required: true, message: "账号不能为空", trigger: "blur" },
+          { validator: validator.phoneValidate, trigger: "blur" }
         ],
         password: [
-          { required: true, message: "密码不能为空",trigger:"blur" },
-          { validator: validator.passwordValidate ,trigger:"blur"}
+          { required: true, message: "密码不能为空", trigger: "blur" },
+          { validator: validator.passwordValidate, trigger: "blur" }
         ],
         forgetPassword: [
-          { required: true, message: "请二次确认您的密码",trigger:"blur" },
-          { validator: validator.passwordValidate ,trigger:"blur"},
-          { validator: validatePass , trigger:"blur"}
-        ],
-        
-        
+          { required: true, message: "请二次确认您的密码", trigger: "blur" },
+          { validator: validator.passwordValidate, trigger: "blur" },
+          { validator: validatePass, trigger: "blur" }
+        ]
       },
       data: {
         list: []
@@ -122,22 +116,24 @@ export default {
     submitRegist() {
       this.$refs.elForm.validate(valid => {
         if (valid) {
-            
-            regist({
-                name:this.regist.readlyName,
-                det:parseInt(this.regist.det),
-                username:this.regist.username,
-                password:this.regist.password,
-              }).then(res=>{
-                console.log(res,"操作成功")
-                Message.success(data.msg)
+          regist({
+            name: this.regist.readlyName,
+            det: parseInt(this.regist.det),
+            username: this.regist.username,
+            password: this.regist.password
+          })
+            .then(res => {
+              console.log("res的值",res)
+              if (res.status == 200) {
+                Message.success(res.msg);
+                
+                document.querySelector(".regist-child").classList.add("active");
+              }
+            })
+            .catch(res => {
+              console.log(res);
+            });
 
-              }).catch(res=>{
-                console.log(res)
-              })
-            
-            document.querySelector(".regist-child").classList.add("active");
-          
           
         } else {
           return false;
@@ -145,16 +141,14 @@ export default {
       });
     }
   },
-  watch:{
-    departmentlist(newVvalue,oldValue){
-        console.log(newVvalue,oldValue,"cao")
-        
+  watch: {
+    departmentlist(newVvalue, oldValue) {
+      console.log(newVvalue, oldValue, "cao");
     }
   },
-  mounted(){
-    console.log(this.departmentlist,"==")
+  mounted() {
+    console.log(this.departmentlist, "==");
   }
-
 };
 </script>
 
@@ -203,10 +197,10 @@ export default {
 .regist-form .el-input__inner {
   padding-right: 60px;
 }
-.registtitle{
-    position: absolute;
-    right: 0;
-    top: 0;
-    cursor:pointer
+.registtitle {
+  position: absolute;
+  right: 0;
+  top: 0;
+  cursor: pointer;
 }
 </style>

@@ -22,6 +22,7 @@ axios.interceptors.response.use(response=>{
     const data=response.data
     console.log("这是返回的值",response.data)
     switch(data.status){
+        
         case 200:
             break;
         case 401: //一般这个是未登录或者登录失效
@@ -31,21 +32,20 @@ axios.interceptors.response.use(response=>{
             })
             break;
         case 403:
-            console.log("返回状态码是403");
             Message.error(data.msg);
             break;
         case 500:
-            console.log("返回状态码500");
             Message.error(data.msg);
-        default: return data
+        default: 
+        Message.error(data.msg)
+        return data
     }
-    console.log(data,"zuih")
     return data
 },err => {  //异常处理
     
     console.log(err,"这个执行啥")
     // Message.error(err.toString());
-    Message.error("服务器错误");
+    Message.error("服务器异常");
     return Promise.reject(err);
 })
 
@@ -53,14 +53,14 @@ axios.interceptors.response.use(response=>{
 
 
 export const getRequest = (url, params) => {
-    let accessToken = storage.get('accessToken');
+    let accessToken = storage.get('token');
     // console.log("请求开始",params)
     return axios({
         method: 'get',
         url: `${url}`,
         params: params,
         headers: {
-            'accessToken': accessToken
+            'Authorization': "JWT ".concat(accessToken)
         }
     });
    
@@ -69,7 +69,7 @@ export const getRequest = (url, params) => {
 
 export const postRequest = (url, params) => {
     // console.log(qs.stringify(params),"aadsads")
-    let accessToken = storage.get("accessToken");
+    let accessToken = storage.get("token");
     // console.log("accessToken",accessToken)
     // console.log(typeof params)
     // let accessToken = getStore("accessToken");
@@ -80,7 +80,7 @@ export const postRequest = (url, params) => {
         data: Qs.stringify(params),
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
-            'accessToken': accessToken
+            'Authorization': "JWT ".concat(accessToken)
         }
     });
 };

@@ -4,7 +4,7 @@
       <div class="project">
         <el-form :model="data" :rules="rules" ref="projectref">
           <el-form-item prop="project" label="项目" label-width="40px">
-            <el-select v-model="data.project" @change="changeProject(data.project)">
+            <el-select v-model="data.project" @change="changeProject(data.project)" placeholder="请选择项目">
               <el-option
                 ref="eloption"
                 v-for="(item,index) in  projectList"
@@ -37,7 +37,7 @@
               <div class="settting-name">
                 <div class="setting-name-context">
                   <span class="icon iconfont">&#xe63f;</span>
-                  <span class="icon iconfont">姓名</span>
+                  <span class="icon iconfont">{{nameCode}}</span>
                 </div>
               </div>
               <div class="setting-open" v-if="settingStatus">
@@ -169,6 +169,8 @@
 <script>
 import Nav from "./Nav.vue";
 import storage from "../../libs/storage.js"
+import { addproject } from "@/axios/api.js"
+import { Message } from "element-ui";
 export default {
   components: {
     "nav-list": Nav,
@@ -176,6 +178,7 @@ export default {
   },
   data() {
     return {
+      nameCode:"",
       projectProductStatus: true,
       projectIndex: null,
       projectProductStatus: 1, // 1项目列表  2添加项目 3编辑项目 4添加成功
@@ -183,13 +186,11 @@ export default {
       settingStatus: false,
       leftStatus: true,
       projectid: null,
-      chioceProject: "测试项目1", //后台返回用户之前选择的项目-然后前端直接展示用户上次选择的项目
       data: {
         project: "" //用户选择的项目，
       },
       styleCode: "height: 800px;width: 1000px;",
       addProjectObj: {
-        id: "",
         name: "",
         devAttr: "",
         testAttr: "",
@@ -220,96 +221,7 @@ export default {
           boss: "谁添加就是谁",
           createTime: ""
         },
-        {
-          id: 3,
-          name: "测试项目3",
-          devAttr: "",
-          testAttr: "",
-          productAttr: "",
-          boss: "谁添加就是谁",
-          createTime: ""
-        },
-        {
-          id: 4,
-          name: "测试项目4",
-          devAttr: "",
-          testAttr: "",
-          productAttr: "",
-          boss: "谁添加就是谁",
-          createTime: ""
-        },
-        {
-          id: 5,
-          name: "测试项目5",
-          devAttr: "",
-          testAttr: "",
-          productAttr: "",
-          boss: "谁添加就是谁",
-          createTime: ""
-        },
-        {
-          id: 6,
-          name: "测试项目6",
-          devAttr: "",
-          testAttr: "",
-          productAttr: "",
-          boss: "谁添加就是谁",
-          createTime: ""
-        },
-        {
-          id: 9,
-          name: "测试项目6",
-          devAttr: "",
-          testAttr: "",
-          productAttr: "",
-          boss: "谁添加就是谁",
-          createTime: ""
-        },
-        {
-          id: 11,
-          name: "测试项目6",
-          devAttr: "",
-          testAttr: "",
-          productAttr: "",
-          boss: "谁添加就是谁",
-          createTime: ""
-        },
-        {
-          id: 13,
-          name: "测试项目6",
-          devAttr: "",
-          testAttr: "",
-          productAttr: "",
-          boss: "谁添加就是谁",
-          createTime: ""
-        },
-        {
-          id: 14,
-          name: "测试项目6",
-          devAttr: "",
-          testAttr: "",
-          productAttr: "",
-          boss: "谁添加就是谁",
-          createTime: ""
-        },
-        {
-          id: 12,
-          name: "测试项目6",
-          devAttr: "",
-          testAttr: "",
-          productAttr: "",
-          boss: "谁添加就是谁",
-          createTime: ""
-        },
-        {
-          id: 17,
-          name: "测试项目6",
-          devAttr: "",
-          testAttr: "",
-          productAttr: "",
-          boss: "谁添加就是谁",
-          createTime: ""
-        }
+     
       ],
 
       nav: [
@@ -380,8 +292,19 @@ export default {
           this.$refs.addProjectObj.validate(valid => {
             if (valid) {
               console.log(this.addProjectObj);
+              addproject({
+                name:this.addProjectObj.name,
+                dev_attr:this.addProjectObj.devAttr,
+                test_attr:this.addProjectObj.testAttr,
+                product_attr:this.addProjectObj.productAttr,
+                create_user_id:storage.get("userId")
+              }).then(res=>{
+                if(res.status==200){
+                  
+                }
+              })
               //将数据传给后台--后台返回生成id之后再添加进去
-              this.projectList.unshift(this.addProjectObj);
+              // this.projectList.unshift(this.addProjectObj);
               //这里单独封装一个js弹窗成功或者失败的方法
               this.projectProductStatus = 1;
               this.addProjectObj = {};
@@ -408,12 +331,14 @@ export default {
       this.projectList.splice(index, 1);
     }
   },
-
+  
   mounted() {
     console.log(111);
-    if (this.chioceProject != "") {
-      this.data.project = this.chioceProject;
-    }
+    // if (this.chioceProject != "") {
+    //   this.data.project = this.chioceProject;
+    // }
+    
+    this.nameCode=storage.get("name")
     //默认记录用户上次访问的id后台返回-然后第一次直接projectId=用户最后一次访问的id
   }
 };

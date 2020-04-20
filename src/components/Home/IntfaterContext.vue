@@ -1320,7 +1320,7 @@ export default {
     } else {
       this.jsonDemo1 = this.jsonDemo;
     }
-    console.log(this.$router.query,"---")
+    console.log(this.$route.query,"---")
 
     // this.restaurants=[]
     // this.postheaders.forEach((item,index)=>{
