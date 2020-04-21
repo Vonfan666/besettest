@@ -141,7 +141,7 @@
           <el-button
             type="primary"
             size="small"
-            @click="addProjectStatus=false;projectProductStatus=1;addProjectObj={}"
+            @click="addProjectStatus=false;projectProductStatus=1;addProjectObj={},test()"
             v-if="projectProductStatus"
           >关闭</el-button>
           <el-button
@@ -200,13 +200,19 @@ export default {
         projectId: ""
       },
       styleCode: "height: 800px;width: 1100px;",
-      addProjectObj: {
+      addProjectObj:
+       {
         name: "",
         dev_attr: "",
         test_attr: "",
         product_attr: "",
         user: "",
-        create_time: ""
+        create_time: "",
+        id: null,
+        user:{
+          id:null,
+          userName:""
+        }
       },
       rules: {
         name: [{ required: true, message: "项目名称不能为空", trigger: "blur" }]
@@ -244,6 +250,7 @@ export default {
   },
   methods: {
     changeProject(a, b) {
+      //左上角选择项目
       console.log(a, b, "+++++");
       storage.set("projectId", a);
       // console.log(this.data.project, "11");
@@ -254,7 +261,6 @@ export default {
       }
     },
     openIcon(self) {
-      console.log("手气");
       this.leftStatus = !this.leftStatus;
       if (this.leftStatus) {
         self.srcElement.innerHTML = "&#xe660;";
@@ -276,14 +282,14 @@ export default {
         Message.error("系统异常")
       });
     },
-    addProjectSubmit() {
-      console.log(this.addProjectObj);
-      //将数据传给后台--后台返回生成id之后再添加进去
-      this.projectList.unshift(this.addProjectObj);
-      //这里单独封装一个js弹窗成功或者失败的方法
-      this.projectProductStatus = 1;
-      this.addProjectObj = {};
-    },
+    // addProjectSubmit() {
+    //   console.log(this.addProjectObj);
+    //   //将数据传给后台--后台返回生成id之后再添加进去
+    //   this.projectList.unshift(this.addProjectObj);
+    //   //这里单独封装一个js弹窗成功或者失败的方法
+    //   this.projectProductStatus = 1;
+    //   this.addProjectObj = {};
+    // },
     //新增项目
     addProjectAdd() {
       //projectProductStatus=2||3时展示添加按钮。。
@@ -295,7 +301,6 @@ export default {
         if (this.projectProductStatus == 2) {
           this.$refs.addProjectObj.validate(valid => {
             if (valid) {
-              console.log(this.addProjectObj);
               projectAdd({
                 name: this.addProjectObj.name,
                 dev_attr: this.addProjectObj.dev_attr,
@@ -325,12 +330,14 @@ export default {
     //编辑更新接口
     addProjectOk() {
       //编辑 更新
-      console.log(this.projectProductStatus);
       projectEdit(this.addProjectObj)
         .then(res => {
           if (res.status == 200) {
             this.projectList[this.projectIndex] = this.addProjectObj;
             this.projectProductStatus = 1;
+            if(this.data.projectId==this.projectList[this.projectIndex].id){
+                this.data.project=this.addProjectObj.name
+              }
             this.addProjectObj = {};
             Message.success(res.msg);
           }
@@ -338,12 +345,18 @@ export default {
         .catch(res => {
           Message.error("系统异常");
         });
+        //如果编辑的等于--首页用户选择的项目则需要更新它的名字
+     
+      
       if (this.projectProductStatus == 3) {
       }
     },
-    addProjectEdit(item, index) {
-      this.addProjectObj = item;
-      this.projectIndex = index;
+    addProjectEdit(item, index) {   
+  
+      var obj=JSON.parse(JSON.stringify(item))
+      this.addProjectObj = obj;
+      
+      this.projectIndex = index
     },
     //删除项目
     addProjectRemove(item, index) {
@@ -359,7 +372,11 @@ export default {
         .catch(res => {
           Message.error("系统异常");
         });
+    },
+    test(){
+      console.log(this.addProjectStatus)
     }
+  
   },
 
   mounted() {
@@ -368,7 +385,7 @@ export default {
     //   this.data.project = this.chioceProject;
     // }
 
-    this.nameCode = storage.get("name");
+    this.nameCode = storage.get("name"); //获取当前用户姓名
 
     var last_projectId = null;
     projectLast({ userId: storage.get("userId") })
@@ -376,7 +393,7 @@ export default {
         if (res.status == 200) {
           this.last_projectId = res.results.user_last_project;
           console.log("this.last_projectId", this.last_projectId);
-        }
+        
         projectList().then(res => {
           //加载该组件则请求项目列表接口
           if (res.status == 200) {
@@ -403,7 +420,7 @@ export default {
           }
         }).catch(res=>{
           Message.error("系统异常")
-        });
+        })};
       })
       .catch(res => {
         Message.error("系统异常");

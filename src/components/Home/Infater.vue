@@ -30,7 +30,7 @@
                 v-for="(item,index) in code"
                 :key="index"
                 @click="searchResult(item.fatherid,item.id)"
-              >{{item.name}}</p>
+              >{{item.name}}____name</p>
             </div>
           </div>
           <div class="it-left-context" v-if="contextStatus">
@@ -70,7 +70,7 @@
                 <!-- 这里点击右边文档需要重新请求 -->
                   <!-- <div class="ddtext"> -->
                   <div class="ddName-father">
-                    <span class="ddName">{{item1.name}}</span>
+                    <span class="ddName">{{item1.name}}____name</span>
                   </div>
 
                   <div class="dd2-father">
