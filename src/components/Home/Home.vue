@@ -4,8 +4,12 @@
       <div class="project">
         <el-form :model="data" :rules="rules" ref="projectref">
           <el-form-item prop="project" label="项目" label-width="40px">
-            <el-select v-model="data.project" @change="changeProject(data.project)" placeholder="请选择项目">
-              <el-option
+            <el-select
+              v-model="data.project"
+              @change="changeProject(data.project,data.projectId)"
+              placeholder="请选择项目"
+            >
+              <el-option class="projectChoice"
                 ref="eloption"
                 v-for="(item,index) in  projectList"
                 :key="index"
@@ -69,13 +73,13 @@
           <el-table :data="projectList" border style="width: 100%" height="650">
             <el-table-column prop="id" label="Id" width="70"></el-table-column>
             <el-table-column prop="name" label="项目名称" width="120"></el-table-column>
-            <el-table-column prop="devAttr" label="开发地址" width="150"></el-table-column>
-            <el-table-column prop="testAttr" label="测试地址" width="150"></el-table-column>
-            <el-table-column prop="productAttr" label="生产地址" width="150"></el-table-column>
-            <el-table-column prop="createTime" label="创建时间" width="120"></el-table-column>
-            <el-table-column prop="boss" label="创建人" width="120"></el-table-column>
+            <el-table-column prop="dev_attr" label="开发地址" width="150"></el-table-column>
+            <el-table-column prop="test_attr" label="测试地址" width="150"></el-table-column>
+            <el-table-column prop="product_attr" label="生产地址" width="150"></el-table-column>
+            <el-table-column prop="create_time" label="创建时间" width="160"></el-table-column>
+            <el-table-column prop="user.userName" label="创建人" width="100"></el-table-column>
 
-            <el-table-column fixed="right" label="操作" width="120">
+            <el-table-column fixed="right" label="操作" width="100">
               <template slot-scope="scope">
                 <el-button
                   @click="addProjectEdit(scope.row,scope.$index);projectProductStatus=3"
@@ -108,14 +112,14 @@
               <el-form-item label="项目名称" prop="name" label-width="80px">
                 <el-input v-model="addProjectObj.name" clearable placeholder="请输入项目名称"></el-input>
               </el-form-item>
-              <el-form-item label="开发地址" prop="devAttr" label-width="80px">
-                <el-input v-model="addProjectObj.devAttr" clearable placeholder="请输入开发环境地址"></el-input>
+              <el-form-item label="开发地址" prop="dev_attr" label-width="80px">
+                <el-input v-model="addProjectObj.dev_attr" clearable placeholder="请输入开发环境地址"></el-input>
               </el-form-item>
-              <el-form-item label="测试地址" prop="productAttr" label-width="80px">
-                <el-input v-model="addProjectObj.testAttr" clearable placeholder="请输入测试环境地址"></el-input>
+              <el-form-item label="测试地址" prop="product_attr" label-width="80px">
+                <el-input v-model="addProjectObj.test_attr" clearable placeholder="请输入测试环境地址"></el-input>
               </el-form-item>
               <el-form-item label="生产地址" prop="infaterName" label-width="80px">
-                <el-input v-model="addProjectObj.productAttr" clearable placeholder="请输入生产环境地址"></el-input>
+                <el-input v-model="addProjectObj.product_attr" clearable placeholder="请输入生产环境地址"></el-input>
               </el-form-item>
             </el-form>
             <!-- <el-form :model="addProjectObj" >
@@ -159,7 +163,6 @@
             @click="addProjectAdd()"
             v-if="projectProductStatus==2 ||projectProductStatus==1"
           >添加</el-button>
-        
         </div>
       </div>
     </add-project>
@@ -168,8 +171,14 @@
 
 <script>
 import Nav from "./Nav.vue";
-import storage from "../../libs/storage.js"
-import { addproject } from "@/axios/api.js"
+import storage from "../../libs/storage.js";
+import {
+  projectAdd,
+  projectList,
+  projectRemove,
+  projectEdit,
+  projectLast
+} from "@/axios/api.js";
 import { Message } from "element-ui";
 export default {
   components: {
@@ -178,7 +187,7 @@ export default {
   },
   data() {
     return {
-      nameCode:"",
+      nameCode: "",
       projectProductStatus: true,
       projectIndex: null,
       projectProductStatus: 1, // 1项目列表  2添加项目 3编辑项目 4添加成功
@@ -187,41 +196,23 @@ export default {
       leftStatus: true,
       projectid: null,
       data: {
-        project: "" //用户选择的项目，
+        project: "", //用户选择的项目，
+        projectId: ""
       },
-      styleCode: "height: 800px;width: 1000px;",
+      styleCode: "height: 800px;width: 1100px;",
       addProjectObj: {
         name: "",
-        devAttr: "",
-        testAttr: "",
-        productAttr: "",
-        boss: "",
-        createTime: ""
+        dev_attr: "",
+        test_attr: "",
+        product_attr: "",
+        user: "",
+        create_time: ""
       },
       rules: {
         name: [{ required: true, message: "项目名称不能为空", trigger: "blur" }]
       },
       projectList: [
         //后台返回的项目列表
-        {
-          id: 1,
-          name: "测试项目1",
-          devAttr: "",
-          testAttr: "",
-          productAttr: "",
-          boss: "谁添加就是谁",
-          createTime: ""
-        },
-        {
-          id: 2,
-          name: "测试项目2",
-          devAttr: "",
-          testAttr: "",
-          productAttr: "",
-          boss: "谁添加就是谁",
-          createTime: ""
-        },
-     
       ],
 
       nav: [
@@ -252,13 +243,14 @@ export default {
     };
   },
   methods: {
-    changeProject(a) {
-      storage.set("projectId",a)
+    changeProject(a, b) {
+      console.log(a, b, "+++++");
+      storage.set("projectId", a);
       // console.log(this.data.project, "11");
       // console.log(this.data)
-      this.$router.push({query:{"projectId":storage.get("projectId")}});
+      this.$router.push({ query: { projectId: storage.get("projectId") } });
       if (this.data.project === 10086) {
-        this.$router.push({query:{"projectId":storage.get("projectId")}});
+        this.$router.push({ query: { projectId: storage.get("projectId") } });
       }
     },
     openIcon(self) {
@@ -270,8 +262,19 @@ export default {
         self.srcElement.innerHTML = "&#xe65e;";
       }
     },
+    //获取项目列表
     addProject() {
       this.addProjectStatus = 1;
+      projectList().then(res => {
+        if (res.status == 200) {
+          this.projectList = [];
+          res.results.forEach((item, index) => {
+            this.projectList.push(item);
+          });
+        }
+      }).catch(res=>{
+        Message.error("系统异常")
+      });
     },
     addProjectSubmit() {
       console.log(this.addProjectObj);
@@ -281,10 +284,11 @@ export default {
       this.projectProductStatus = 1;
       this.addProjectObj = {};
     },
+    //新增项目
     addProjectAdd() {
       //projectProductStatus=2||3时展示添加按钮。。
       //从项目列表点击添加---只是projectProductStatus=2
-
+      console.log(this.projectProductStatus);
       if (this.projectProductStatus == 1) {
         this.projectProductStatus = 2;
       } else {
@@ -292,19 +296,24 @@ export default {
           this.$refs.addProjectObj.validate(valid => {
             if (valid) {
               console.log(this.addProjectObj);
-              addproject({
-                name:this.addProjectObj.name,
-                dev_attr:this.addProjectObj.devAttr,
-                test_attr:this.addProjectObj.testAttr,
-                product_attr:this.addProjectObj.productAttr,
-                create_user_id:storage.get("userId")
-              }).then(res=>{
-                if(res.status==200){
-                  
-                }
+              projectAdd({
+                name: this.addProjectObj.name,
+                dev_attr: this.addProjectObj.dev_attr,
+                test_attr: this.addProjectObj.test_attr,
+                product_attr: this.addProjectObj.product_attr,
+                user: storage.get("userId")
               })
+                .then(res => {
+                  if (res.status == 200) {
+                    this.projectList.unshift(res.results);
+                    Message.success(res.msg);
+                  }
+                })
+                .catch(res => {
+                  Message.error("数据异常");
+                });
               //将数据传给后台--后台返回生成id之后再添加进去
-              // this.projectList.unshift(this.addProjectObj);
+              //
               //这里单独封装一个js弹窗成功或者失败的方法
               this.projectProductStatus = 1;
               this.addProjectObj = {};
@@ -313,33 +322,95 @@ export default {
         }
       }
     },
+    //编辑更新接口
     addProjectOk() {
       //编辑 更新
       console.log(this.projectProductStatus);
-
+      projectEdit(this.addProjectObj)
+        .then(res => {
+          if (res.status == 200) {
+            this.projectList[this.projectIndex] = this.addProjectObj;
+            this.projectProductStatus = 1;
+            this.addProjectObj = {};
+            Message.success(res.msg);
+          }
+        })
+        .catch(res => {
+          Message.error("系统异常");
+        });
       if (this.projectProductStatus == 3) {
-        this.projectList[this.projectIndex] = this.addProjectObj;
-        this.projectProductStatus = 1;
-        this.addProjectObj = {};
       }
     },
     addProjectEdit(item, index) {
       this.addProjectObj = item;
       this.projectIndex = index;
     },
+    //删除项目
     addProjectRemove(item, index) {
-      this.projectList.splice(index, 1);
+      projectRemove({
+        id: item.id
+      })
+        .then(res => {
+          if (res.status == 200) {
+            this.projectList.splice(index, 1);
+            Message.success(res.msg);
+          }
+        })
+        .catch(res => {
+          Message.error("系统异常");
+        });
     }
   },
-  
+
   mounted() {
     console.log(111);
     // if (this.chioceProject != "") {
     //   this.data.project = this.chioceProject;
     // }
-    
-    this.nameCode=storage.get("name")
+
+    this.nameCode = storage.get("name");
+
+    var last_projectId = null;
+    projectLast({ userId: storage.get("userId") })
+      .then(res => {
+        if (res.status == 200) {
+          this.last_projectId = res.results.user_last_project;
+          console.log("this.last_projectId", this.last_projectId);
+        }
+        projectList().then(res => {
+          //加载该组件则请求项目列表接口
+          if (res.status == 200) {
+            console.log(this.last_projectId, "++++ca");
+            res.results.forEach((item, index) => {
+              this.projectList.push(item);
+              if ((this.last_projectId == item.id)) {
+                this.data.project = item.name;
+                this.data.projectId = item.id;
+                storage.set("projectId", item.id);
+                this.$router.push({ query: { projectId: storage.get("projectId") } });
+                // var a=document.querySelector(".projectChioce ").eq(index).innerHTML()
+                // console.log(a)
+              }
+            });
+            if (this.last_projectId == 0) {
+              console.log(this.last_projectId, "++++999");
+              this.data.project = this.projectList[0].name;
+              this.data.projectId = this.projectList[0].id;
+              storage.set("projectId", this.projectList[0].id);
+              this.$router.push({ query: { projectId: storage.get("projectId") } });
+              
+            }
+          }
+        }).catch(res=>{
+          Message.error("系统异常")
+        });
+      })
+      .catch(res => {
+        Message.error("系统异常");
+      });
+
     //默认记录用户上次访问的id后台返回-然后第一次直接projectId=用户最后一次访问的id
+
   }
 };
 </script>

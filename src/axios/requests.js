@@ -20,7 +20,7 @@ axios.interceptors.request.use(config => {
 //后端返回数据拦截
 axios.interceptors.response.use(response=>{
     const data=response.data
-    console.log("这是返回的值",response.data)
+    // console.log("这是返回的值",response.data)
     switch(data.status){
         
         case 200:
@@ -45,7 +45,7 @@ axios.interceptors.response.use(response=>{
     
     console.log(err,"这个执行啥")
     // Message.error(err.toString());
-    Message.error("服务器异常");
+    // Message.error("服务器异常");
     return Promise.reject(err);
 })
 

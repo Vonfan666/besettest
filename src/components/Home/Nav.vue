@@ -27,7 +27,7 @@ export default {
       flagstatus:false,
       count: 1,
       navChildStatus: [], //判断下面有是否存在子级list
-      navOpenStatus: [] //判断子级是否展开
+      navOpenStatus: [] //判断父级是否展开
     };
   },
   methods: {
@@ -45,7 +45,8 @@ export default {
       });
     },
     navOpen(index, a) {
-
+      //点击效果
+      console.log("点击效果",a)
       if (a.target.className == "nav-frist") {
         var ele = a.srcElement;
       } else if (a.target.className == "frist-title" || a.target.title == "icon") {
@@ -54,7 +55,7 @@ export default {
       }
       if (this.navChildStatus[index]) {
         this.$set(this.navOpenStatus, index, !this.navOpenStatus[index]);
-        if (this.navOpenStatus[index]) {
+        if (this.navOpenStatus[index]) {  //控制箭头方向
           ele.querySelector(".icon").classList.replace("el-icon-arrow-down", "el-icon-arrow-up");
         } else {
           ele.querySelector(".icon").classList.replace("el-icon-arrow-up", "el-icon-arrow-down");
@@ -120,8 +121,10 @@ export default {
     // console.log(this.listCode);
     this.judgechild();
     // console.log("kaishi ", this.navOpenStatus);
+    
   },
   mounted() {
+
     document.querySelectorAll("h4").forEach(function(ele) {
       ele.classList.add("h1");
       
