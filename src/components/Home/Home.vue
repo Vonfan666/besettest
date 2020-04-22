@@ -9,9 +9,10 @@
               @change="changeProject(data.project,data.projectId)"
               placeholder="请选择项目"
             >
-              <el-option class="projectChoice"
+              <el-option
+                class="projectChoice"
                 ref="eloption"
-                v-for="(item,index) in  projectList"
+                v-for="(item,index) in  projectLists"
                 :key="index"
                 :value="item.id"
                 :label="item.name"
@@ -96,6 +97,18 @@
             </el-table-column>
           </el-table>
         </div>
+        <div class="block" style="margin-top:10px" v-if="projectProductStatus==1 && pageStatus==true">
+          <!-- <span class="demonstration">完整功能</span> -->
+          <el-pagination
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+            :current-page="currentPage"
+            :page-sizes="[5, 10, 20, 50]"
+            :page-size="page_size"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="total"
+          ></el-pagination>
+        </div>
         <div class="addProjectBodyEdit" v-if="projectProductStatus==3 || projectProductStatus==2">
           <!-- <div class="addProjectBodyEditClass">
             <span class="addProjectBodyEditName">项目名称：</span>
@@ -141,7 +154,7 @@
           <el-button
             type="primary"
             size="small"
-            @click="addProjectStatus=false;projectProductStatus=1;addProjectObj={},test()"
+            @click="closeProject()"
             v-if="projectProductStatus"
           >关闭</el-button>
           <el-button
@@ -187,6 +200,12 @@ export default {
   },
   data() {
     return {
+      last_projectId:52,
+      pageStatus:true,
+      currentPage: null, //当前是第几页
+      page: 1, //选择第几页
+      total: null, //数据总条数
+      page_size: 10, //每页数据多少个，默认10个
       nameCode: "",
       projectProductStatus: true,
       projectIndex: null,
@@ -199,9 +218,8 @@ export default {
         project: "", //用户选择的项目，
         projectId: ""
       },
-      styleCode: "height: 800px;width: 1100px;",
-      addProjectObj:
-       {
+      styleCode: "height: 840px;width: 1100px;",
+      addProjectObj: {
         name: "",
         dev_attr: "",
         test_attr: "",
@@ -209,9 +227,9 @@ export default {
         user: "",
         create_time: "",
         id: null,
-        user:{
-          id:null,
-          userName:""
+        user: {
+          id: null,
+          userName: ""
         }
       },
       rules: {
@@ -220,6 +238,7 @@ export default {
       projectList: [
         //后台返回的项目列表
       ],
+      projectLists:[],
 
       nav: [
         //左侧导航
@@ -271,16 +290,22 @@ export default {
     //获取项目列表
     addProject() {
       this.addProjectStatus = 1;
-      projectList().then(res => {
-        if (res.status == 200) {
-          this.projectList = [];
-          res.results.forEach((item, index) => {
-            this.projectList.push(item);
-          });
-        }
-      }).catch(res=>{
-        Message.error("系统异常")
-      });
+      projectList({
+        page: this.page,
+        page_size: this.page_size
+      })
+        .then(res => {
+          if (res.status == 200) {
+            this.total = res.total;
+            this.projectList = [];
+            res.results.forEach((item, index) => {
+              this.projectList.push(item);
+            });
+          }
+        })
+        .catch(res => {
+          Message.error("系统异常");
+        });
     },
     // addProjectSubmit() {
     //   console.log(this.addProjectObj);
@@ -306,11 +331,16 @@ export default {
                 dev_attr: this.addProjectObj.dev_attr,
                 test_attr: this.addProjectObj.test_attr,
                 product_attr: this.addProjectObj.product_attr,
-                user: storage.get("userId")
+                user: storage.get("userId"),
+                page: this.page,
+                page_size: this.page_size
               })
                 .then(res => {
                   if (res.status == 200) {
+                    this.total = res.total;
+
                     this.projectList.unshift(res.results);
+                    this.projectList.pop(res.results);
                     Message.success(res.msg);
                   }
                 })
@@ -335,9 +365,9 @@ export default {
           if (res.status == 200) {
             this.projectList[this.projectIndex] = this.addProjectObj;
             this.projectProductStatus = 1;
-            if(this.data.projectId==this.projectList[this.projectIndex].id){
-                this.data.project=this.addProjectObj.name
-              }
+            if (this.data.projectId == this.projectList[this.projectIndex].id) {
+              this.data.project = this.addProjectObj.name;
+            }
             this.addProjectObj = {};
             Message.success(res.msg);
           }
@@ -345,26 +375,47 @@ export default {
         .catch(res => {
           Message.error("系统异常");
         });
-        //如果编辑的等于--首页用户选择的项目则需要更新它的名字
-     
-      
+      //如果编辑的等于--首页用户选择的项目则需要更新它的名字
+
       if (this.projectProductStatus == 3) {
       }
     },
-    addProjectEdit(item, index) {   
-  
-      var obj=JSON.parse(JSON.stringify(item))
+    addProjectEdit(item, index) {
+      var obj = JSON.parse(JSON.stringify(item));
       this.addProjectObj = obj;
-      
-      this.projectIndex = index
+
+      this.projectIndex = index;
     },
     //删除项目
     addProjectRemove(item, index) {
       projectRemove({
-        id: item.id
+        id: item.id,
+        page: this.page,
+        page_size: this.page_size
       })
         .then(res => {
           if (res.status == 200) {
+            console.log("当前页面", this.currentPage);
+            this.total = res.total;
+            if (parseInt(res.page_size) <parseInt(this.currentPage)) {
+              this.currentPage = res.page_size;
+              projectList({
+                page: this.currentPage,
+                page_size: this.page_size
+              })
+                .then(res => {
+                  if (res.status == 200) {
+                    this.total = res.total;
+                    this.projectList = [];
+                    res.results.forEach((item, index) => {
+                      this.projectList.push(item);
+                    });
+                  }
+                })
+                .catch(res => {
+                  Message.error("系统异常");
+                });
+            }
             this.projectList.splice(index, 1);
             Message.success(res.msg);
           }
@@ -373,10 +424,88 @@ export default {
           Message.error("系统异常");
         });
     },
-    test(){
-      console.log(this.addProjectStatus)
+    closeProject() {
+      this.addProjectStatus=false;
+      this.projectProductStatus=1;
+      this.addProjectObj={}
+       projectLast({ userId: storage.get("userId") })
+      .then(res => {
+        if (res.status == 200) {
+          this.last_projectId = res.results.user_last_project;
+          console.log("this.last_projectId", this.last_projectId);
+
+          projectList()
+            .then(res => {
+              //加载该组件则请求项目列表接口
+              if (res.status == 200) {
+
+                res.results.forEach((item, index) => {
+                  this.projectLists.push(item);
+                  if (this.last_projectId == item.id) {
+                    this.data.project = item.name;
+                    this.data.projectId = item.id;
+                    storage.set("projectId", item.id);
+                    this.$router.push({
+                      query: { projectId: storage.get("projectId") }
+                    });
+                    // var a=document.querySelector(".projectChioce ").eq(index).innerHTML()
+                    // console.log(a)
+                  }
+                });
+                if (this.last_projectId == 0) {
+                  console.log(this.last_projectId, "++++999");
+                  this.data.project = this.projectLists[0].name;
+                  this.data.projectId = this.projectLists[0].id;
+                  storage.set("projectId", this.projectLists[0].id);
+                  this.$router.push({
+                    query: { projectId: storage.get("projectId") }
+                  });
+                }
+              }
+            })
+            .catch(res => {
+              Message.error("系统异常");
+            });
+        }
+      
+
+    })
+    },
+    handleSizeChange(val) {
+      console.log("改变页面展示数量", val);
+
+      this.page_size = val;
+      this.projectList.splice(0, this.projectList.length);
+      projectList({
+        page: this.page,
+        page_size: this.page_size
+      }).then(res => {
+        if (res.status == 200) {
+          // this.currentPage=val
+          // this.page_size=val
+          this.projectList.splice(0, this.projectList.length);
+          res.results.forEach((item, index) => {
+            this.projectList.push(item);
+          });
+        }
+      });
+    },
+    handleCurrentChange(val) {
+      console.log("当前选择第${val}页", val);
+      this.page = val;
+      projectList({
+        page: val,
+        page_size: this.page_size
+      }).then(res => {
+        if (res.status == 200) {
+          this.currentPage = val;
+          this.projectList.splice(0, this.projectList.length);
+          res.results.forEach((item, index) => {
+            this.projectList.push(item);
+          });
+        }
+      });
     }
-  
   },
 
   mounted() {
@@ -387,48 +516,67 @@ export default {
 
     this.nameCode = storage.get("name"); //获取当前用户姓名
 
-    var last_projectId = null;
     projectLast({ userId: storage.get("userId") })
       .then(res => {
         if (res.status == 200) {
           this.last_projectId = res.results.user_last_project;
           console.log("this.last_projectId", this.last_projectId);
-        
-        projectList().then(res => {
-          //加载该组件则请求项目列表接口
-          if (res.status == 200) {
-            console.log(this.last_projectId, "++++ca");
-            res.results.forEach((item, index) => {
-              this.projectList.push(item);
-              if ((this.last_projectId == item.id)) {
-                this.data.project = item.name;
-                this.data.projectId = item.id;
-                storage.set("projectId", item.id);
-                this.$router.push({ query: { projectId: storage.get("projectId") } });
-                // var a=document.querySelector(".projectChioce ").eq(index).innerHTML()
-                // console.log(a)
+
+          projectList({
+
+          })
+            .then(res => {
+              //加载该组件则请求项目列表接口
+              if (res.status == 200) {
+
+                res.results.forEach((item, index) => {
+                  this.projectLists.push(item);
+                  
+                  if (this.last_projectId == item.id) {
+                    this.data.project = item.name;
+                    this.data.projectId = item.id;
+                    storage.set("projectId", item.id);
+                    this.$router.push({
+                      query: { projectId: storage.get("projectId") }
+                    });
+                    // var a=document.querySelector(".projectChioce ").eq(index).innerHTML()
+                    // console.log(a)
+                  }
+                });
+                if (this.last_projectId == 0) {
+                  console.log(this.last_projectId, "++++999");
+                  this.data.project = this.projectLists[0].name;
+                  this.data.projectId = this.projectLists[0].id;
+                  storage.set("projectId", this.projectLists[0].id);
+                  this.$router.push({
+                    query: { projectId: storage.get("projectId") }
+                  });
+                }
               }
+            })
+            .catch(res => {
+              Message.error("系统异常");
             });
-            if (this.last_projectId == 0) {
-              console.log(this.last_projectId, "++++999");
-              this.data.project = this.projectList[0].name;
-              this.data.projectId = this.projectList[0].id;
-              storage.set("projectId", this.projectList[0].id);
-              this.$router.push({ query: { projectId: storage.get("projectId") } });
-              
-            }
-          }
-        }).catch(res=>{
-          Message.error("系统异常")
-        })};
+        }
       })
       .catch(res => {
         Message.error("系统异常");
       });
 
     //默认记录用户上次访问的id后台返回-然后第一次直接projectId=用户最后一次访问的id
-
+  },
+  watch:{
+    total(newValue,oldValue){
+      console.log(newValue)
+      if(newValue<=this.page_size){
+        this.pageStatus=false
+      }else{
+        this.pageStatus=true
+      }
+      
+    }
   }
+  
 };
 </script>
 
