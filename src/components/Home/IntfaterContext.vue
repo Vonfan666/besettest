@@ -918,6 +918,7 @@ export default {
       this.Environment.value.splice(index + 1, 0, "t");
       this.restaurants.splice(index + 1, 0, "");
       this.valueStatus.splice(index + 1, 0, "");
+      console.log(this.postheaders)
     },
     removeEnvironment(index) {
       if (this.selected.length == 1) {

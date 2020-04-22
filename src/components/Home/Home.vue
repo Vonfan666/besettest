@@ -7,6 +7,7 @@
             <el-select
               v-model="data.project"
               @change="changeProject(data.project,data.projectId)"
+              
               placeholder="请选择项目"
             >
               <el-option
@@ -190,7 +191,8 @@ import {
   projectList,
   projectRemove,
   projectEdit,
-  projectLast
+  projectLast,
+  lastUseProject
 } from "@/axios/api.js";
 import { Message } from "element-ui";
 export default {
@@ -270,14 +272,19 @@ export default {
   methods: {
     changeProject(a, b) {
       //左上角选择项目
-      console.log(a, b, "+++++");
       storage.set("projectId", a);
-      // console.log(this.data.project, "11");
-      // console.log(this.data)
-      this.$router.push({ query: { projectId: storage.get("projectId") } });
-      if (this.data.project === 10086) {
-        this.$router.push({ query: { projectId: storage.get("projectId") } });
-      }
+      lastUseProject({
+        userId:storage.get("userId"),
+        projectId:storage.get("projectId")
+      }).then(res=>{
+        if(res.status==200){
+          this.$router.push({ query: { projectId: storage.get("projectId") } });
+
+        }
+      }).catch(res=>{
+        Message.error("服务异常")
+      })
+      
     },
     openIcon(self) {
       this.leftStatus = !this.leftStatus;
@@ -319,7 +326,6 @@ export default {
     addProjectAdd() {
       //projectProductStatus=2||3时展示添加按钮。。
       //从项目列表点击添加---只是projectProductStatus=2
-      console.log(this.projectProductStatus);
       if (this.projectProductStatus == 1) {
         this.projectProductStatus = 2;
       } else {
@@ -395,7 +401,6 @@ export default {
       })
         .then(res => {
           if (res.status == 200) {
-            console.log("当前页面", this.currentPage);
             this.total = res.total;
             if (parseInt(res.page_size) <parseInt(this.currentPage)) {
               this.currentPage = res.page_size;
@@ -432,8 +437,6 @@ export default {
       .then(res => {
         if (res.status == 200) {
           this.last_projectId = res.results.user_last_project;
-          console.log("this.last_projectId", this.last_projectId);
-
           projectList()
             .then(res => {
               //加载该组件则请求项目列表接口
@@ -448,12 +451,9 @@ export default {
                     this.$router.push({
                       query: { projectId: storage.get("projectId") }
                     });
-                    // var a=document.querySelector(".projectChioce ").eq(index).innerHTML()
-                    // console.log(a)
                   }
                 });
                 if (this.last_projectId == 0) {
-                  console.log(this.last_projectId, "++++999");
                   this.data.project = this.projectLists[0].name;
                   this.data.projectId = this.projectLists[0].id;
                   storage.set("projectId", this.projectLists[0].id);
@@ -472,7 +472,6 @@ export default {
     })
     },
     handleSizeChange(val) {
-      console.log("改变页面展示数量", val);
 
       this.page_size = val;
       this.projectList.splice(0, this.projectList.length);
@@ -491,7 +490,6 @@ export default {
       });
     },
     handleCurrentChange(val) {
-      console.log("当前选择第${val}页", val);
       this.page = val;
       projectList({
         page: val,
@@ -505,11 +503,13 @@ export default {
           });
         }
       });
-    }
+    },
+    cao(){
+      console.log(111)
+    },
   },
 
   mounted() {
-    console.log(111);
     // if (this.chioceProject != "") {
     //   this.data.project = this.chioceProject;
     // }
@@ -520,7 +520,6 @@ export default {
       .then(res => {
         if (res.status == 200) {
           this.last_projectId = res.results.user_last_project;
-          console.log("this.last_projectId", this.last_projectId);
 
           projectList({
 
@@ -544,7 +543,6 @@ export default {
                   }
                 });
                 if (this.last_projectId == 0) {
-                  console.log(this.last_projectId, "++++999");
                   this.data.project = this.projectLists[0].name;
                   this.data.projectId = this.projectLists[0].id;
                   storage.set("projectId", this.projectLists[0].id);
@@ -567,7 +565,6 @@ export default {
   },
   watch:{
     total(newValue,oldValue){
-      console.log(newValue)
       if(newValue<=this.page_size){
         this.pageStatus=false
       }else{

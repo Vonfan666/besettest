@@ -215,7 +215,7 @@ export default {
       });
       var tt = this.indent[index];
       this.indent.splice(index + 1, 0, 15 + tt);
-
+      console.log(JSON.stringify(this.tableData))
     },
     addTT() {  //添加请求头顶级
       if(this.$parent.postType="header-com"){

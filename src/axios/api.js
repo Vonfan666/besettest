@@ -43,4 +43,9 @@ export const projectLast = (params)=> {
     return getRequest("/users/last_use_project/",params)
 }
 
+//存储用户最新访问的项目
+export const lastUseProject=(params)=>{
+    return postRequest("/users/last_use_project/",params)
+}
+
 
