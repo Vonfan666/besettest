@@ -185,7 +185,7 @@
 
 <script>
 import Nav from "./Nav.vue";
-import storage from "../../libs/storage.js";
+// import storage from "../../libs/storage.js";
 import {
   projectAdd,
   projectList,
@@ -195,6 +195,7 @@ import {
   lastUseProject
 } from "@/axios/api.js";
 import { Message } from "element-ui";
+import storage  from '@/libs/storage.js'
 export default {
   components: {
     "nav-list": Nav,
@@ -202,7 +203,7 @@ export default {
   },
   data() {
     return {
-      last_projectId:52,
+      last_projectId:null,
       pageStatus:true,
       currentPage: null, //当前是第几页
       page: 1, //选择第几页
@@ -278,6 +279,7 @@ export default {
         projectId:storage.get("projectId")
       }).then(res=>{
         if(res.status==200){
+          this.last_projectId=a
           this.$router.push({ query: { projectId: storage.get("projectId") } });
 
         }
@@ -343,10 +345,16 @@ export default {
               })
                 .then(res => {
                   if (res.status == 200) {
+                    
                     this.total = res.total;
-
                     this.projectList.unshift(res.results);
-                    this.projectList.pop(res.results);
+                    if(this.projectList.length<=this.page_size){
+                      
+                    }else{
+                      this.projectList.pop(res.results);
+                    }
+                    
+                    
                     Message.success(res.msg);
                   }
                 })
@@ -370,6 +378,8 @@ export default {
         .then(res => {
           if (res.status == 200) {
             this.projectList[this.projectIndex] = this.addProjectObj;
+            this.projectLists[this.projectIndex].name=this.addProjectObj.name
+            // this.projectLists.splice(this.projectIndex,1,this.addProjectObj)
             this.projectProductStatus = 1;
             if (this.data.projectId == this.projectList[this.projectIndex].id) {
               this.data.project = this.addProjectObj.name;
@@ -401,6 +411,14 @@ export default {
       })
         .then(res => {
           if (res.status == 200) {
+            this.projectLists.forEach((item,index)=>{
+              if(this.last_projectId==item.id){  
+                this.last_projectId=null
+                this.projectLists.splice(index,1)   //删除历史访问ID
+                this.data.project=""
+                this.data.projectId=""
+              }
+            })
             this.total = res.total;
             if (parseInt(res.page_size) <parseInt(this.currentPage)) {
               this.currentPage = res.page_size;
@@ -436,20 +454,19 @@ export default {
        projectLast({ userId: storage.get("userId") })
       .then(res => {
         if (res.status == 200) {
-          this.last_projectId = res.results.user_last_project;
+          // this.last_projectId=t
           projectList()
             .then(res => {
               //加载该组件则请求项目列表接口
               if (res.status == 200) {
-
                 res.results.forEach((item, index) => {
-                  this.projectLists.push(item);
+                  this.projectLists.splice(index,1,item)
                   if (this.last_projectId == item.id) {
                     this.data.project = item.name;
                     this.data.projectId = item.id;
                     storage.set("projectId", item.id);
                     this.$router.push({
-                      query: { projectId: storage.get("projectId") }
+                      query: { projectId: storage.get("projectId")}
                     });
                   }
                 });
@@ -490,6 +507,7 @@ export default {
       });
     },
     handleCurrentChange(val) {
+      
       this.page = val;
       projectList({
         page: val,
@@ -505,7 +523,6 @@ export default {
       });
     },
     cao(){
-      console.log(111)
     },
   },
 
