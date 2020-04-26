@@ -415,8 +415,7 @@ export default {
               if(this.last_projectId==item.id){  
                 this.last_projectId=null
                 this.projectLists.splice(index,1)   //删除历史访问ID
-                this.data.project=""
-                this.data.projectId=""
+                
               }
             })
             this.total = res.total;

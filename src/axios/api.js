@@ -49,3 +49,13 @@ export const lastUseProject=(params)=>{
 }
 
 
+//获取请求方法 请求类型 响应类型列表数据
+export const postMethods=(params)=>{
+    return getRequest("/users/post_methods/",params)
+}
+
+export const addFile=(params)=>{
+    return postRequest("/users/add_file/",params)
+}
+
+

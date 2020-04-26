@@ -132,7 +132,7 @@
             <span class="colorCode3">新增环境变量</span>
 
             <el-button type="primary" size="small" @click="clickEnvironment()" class="addCode">
-              <span >添加变量</span>
+              <span>添加变量</span>
             </el-button>
 
             <environment-box
@@ -208,8 +208,8 @@
                   </div>
                 </div>
                 <div class="environmentbody">
-                  <el-table :data="EnvironmentList" border  style="width: 100%; margin-top: 20px">
-                    <el-table-column label width="59" >
+                  <el-table :data="EnvironmentList" border style="width: 100%; margin-top: 20px">
+                    <el-table-column label width="59">
                       <template slot-scope="scope">
                         <span
                           class="environmentDelete el-icon-close"
@@ -217,7 +217,7 @@
                         ></span>
                       </template>
                     </el-table-column>
-                    <el-table-column label="key" prop="key" >
+                    <el-table-column label="key" prop="key">
                       <template slot-scope="scope">
                         <input class="input" v-model="EnvironmentList[scope.$index].key" />
                       </template>
@@ -350,8 +350,7 @@
     </message-box>
 
     <div class="tt">
-        <el-button type="primary" size="small" @click="Submit()">确认</el-button>
-
+      <el-button type="primary" size="small" @click="Submit()">确认</el-button>
     </div>
   </div>
 </template>
@@ -359,6 +358,8 @@
 <script>
 // import  headerCom from "./IrPost/postHeader.vue"
 // import  dataCom from "./IrPost/PostData"
+import { postMethods } from "../../axios/api.js";
+import {Message} from  "element-ui"
 export default {
   components: {
     "header-com": () => import("./IrPost/postHeader.vue"),
@@ -378,8 +379,8 @@ export default {
       addStatus: 0, //判断是新增还是更新 0为新增 1为更新  返回或者关闭改为null
       environments: false, //环境名
       Environmentname: "",
-      EnvironmentsIndex:null,  //点击名称进入变量列表时的index
-      Environments: [ 
+      EnvironmentsIndex: null, //点击名称进入变量列表时的index
+      Environments: [
         //环境变量列表
         {
           name: "测试环境1",
@@ -471,7 +472,7 @@ export default {
           ]
         }
       ],
-      globalVariables:[],  //提交时把Environments里type=1的独立出来---返回时加入进去
+      globalVariables: [], //提交时把Environments里type=1的独立出来---返回时加入进去
       EnvironmentList: [],
       EnvironmentStatus: false,
       EnvironmentStatused: false,
@@ -561,44 +562,16 @@ export default {
         infaterName: [
           { required: true, message: "请输入接口名称", trigger: "blur" }
         ],
-        postAttr: 
-        
-        
-        
-        
-        [
+        postAttr: [
           { required: true, message: "请输入请求地址", trigger: "blur" }
         ]
       },
 
       //后台返回的数据
       dataList: {
-        methods: [
-          { id: 1, name: "GET" },
-          { id: 2, name: "POST" },
-          { id: 3, name: "PUT" },
-          { id: 4, name: "DELETE" },
-          { id: 5, name: "PATCH" },
-          { id: 6, name: "COPY" },
-          { id: 7, name: "OPTIONS" }
-        ],
-        type: [
-          { id: 1, name: "X-WWW-FORM-URLENCODED" },
-          { id: 2, name: "JSON" },
-          { id: 3, name: "FORM-DATA" },
-          { id: 4, name: "BINARY" },
-          { id: 5, name: "RAW" },
-          { id: 6, name: "XML" }
-        ],
-        resType: [
-          { id: 1, name: "JSON" },
-          { id: 2, name: "JSONP" },
-          { id: 3, name: "TEXT" },
-          { id: 3, name: "XML" },
-          { id: 4, name: "HTML" },
-          { id: 5, name: "IMAGE" },
-          { id: 6, name: "BINARY" }
-        ],
+        methods: null,
+        type:null,
+        resType: null,
 
         resStatus: [
           { id: 1, name: "JSON" },
@@ -918,7 +891,7 @@ export default {
       this.Environment.value.splice(index + 1, 0, "t");
       this.restaurants.splice(index + 1, 0, "");
       this.valueStatus.splice(index + 1, 0, "");
-      console.log(this.postheaders)
+      console.log(this.postheaders);
     },
     removeEnvironment(index) {
       if (this.selected.length == 1) {
@@ -1138,7 +1111,7 @@ export default {
       }
     },
     EnvironmentsMethod(item, name) {
-      console.log(name)
+      console.log(name);
       //将环境大列表的类容push到环境列表
       console.log(JSON.stringify(item));
       this.EnvironmentList.splice(0, this.EnvironmentList.length);
@@ -1150,19 +1123,20 @@ export default {
       this.environments = false;
       this.EnvironmentStatused = true;
     },
-    EnvironmentInsert() { //sasa
+    EnvironmentInsert() {
+      //sasa
       this.EnvironmentList.push({ key: "", value: "" });
     },
     EnvironmentUpdate() {
-      console.log("this.addStatus",this.addStatus)
-      console.log("this.EnvironmentList",this.EnvironmentList)
+      console.log("this.addStatus", this.addStatus);
+      console.log("this.EnvironmentList", this.EnvironmentList);
       //新增变量-更新到主Environments并提交到后端保存
       if (this.Environmentname == "") {
         // this.addStatus=0
         this.open3("名称不能为空", "warning");
-
       } else {
-        if (this.addStatus == 0) {  //状态等于0就是新增环境以及对应变量
+        if (this.addStatus == 0) {
+          //状态等于0就是新增环境以及对应变量
           var name = this.Environmentname;
           var indexCode = this.Environments.length;
           //现在环境列表插入父级
@@ -1174,49 +1148,53 @@ export default {
           });
           // console.log(JSON.stringify(this.EnvironmentList),"---")
           this.EnvironmentList.forEach((item, index) => {
-            console.log(item,indexCode,this.Environments.length)
+            console.log(item, indexCode, this.Environments.length);
             this.Environments[indexCode].children.push(item);
           });
           this.open3("添加成功", "success");
-          this.Environmentname=""  //名称置空
-          this.EnvironmentStatused=false;  //隐藏变量页面
-          this.environments=true  //打开环境页面
-          this.EnvironmentList.splice(0,this.EnvironmentList.length) //置空EnvironmentList
-          this.addStatus=null   //重置添加类型
+          this.Environmentname = ""; //名称置空
+          this.EnvironmentStatused = false; //隐藏变量页面
+          this.environments = true; //打开环境页面
+          this.EnvironmentList.splice(0, this.EnvironmentList.length); //置空EnvironmentList
+          this.addStatus = null; //重置添加类型
           console.log(this.Environments);
         }
       }
-      if(this.addStatus == 1){  //状态等于1就是在原有的基础上更新  首先直接提交给后台-页面处理-先删除环境列表原来的-然后在
-          //提交请求成功之后
-          var name=this.Environmentname
-          this.Environments[this.EnvironmentsIndex].name=name
-          //以上是如果用户修改环境名称
-          this.EnvironmentList.forEach((item,index) => {
-            this.Environments[this.EnvironmentsIndex].children.splice(index,1,item)
-          }); 
-          
-          console.log(this.Environments)
-          this.open3("更新成功", "success");
-          this.Environmentname=""
-          this.EnvironmentStatused=false;
-          this.environments=true
-          this.EnvironmentList.splice(0,this.EnvironmentList.length)
-          this.addStatus=null 
+      if (this.addStatus == 1) {
+        //状态等于1就是在原有的基础上更新  首先直接提交给后台-页面处理-先删除环境列表原来的-然后在
+        //提交请求成功之后
+        var name = this.Environmentname;
+        this.Environments[this.EnvironmentsIndex].name = name;
+        //以上是如果用户修改环境名称
+        this.EnvironmentList.forEach((item, index) => {
+          this.Environments[this.EnvironmentsIndex].children.splice(
+            index,
+            1,
+            item
+          );
+        });
+
+        console.log(this.Environments);
+        this.open3("更新成功", "success");
+        this.Environmentname = "";
+        this.EnvironmentStatused = false;
+        this.environments = true;
+        this.EnvironmentList.splice(0, this.EnvironmentList.length);
+        this.addStatus = null;
       }
-    
     },
-    ifEnvironment(){
-      var  l=[]
-      this.Environments.forEach((item,index)=>{
-        l.push(item.type)
-      })
-      console.log(l)
-      if(l.indexOf(1)>=0){
-        console.log("_______________")
-        this.addStatus=1
-        this.EnvironmentsIndex=l.indexOf(1)
-        var item=this.Environments[this.EnvironmentsIndex].children
-        var name=this.Environments[this.EnvironmentsIndex].name
+    ifEnvironment() {
+      var l = [];
+      this.Environments.forEach((item, index) => {
+        l.push(item.type);
+      });
+      console.log(l);
+      if (l.indexOf(1) >= 0) {
+        console.log("_______________");
+        this.addStatus = 1;
+        this.EnvironmentsIndex = l.indexOf(1);
+        var item = this.Environments[this.EnvironmentsIndex].children;
+        var name = this.Environments[this.EnvironmentsIndex].name;
         this.EnvironmentList.splice(0, this.EnvironmentList.length);
         this.Environmentname = name;
         item.forEach((item1, idnex) => {
@@ -1225,27 +1203,25 @@ export default {
         // this.EnvironmentList.push({ key: "", value: "" });
         this.environments = false;
         this.EnvironmentStatused = true;
-
-      }else{
-         console.log("++++++++")
-        this.addStatus=0
+      } else {
+        console.log("++++++++");
+        this.addStatus = 0;
       }
-      
-      console.log(this.addStatus)
+
+      console.log(this.addStatus);
     },
-    EnvironmentClear(){
-      this.addStatus=null
-      this.Environmentname=""
-      this.EnvironmentList.splice(0,this.EnvironmentList.length)
-      
+    EnvironmentClear() {
+      this.addStatus = null;
+      this.Environmentname = "";
+      this.EnvironmentList.splice(0, this.EnvironmentList.length);
     },
     environmentDelete(index) {
       //删除变量
-      var  indexCode=this.EnvironmentsIndex
-      console.log(indexCode)
-      console.log(index,this.Environments[this.EnvironmentsIndex])
+      var indexCode = this.EnvironmentsIndex;
+      console.log(indexCode);
+      console.log(index, this.Environments[this.EnvironmentsIndex]);
       this.EnvironmentList.splice(index, 1);
-      this.Environments[indexCode].children.splice(index,1)
+      this.Environments[indexCode].children.splice(index, 1);
       //删除环境中的key
     },
     environmentsDelete(index) {
@@ -1310,9 +1286,8 @@ export default {
       this.EnvironmentStatus = !this.EnvironmentStatus;
       this.environments = !this.environments;
     },
-    Submit(){
-      console.log("请求接口")
-      
+    Submit() {
+      console.log("请求接口");
     }
   },
 
@@ -1321,7 +1296,7 @@ export default {
     } else {
       this.jsonDemo1 = this.jsonDemo;
     }
-    console.log(this.$route.query,"---")
+    console.log(this.$route.query, "---");
 
     // this.restaurants=[]
     // this.postheaders.forEach((item,index)=>{
@@ -1354,15 +1329,31 @@ export default {
     this.selected.forEach((item, index) => {
       this.Environment.value.push("");
     });
-    console.log(this.$route,"---")
+    console.log(this.$route, "---");
+
+    postMethods()   //获取请求方法 请求类型 响应类型列表数据
+      .then(res => {
+        if (res.status == 200) {
+          this.dataList.methods=res.res_post_methods
+          this.dataList.type=res.res_post_type
+          this.dataList.resType=res.res_res_type
+        }else{
+          Message.error("服务器异常")
+        }
+      })
+      .catch(res=>{
+        Message.error(res)
+      }
+  
+      );
   },
 
-  watch:{
-    $route:{
-      handler:function(newValue,oldValue){
-        console.log(newValue.query,oldValue.query,"----")
+  watch: {
+    $route: {
+      handler: function(newValue, oldValue) {
+        console.log(newValue.query, oldValue.query, "----");
       },
-      deep:true
+      deep: true
     }
   }
 };
@@ -1493,9 +1484,9 @@ export default {
 .pd-title .el-button {
   float: right;
 }
-.pd-title .addCode{
+.pd-title .addCode {
   position: relative;
-    top: -10px;
+  top: -10px;
 }
 // .environmentbody  .cell input{
 //   // position: absolute ;
@@ -1551,7 +1542,6 @@ export default {
   margin-left: 10px !important;
 }
 
-
 .enviromentClass {
   margin: 0 30px;
 }
@@ -1576,8 +1566,6 @@ export default {
   border-radius: 2px;
   border: 2px solid #ebeef5;
 }
-
-
 </style>
 <style>
 .IR .el-form-item__label {
@@ -1655,5 +1643,4 @@ export default {
   .el-table_3_column_14  {
     position: relative;
   } */
-
 </style>

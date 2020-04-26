@@ -149,6 +149,8 @@
 <script>
 import InfaterContext from "./IntfaterContext.vue";
 import storage from '../../libs/storage';
+import { addFile } from "../../axios/api.js";
+
 export default {
   components: {
     "ir-con": InfaterContext,
@@ -263,9 +265,15 @@ export default {
       }
     },
     addFielsSubmit() {
+      
       this.$refs.refAddfiles.validate(valid => {
         if (valid) {
-          //这里请求后台获取一个文件夹id
+           addFile({
+        name:this.updateFiels.fielsName,
+        projectId:storage.get("projectId")
+      }).then(res=>{
+        console.log(res)
+      }).catch()
           let id = 4; //假设后台返回id=4
           this.$set(this.list, this.list.length, {
             id: id,
@@ -283,6 +291,8 @@ export default {
     },
     addFiles() {
       this.mbFielsStutas = !this.mbFielsStutas;
+     
+
     },
     addContext(id, index) {
       //文件夹下添加接口
