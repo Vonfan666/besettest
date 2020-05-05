@@ -9,6 +9,14 @@ import "../static/icon/iconfont.css"
 Vue.config.productionTip = false
 
 
+
+
+// 在调用 Vue.use 前，给 Message 添加 install 方法
+
+
+// 和所有组件一样，一并进行use
+
+// Vue.use(Message)
 Vue.use(ElementUi)
 /* eslint-disable no-new */
 new Vue({

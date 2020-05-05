@@ -29,7 +29,7 @@
             type="text"
             class="cname"
             v-model="postData[scope.$index].cname"
-            :style="{ 'text-indent':indent[scope.$index]+'px'}"
+            :style="{ 'text-indent': indent[scope.$index]+'px'}"
           />
         </template>
       </el-table-column>
@@ -46,9 +46,13 @@
       <el-table-column label="类型">
         <template slot-scope="scope">
           <el-select v-model="postData[scope.$index].type">
-            <el-option label="true" value="true"></el-option>
-            <el-option label="false" value="false"></el-option>
-          </el-select>
+            <el-option   
+            v-for="(item,index) in type"
+            :key="index"
+            :label="item.name" 
+            :value="item.id">
+            </el-option>
+         </el-select>
         </template>
       </el-table-column>
       <el-table-column label="mock数据">
@@ -65,7 +69,7 @@
         <template slot-scope="scope">
           <input
             type="text"
-            class="cname"
+            class="mock"
             v-model="postData[scope.$index].detail"
             @input="aa(scope.$index,scope.row.name)"
           />
@@ -97,7 +101,15 @@ export default {
   data() {
     
     return {
-      
+      type: [
+        {id:1,name: "string"},
+        {id:2,name: "number"},
+        {id:3,name: "boolean"},
+        {id:4,name: "object"},
+        {id:5,name: "array"},
+        {id:6,name: "file"},
+        {id:7,name: "null"},
+        ],
       dragging: null,
       indent: [], //输入框的边距
       // postData: [
@@ -216,21 +228,21 @@ export default {
     addTS(index, event) {
       console.log(this.$parent.postType)
        if(this.$parent.postType="data-com"){
-        var id=this.postData.length
+        var id=this.postData.length+1  //修改初始id
         var parentId=this.postData[index].id
       }
       if(this.$parent.postType="data-com2"){
-        var id=this.postData.length
+        var id=this.postData.length+1
         var parentId=this.postData[index].id
       }
       this.postData.splice(index + 1, 0, {
         cname: "",
         isrequired: "true",
-        type: "true",
+        type: 1,
         detail: "",
-        id: id,
+        id: id, //修改初始id
         parentId: parentId,
-        mockValue:"22",
+        mockValue:"",
         children: [],
       });
       var tt = this.indent[index];
@@ -238,24 +250,24 @@ export default {
     },
     addTT() {
       if(this.$parent.postType="data-com"){
-        var id=this.postData.length
+        var id=this.postData.length+1
       }
       if(this.$parent.postType="data-com2"){
-        var id=this.postData.length
+        var id=this.postData.length+1
       }
       this.postData.push({
         cname: "",
         isrequired: "true",
-        type: "true",
+        type: 1,
         detail: "",
         id: id,
         parentId: 0,
-        mockValue:"22",
+        mockValue:"",
         children: [],
       });
       this.indent.push(0);
       this.open2();
-
+      console.log(this.indent)
     },
     open2() {
       this.$message({
@@ -265,15 +277,19 @@ export default {
       });
     },
     removeTS(index) {
+      console.log(this.indent)
       var id = this.postData[index].id
 
       this.postData.splice(index, 1);
       this.indent.splice(index, 1);
-      this.findChild(id)
-
+      if (id!=0){  //Id等于0就删除所有字段了
+        this.findChild(id)
+      }
+      
+      
     },
     findChild(id){
-      
+      //级联删除
       for(var n=0;n<this.postData.length;n++){
 
          if(this.postData[n].parentId==id){
@@ -288,7 +304,7 @@ export default {
     },
     isListData() {
      
-      if (this.postData.length == 0  && this.postData.length==undefined) {
+      if (this.postData.length == 0 ) {
         this.$set(this.postData, 0, {
           prop: "",
           isrequired: "true",
@@ -298,17 +314,39 @@ export default {
       }
     },
 
-    indentMarginLeft() {
-      this.postData.forEach((item, index) => {
-        this.indent[index] = 0;
-      });
-    }
+    indentMarginLeft(data,mariginLeft) {
+      for(var n=0;data.length>n;n++){
+          this.indent.push(mariginLeft)
+          this.indentMarginLeftChild(data,data[n].id,mariginLeft+15)
+          data.splice(n,1)
+          n--
+        }
+
+    },
+    indentMarginLeftChild(data,id,mariginLeft){
+      for(var n=0;data.length>n;n++){
+        if(id==data[n].parentId){
+          this.indent.push(mariginLeft)
+          this.indentMarginLeftChild(data,data[n].id,mariginLeft+15)   
+          // var id=
+          data.splice(n,1)
+          n--
+        }
+      }
+    },
   },
   created() {
-    this.isListData(), //如果列表为空则自动添加一个
-      this.indentMarginLeft();
+    
   },
   updated() {
+    // this.isListData(), //如果列表为空则自动添加一个
+        this.indent.splice(0,this.indent.length)
+        var  data=JSON.parse(JSON.stringify(this.postData))
+        this.indentMarginLeft(data,0)
+  },
+  mounted(){
+    //  this.indent=this.$parent.postIndent;
+    // console.log("postData",this.postData)
   }
 };
 </script>

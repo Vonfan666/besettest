@@ -46,8 +46,13 @@
       <el-table-column label="类型">
         <template slot-scope="scope">
           <el-select v-model="tableData[scope.$index].type">
-            <el-option label="true" value="true"></el-option>
-            <el-option label="false" value="false"></el-option>
+            <el-option 
+            v-for="(item,index) in type"
+            :key="index"
+            :label="item.name"
+             :value="item.id">
+             </el-option>
+            
           </el-select>
         </template>
       </el-table-column>
@@ -97,6 +102,15 @@ export default {
   props: ["msbox", "indextp", "tableData"], //消息弹窗
   data() {
     return {
+      type: [
+        {id:1,name: "string"},
+        {id:2,name: "number"},
+        {id:3,name: "boolean"},
+        {id:4,name: "object"},
+        {id:5,name: "array"},
+        {id:6,name: "file"},
+        {id:7,name: "null"},
+        ],
       dragging: null,
       indent: [] //输入框的边距
       // tableData: [
@@ -196,21 +210,21 @@ export default {
     },
     addTS(index, event) {  //添加子级请求头
       if(this.$parent.postType="header-com"){
-        var id=this.tableData.length
+        var id=this.tableData.length+1
         var parentId=this.tableData[index].id
       }
       if(this.$parent.postType="header-com2"){
-        var id=this.tableData.length
+        var id=this.tableData.length+1
         var parentId=this.tableData[index].id
       }
       this.tableData.splice(index + 1, 0, {
         cname: "",
-        isrequired: null,
-        type: "",
+        isrequired: "true",
+        type: 1,
         detail: "",
         id: id,
         parentId: parentId,
-        mockValue:"11",
+        mockValue:"",
         children: [],
       });
       var tt = this.indent[index];
@@ -219,19 +233,19 @@ export default {
     },
     addTT() {  //添加请求头顶级
       if(this.$parent.postType="header-com"){
-        var id=this.tableData.length
+        var id=this.tableData.length+1
       }
       if(this.$parent.postType="header-com2"){
-        var id=this.tableData.length
+        var id=this.tableData.length+1
       }
       this.tableData.push({
         cname: "",
-        isrequired: null,
-        type: "",
+        isrequired: "true",
+        type: 1,
         detail: "",
         id: id,
         parentId: 0,
-        mockValue:"11",
+        mockValue:"",
         children: [],
       });
       this.indent.push(0);
@@ -259,7 +273,9 @@ export default {
       this.tableData.splice(index, 1);
       this.indent.splice(index, 1);
       //这里删除需要坐下处理--如果删除的类容有下级则删除所有下级
-      this.findChild(id)
+      if (id!=0){  //Id等于0就删除所有字段了
+        this.findChild(id)
+      }
     },
 //0, 0, 0, 0, 0, 0, 15, 30,
     //循环遍历查找下级
@@ -278,7 +294,8 @@ export default {
 
     },
     isListData() {
-      if (this.tableData.length == 0) {
+      console.log(this.tableData)
+      if (this.tableData.length == 0 ) {
         this.$set(this.tableData, 0, {
           prop: "",
           isrequired: "true",
@@ -288,17 +305,36 @@ export default {
       }
     },
 
-    indentMarginLeft() {
-      this.tableData.forEach((item, index) => {
-        this.indent[index] = 0;
-      });
-    }
+    indentMarginLeft(data,mariginLeft) {
+      for(var n=0;data.length>n;n++){
+          this.indent.push(mariginLeft)
+          this.indentMarginLeftChild(data,data[n].id,mariginLeft+15)
+          data.splice(n,1)
+          n--
+        }
+
+    },
+    indentMarginLeftChild(data,id,mariginLeft){
+      for(var n=0;data.length>n;n++){
+        if(id==data[n].parentId){
+          this.indent.push(mariginLeft)
+          this.indentMarginLeftChild(data,data[n].id,mariginLeft+15)   
+          // var id=
+          data.splice(n,1)
+          n--
+        }
+      }
+   
   },
   created() {
-    this.isListData(), //如果列表为空则自动添加一个
-      this.indentMarginLeft();
+    
   },
   updated() {
+    // this.isListData(), //如果列表为空则自动添加一个
+     this.indent.splice(0,this.indent.length)
+        var  data=JSON.parse(JSON.stringify(this.postData))
+        this.indentMarginLeft(data,0)
+  },
   }
 };
 

@@ -37,7 +37,7 @@ axios.interceptors.response.use(response=>{
         case 500:
             Message.error(data.msg);
         default: 
-        Message.error(data.msg)
+        // Message.error(data.msg)
         return data
     }
     return data
@@ -45,7 +45,7 @@ axios.interceptors.response.use(response=>{
     
     console.log(err,"这个执行啥")
     // Message.error(err.toString());
-    // Message.error("服务器异常");
+    Message.error("服务器异常");
     return Promise.reject(err);
 })
 

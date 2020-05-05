@@ -2,6 +2,23 @@
   <div class="IR">
     <div class="title">
       <span class="t-info">基本信息</span>
+      <div class="Environment">
+        <el-form class="top-el-form" :model="model">
+          <el-form-item label="" label-width="63px" label-height="20px" class="top-eft">
+            <el-select v-model="model.postMethods">
+              <el-option 
+                v-for="(item,index) in dataList.methods"
+                :key="index"
+                :label="item.name"
+                :value="item.id"
+              ></el-option>
+              
+            </el-select>
+            <span class="el-icon-plus EnvironmentIcon" @click="EnvironmentIcon()"></span>
+          </el-form-item>
+        </el-form>
+        
+      </div>
     </div>
     <div class="top">
       <div class="top-1">
@@ -27,7 +44,7 @@
             </el-select>
           </el-form-item>
           <el-form-item label="响应类型" label-width="63px" class="top-eft">
-            <el-select v-model="model.responseStatus">
+            <el-select v-model="model.resType">
               <el-option
                 v-for="(item,index) in dataList.resType"
                 :key="index"
@@ -78,6 +95,9 @@
       <div class="pd-title">
         <span @click="changeBottomColor($event,'header-com')">请求头(header)</span>
         <span @click="changeBottomColor($event,'data-com')" class="colorCode">请求参数(body)</span>
+        <el-button type="primary" size="small" @click="mockRequests()">
+          <span class="mockRequests"></span>&#12288;接口请求
+        </el-button>
       </div>
       <div class="hd-com">
         <keep-alive>
@@ -94,6 +114,9 @@
       <div class="pd-title">
         <span @click="changeBottomColor2($event,'header-com2')">响应头(header)</span>
         <span @click="changeBottomColor2($event,'data-com2')" class="colorCode2">响应参数(body)</span>
+        <el-button type="primary" size="small">
+          <span class="mockRequests"></span>&#12288;模拟返回
+        </el-button>
       </div>
       <div class="hd-com">
         <keep-alive>
@@ -129,7 +152,7 @@
         </el-form>-->
         <el-row class="demo-autocomplete">
           <div class="pd-title">
-            <span class="colorCode3">新增环境变量</span>
+            <!-- <span class="colorCode3">新增环境变量</span> -->
 
             <el-button type="primary" size="small" @click="clickEnvironment()" class="addCode">
               <span>添加变量</span>
@@ -201,7 +224,7 @@
                   <h2 style="margin: 19px 30px;" v-if="environmentType==0">环境变量</h2>
                   <h2 style="margin: 19px 30px;" v-if="environmentType==1">全局变量</h2>
                 </div>
-                <div class="addEnvironmentName">
+                <div class="addEnvironmentName" v-if="environmentType==0">
                   <div>Environment Name</div>
                   <div>
                     <input class="addEnvironmentInput" v-model="Environmentname" />
@@ -272,8 +295,8 @@
               </div>
             </environment-box>
           </div>
-          <el-col :span="12">
-            <div class="sub-title" v-for="(item,index) in selected" :key="index">
+          <!-- <el-col :span="12"> -->
+          <!-- <div class="sub-title" v-for="(item,index) in selected" :key="index">
               <div class="left">
                 <span>key</span>
                 <el-autocomplete
@@ -295,21 +318,21 @@
                       class="el-icon-remove-outline"
                       @click="removeEnvironment(index)"
                       :disabled="disabled"
-                    ></span>
+          ></span>-->
 
-                    <!-- el-icon-remove-outline -->
+          <!-- el-icon-remove-outline
                     <span class="el-icon-circle-plus-outline" @click="addEnvironment(index)"></span>
                   </div>
                 </el-form>
               </div>
-            </div>
-            <br />
-          </el-col>
+          </div>-->
+          <br />
+          <!-- </el-col> -->
         </el-row>
-        {{selected}}
+        <!-- {{selected}} -->
       </div>
       <div class="pd-title">
-        <span class="colorCode3">示例数据</span>
+        <span class="colorCode3">返回数据</span>
       </div>
       <div class="slData">
         <!--  // this.jsonDemo1 = JSON.stringify(this.jsonDemo, null, 4); -->
@@ -358,8 +381,14 @@
 <script>
 // import  headerCom from "./IrPost/postHeader.vue"
 // import  dataCom from "./IrPost/PostData"
-import { postMethods } from "../../axios/api.js";
-import {Message} from  "element-ui"
+import {
+  postMethods,
+  SelectFile,
+  EditInterfaceDetail,
+  MockPost
+} from "../../axios/api.js";
+import { Message } from "element-ui";
+import storage from "../../libs/storage";
 export default {
   components: {
     "header-com": () => import("./IrPost/postHeader.vue"),
@@ -371,6 +400,8 @@ export default {
   },
   data() {
     return {
+      // postIndent:[],
+      l: [], //将后台返回数据转化为一级目录的数据
       disabled: false,
       environmentType: 1, //0是环境变量  1是全局变量
       Environment: {
@@ -570,7 +601,7 @@ export default {
       //后台返回的数据
       dataList: {
         methods: null,
-        type:null,
+        type: null,
         resType: null,
 
         resStatus: [
@@ -584,304 +615,33 @@ export default {
         ]
       },
       //只有一级的数据包含id和parentId
+      //前端输入返回请求头字段
+
       postheaders: [
-        //前端输入返回请求头字段
-        {
-          cname: "aaa111",
-          isrequired: "ture",
-          type: "ture",
-          detail: "这是请求头1",
-          id: 0,
-          parentId: 0,
-          mockValue: "11",
-          children: []
-        },
-        {
-          cname: "b",
-          isrequired: "ture",
-          type: "ture",
-          detail: "这是请求头2",
-          id: 1,
-          parentId: 0,
-          mockValue: "11",
-          children: []
-        },
-        {
-          cname: "c",
-          isrequired: "ture",
-          type: "ture",
-          detail: "这是请求头3",
-          id: 2,
-          parentId: 0,
-          mockValue: "11",
-          children: []
-        },
-        {
-          cname: "d",
-          isrequired: "ture",
-          type: "ture",
-          detail: "这是请求头4",
-          id: 3,
-          parentId: 0,
-          mockValue: "11",
-          children: []
-        },
-        {
-          cname: "e",
-          isrequired: "ture",
-          type: "ture",
-          detail: "这是请求头5",
-          id: 4,
-          parentId: 0,
-          mockValue: "11",
-          children: []
-        },
-        {
-          cname: "f",
-          isrequired: "ture",
-          type: "ture",
-          detail: "这是请求头6",
-          id: 5,
-          parentId: 0,
-          mockValue: "11",
-          children: []
-        }
+
       ],
       postDatas: [
-        //输入请求参数
-        {
-          cname: "a2",
-          isrequired: "ture",
-          type: "ture",
-          detail: "这是请求参数1",
-          id: 0,
-          parentId: 0,
-          mockValue: "11",
-          children: []
-        },
-        {
-          cname: "b2",
-          isrequired: "ture",
-          type: "ture",
-          detail: "这是请求参数2",
-          id: 1,
-          parentId: 0,
-          mockValue: "2",
-          children: []
-        },
-        {
-          cname: "c2",
-          isrequired: "ture",
-          type: "ture",
-          detail: "这是请求参数3",
-          id: 2,
-          parentId: 0,
-          mockValue: "3",
-          children: []
-        },
-        {
-          cname: "d2",
-          isrequired: "ture",
-          type: "ture",
-          detail: "这是请求参数4",
-          id: 3,
-          parentId: 0,
-          mockValue: "4",
-          children: []
-        },
-        {
-          cname: "e2",
-          isrequired: "ture",
-          type: "ture",
-          detail: "这是请求参数5",
-          id: 4,
-          parentId: 0,
-          mockValue: "5",
-          children: []
-        },
-        {
-          cname: "f2",
-          isrequired: "ture",
-          type: "ture",
-          detail: "这是请求参数6",
-          id: 5,
-          parentId: 0,
-          mockValue: "6",
-          children: []
-        }
+ 
       ],
       resHeaders: [
-        //后台返回请求头字段
-        {
-          cname: "aaa",
-          isrequired: "ture",
-          type: "ture",
-          detail: "这是响应头1",
-          id: 0,
-          parentId: 0,
-          mockValue: "resHeaders",
-          children: []
-        },
-        {
-          cname: "b",
-          isrequired: "ture",
-          type: "ture",
-          detail: "这是响应头2",
-          id: 1,
-          parentId: 0,
-          mockValue: "11",
-          children: []
-        },
-        {
-          cname: "c",
-          isrequired: "ture",
-          type: "ture",
-          detail: "这是响应头3",
-          id: 2,
-          parentId: 0,
-          mockValue: "11",
-          children: []
-        },
-        {
-          cname: "d",
-          isrequired: "ture",
-          type: "ture",
-          detail: "这是响应头4",
-          id: 3,
-          parentId: 0,
-          mockValue: "11",
-          children: []
-        },
-        {
-          cname: "e",
-          isrequired: "ture",
-          type: "ture",
-          detail: "这是响应头5",
-          id: 4,
-          parentId: 0,
-          mockValue: "11",
-          children: []
-        },
-        {
-          cname: "f",
-          isrequired: "ture",
-          type: "ture",
-          detail: "这是响应头6",
-          id: 5,
-          parentId: 0,
-          mockValue: "11",
-          children: []
-        }
+       
       ],
       resDatas: [
-        //返回参数
-        {
-          cname: "a2111",
-          isrequired: "ture",
-          type: "ture",
-          detail: "这是返回参数1",
-          id: 0,
-          parentId: 0,
-          mockValue: "resDatas",
-          children: []
-        },
-        {
-          cname: "b2",
-          isrequired: "ture",
-          type: "ture",
-          detail: "这是返回参数2",
-          id: 1,
-          parentId: 0,
-          mockValue: "11",
-          children: []
-        },
-        {
-          cname: "c2",
-          isrequired: "ture",
-          type: "ture",
-          detail: "这是请返回参数3",
-          id: 2,
-          parentId: 0,
-          mockValue: "11",
-          children: []
-        },
-        {
-          cname: "d2",
-          isrequired: "ture",
-          type: "ture",
-          detail: "这是返回参数4",
-          id: 3,
-          parentId: 0,
-          mockValue: "11",
-          children: []
-        },
-        {
-          cname: "e2",
-          isrequired: "ture",
-          type: "ture",
-          detail: "这是返回参数5",
-          id: 4,
-          parentId: 0,
-          mockValue: "11",
-          children: []
-        },
-        {
-          cname: "f2",
-          isrequired: "ture",
-          type: "ture",
-          detail: "这是返回参数6",
-          id: 5,
-          parentId: 0,
-          mockValue: "11",
-          children: []
-        }
+      
       ],
       requestsResDatas: [
         //  实际请求返回参数
-        {
-          cname: "a2111",
-          isrequired: "ture",
-          type: "ture",
-          detail: "这是返回参数1",
-          value: "a111"
-        },
-        {
-          cname: "b2",
-          isrequired: "ture",
-          type: "ture",
-          detail: "这是返回参数2",
-          value: "b22"
-        },
-        {
-          cname: "c2",
-          isrequired: "ture",
-          type: "ture",
-          detail: "这是请返回参数3",
-          value: "c22"
-        },
-        {
-          cname: "d2",
-          isrequired: "ture",
-          type: "ture",
-          detail: "这是返回参数4",
-          value: "d22"
-        },
-        {
-          cname: "e2",
-          isrequired: "ture",
-          type: "ture",
-          detail: "这是返回参数5",
-          value: "e322"
-        },
-        {
-          cname: "f2",
-          isrequired: "ture",
-          type: "ture",
-          detail: "这是返回参数6",
-          value: "f22"
-        }
+       
       ],
-      type: ["string", "number", "boolean", "object", "array", "file", "null"]
+      type: [
+        { id: 1, name: "string" },
+        { id: 2, name: "number" },
+        { id: 3, name: "boolean" },
+        { id: 4, name: "object" },
+        { id: 5, name: "array" },
+        { id: 6, name: "file" },
+        { id: 7, name: "null" }
+      ]
     };
   },
   methods: {
@@ -945,6 +705,7 @@ export default {
     postJsonSubmit() {
       //确认json数据提交--判断是导入到什么参数
       //  postType判断类型   postJson临时绑定上传的数据   postJHeader一级的请求头数据
+      console.log(this.postType);
       try {
         switch (this.postType) {
           case "header-com":
@@ -955,11 +716,18 @@ export default {
             console.log(a);
             break;
           case "data-com":
-            this.postJData = JSON.parse(this.postJson);
-            this.isValid(this.postJData, this.postDatas); //this.postDatas老数据   postJData新数据
+            this.postJData = JSON.parse(this.postJson); //postJson导入的标准json数据
+            this.isValid(this.postJData, this.postDatas); //postJData新数据 this.postDatas老数据
             var dataCode = JSON.parse(JSON.stringify(this.postDatas));
             var a = this.addObjectSatrt(dataCode);
-            console.log(a);
+            // console.log("导入成功后处理的数据",JSON.stringify(a));
+            // this.postDatas=a
+            // var  c=this.SplitData(a)
+            // console.log("haha",JSON.stringify(c))
+            // // var postDataIndent=this.$refs.child.indent
+
+            // console.log(this.$refs.child.indent)
+            // console.log("postDatas最终数据结构",JSON.stringify(this.postDatas))
             break;
           case "header-com2":
             this.resJHeader = JSON.parse(this.postJson);
@@ -971,8 +739,11 @@ export default {
           case "data-com2":
             this.resJData = JSON.parse(this.postJson);
             this.isValid(this.resJData, this.resDatas); //this.postDatas老数据   postJData新数据
-            var dataCode = JSON.parse(JSON.stringify(this.resDatas));
-            var a = this.addObjectSatrt(dataCode);
+            // var dataCode = JSON.parse(JSON.stringify(this.resDatas));
+            // var a = this.addObjectSatrt(dataCode);
+
+            // console.log(a);
+            // this.resDatas=a
             break;
           default:
             open3("未知错误，请重新上传");
@@ -981,6 +752,42 @@ export default {
         this.open3("数据格式有误,请认真检查后上传", "warning");
       }
     },
+
+    SplitData(a) {
+      var l = [];
+      //数据库存的是父子id
+      //将父子id的列表转化拆分成全部为一级目录的父子列表
+      if (a != null || a != undefined) {
+        a.forEach((item, index) => {
+          if (item.children.length === 0) {
+            l.push(item);
+          }
+          if (item.children.length > 0) {
+            var itemCode = JSON.parse(JSON.stringify(item));
+
+            itemCode.children.splice(0, itemCode.children.length);
+            l.push(itemCode);
+            this.SplitDataChild(l, item.children);
+          }
+        });
+        return l;
+      }
+    },
+    SplitDataChild(l, a) {
+      a.forEach((item, index) => {
+        if (item.children.length === 0) {
+          l.push(item);
+        }
+        if (item.children.length > 0) {
+          var itemCode = JSON.parse(JSON.stringify(item));
+
+          itemCode.children.splice(0, itemCode.children.length);
+          l.push(itemCode);
+          this.SplitDataChild(l, item.children);
+        }
+      });
+    },
+
     addObjectSatrt(dataCode) {
       //在提交请求是将导入的数据处理成标准的json
       var postheadersCommit = [];
@@ -1015,17 +822,25 @@ export default {
       //newData传进来的json数据
       var falg = 0;
       var fatherList = Object.keys(newData);
+      console.log("fatherList", fatherList);
       fatherList.forEach((item, index) => {
-        var id = oldData.length; //改过
+        var id = oldData.length + 1; //改过
         if (typeof newData[item] == "object") {
+          if (newData[item] instanceof Object) {
+            var typeCode = "object";
+            if (newData[item] instanceof Array) {
+              var typeCode = "Array";
+            }
+          }
           oldData.splice(oldData.length, 0, {
             cname: item,
             isrequired: "ture",
-            type: typeof item,
+            type: typeCode,
             detail: "",
             id: id,
             parentId: 0,
-            children: []
+            children: [],
+            mockValue: ""
           }); //如果是对象则先把这个字段加入对应列表
           this.$refs.child.indent.push(falg); //如果是对象则先把这个字段加入对应的边距列表，
           this.forE(newData[item], falg + 15, oldData, id); //然后继续遍历其下的内容  ---去掉newData参数
@@ -1035,15 +850,17 @@ export default {
             isrequired: "ture",
             type: typeof item,
             detail: "",
-            id: oldData.length, //改动
+            id: oldData.length + 1, //改动
             parentId: 0,
-            children: []
+            children: [],
+            mockValue: ""
           });
           this.$refs.child.indent.push(falg);
         }
       });
     },
     forE(obj, falg, oldData, parentId) {
+      // debugger
       //改动
       // 三种情况  1 对象包含list  list包含对象   对象list并存
       if (obj instanceof Array) {
@@ -1056,16 +873,17 @@ export default {
           if (typeof obj[index] == "object") {
             // oldData.splice({ cname: item, isrequired: "ture", type: "ture", detail: "" })  //如果是对象则先把这个字段加入对应列表
             // this.$refs.child.indent.push(falg) //如果是对象则先把这个字段加入对应的边距列表，
-            this.forE(obj[index], falg, oldData, oldData.length - 1); //然后继续遍历其下的内容  gaihuo
+            this.forE(obj[index], falg, oldData, oldData.length); //然后继续遍历其下的内容  gaihuo
           } else {
             oldData.splice(oldData.length, 0, {
               cname: item,
               isrequired: "ture",
               type: typeof item,
               detail: "",
-              id: oldData.length,
+              id: oldData.length + 1,
               parentId: parentId,
-              children: []
+              children: [],
+              mockValue: ""
             });
             this.$refs.child.indent.push(falg);
           }
@@ -1081,7 +899,7 @@ export default {
               //如果是列表
               var typeCode = "Array"; //定义类型为列表
             }
-            var id = oldData.length; //改过     id等于oldData也就是存解析数据列表的长度-也就是最大id+1
+            var id = oldData.length + 1; //改过     id等于oldData也就是存解析数据列表的长度-也就是最大id+1
             oldData.splice(oldData.length, 0, {
               //如果是对象则先把这个key加入对应列表
               cname: item,
@@ -1090,7 +908,8 @@ export default {
               detail: "",
               id: id,
               parentId: parentId,
-              children: []
+              children: [],
+              mockValue: ""
             });
             this.$refs.child.indent.push(falg); //如果是对象则先把这个字段加入对应的边距列表，
             this.forE(obj[item], falg + 15, oldData, id); //然后继续遍历其下的内容
@@ -1101,14 +920,16 @@ export default {
               isrequired: "ture",
               type: typeof item,
               detail: "",
-              id: oldData.length,
+              id: oldData.length + 1,
               parentId: parentId,
-              children: []
+              children: [],
+              mockValue: ""
             });
             this.$refs.child.indent.push(falg);
           }
         });
       }
+      console.log(oldData);
     },
     EnvironmentsMethod(item, name) {
       console.log(name);
@@ -1287,17 +1108,105 @@ export default {
       this.environments = !this.environments;
     },
     Submit() {
-      console.log("请求接口");
-    }
+      console.log("请求接口", this.$refs.child.indent);
+      console.log(this.$route.query.childId);
+      var dataCode1 = JSON.parse(JSON.stringify(this.postheaders));
+      var a1 = this.addObjectSatrt(dataCode1);
+
+      var dataCode2 = JSON.parse(JSON.stringify(this.postDatas));
+      var a2 = this.addObjectSatrt(dataCode2);
+
+      var dataCode3 = JSON.parse(JSON.stringify(this.resHeaders));
+      var a3 = this.addObjectSatrt(dataCode3);
+
+      var dataCode4 = JSON.parse(JSON.stringify(this.resDatas));
+      var a4 = this.addObjectSatrt(dataCode4);
+
+      EditInterfaceDetail({
+        id: this.$route.query.childId,
+        filesName: this.model.infaterName,
+        postMethodsId: this.model.postMethods,
+        postTypeId: this.model.postType,
+        resTypeId: this.model.resType,
+        post_attr: this.model.postAttr,
+        interface_detail: this.model.interDetail,
+        mock_attr: this.model.mockAttr,
+        post_header: JSON.stringify(a1),
+        post_data: JSON.stringify(a2),
+        res_header: JSON.stringify(a3),
+        res_data: JSON.stringify(a4)
+        // indent:JSON.stringify(this.$refs.child.indent)
+      }).then(res => {
+        console.log(this.$parent.updateFiels.fielsName, "111");
+        if (res.status === 200) {
+          Message.success("更新成功");
+          console.log(res.results.res_data);
+          this.postheaders = this.SplitData(res.results.post_header);
+
+          this.postDatas = this.SplitData(res.results.post_data);
+          this.resHeaders = this.SplitData(res.results.res_header);
+          this.resDatas = this.SplitData(res.results.res_data);
+          if (res.results.post_methods != null) {
+            this.model.postMethods = res.results.post_methods.id;
+          }
+          if (res.results.post_type != null) {
+            this.model.postType = res.results.post_type.id;
+          }
+          if (res.results.res_type != null) {
+            this.model.resType = res.results.res_type.id;
+          }
+
+          this.model.infaterName = res.results.filesName;
+          //修改左侧导航接口文档名称
+
+          // this.$parent.updateFiels.fielsName=res.results[0].filesName
+          this.model.postAttr = res.results.post_attr;
+          this.model.interDetail = res.results.interface_detail;
+          this.model.mockAttr = res.results.mock_attr;
+          if (this.postheaders == null) {
+            this.postheaders = [];
+          }
+          if (this.postDatas == null) {
+            this.postDatas = [];
+          }
+          if (this.resHeaders == null) {
+            this.resHeaders = [];
+          }
+          if (this.resDatas == null) {
+            this.resDatas = [];
+          }
+        }
+      });
+    },
+    mockRequests() {
+      var headers = {};
+      this.postheaders.forEach((item, index) => {
+        headers[item.cname] = item.mockValue;
+      });
+      var data = {}; //多级需要递归遍历
+      this.postDatas.forEach((item, index) => {
+        data[item.cname] = item.mockValue;
+      });
+      MockPost({
+        headers: JSON.stringify(headers),
+        url: this.model.mockAttr, //这个地址是测试环境地址-不是mock地址，该请求是真实请求
+        data: JSON.stringify(data)
+      }).then(res => {
+        if (Object.keys(res).length >= 0) {
+          console.log(res.results);
+          this.jsonDemo1 = JSON.stringify(res, null, 4);
+          Message.success("接口请求成功");
+        } else {
+          Message.error("接口请求失败");
+        }
+      });
+    },
+    EnvironmentIcon(){
+      this.clickEnvironment()
+    },
   },
 
   created() {
-    if (this.jsonDemo1) {
-    } else {
-      this.jsonDemo1 = this.jsonDemo;
-    }
-    console.log(this.$route.query, "---");
-
     // this.restaurants=[]
     // this.postheaders.forEach((item,index)=>{
     //   this.restaurants.push({"value":item.cname})
@@ -1312,12 +1221,17 @@ export default {
       this.restaurants.push({ value: item.cname });
       this.valueStatus.push(item.value);
     });
-    if (this.selected.length == 1) {
-      document.querySelector(".el-icon-remove-outline").style.color = "#606266";
-      this.disabled = "disabled";
+    // if (this.selected.length == 1) {
+    //   document.querySelector(".el-icon-remove-outline").style.color = "#606266";
+    //   this.disabled = "disabled";
+    // } else {
+    //   document.querySelector(".el-icon-remove-outline").style.color = "#409eff";
+    // }
+    if (this.jsonDemo1) {
     } else {
-      document.querySelector(".el-icon-remove-outline").style.color = "#409eff";
+      this.jsonDemo1 = this.jsonDemo;
     }
+    console.log(this.$route.query, "---");
   },
   mounted() {
     this.restaurants = [];
@@ -1331,28 +1245,25 @@ export default {
     });
     console.log(this.$route, "---");
 
-    postMethods()   //获取请求方法 请求类型 响应类型列表数据
+    postMethods() //获取请求方法 请求类型 响应类型列表数据
       .then(res => {
         if (res.status == 200) {
-          this.dataList.methods=res.res_post_methods
-          this.dataList.type=res.res_post_type
-          this.dataList.resType=res.res_res_type
-        }else{
-          Message.error("服务器异常")
+          this.dataList.methods = res.res_post_methods;
+          this.dataList.type = res.res_post_type;
+          this.dataList.resType = res.res_res_type;
+        } else {
+          Message.error("服务器异常");
         }
       })
-      .catch(res=>{
-        Message.error(res)
-      }
-  
-      );
+      .catch(res => {
+        Message.error(res);
+      });
+    //子组件
   },
 
   watch: {
     $route: {
-      handler: function(newValue, oldValue) {
-        console.log(newValue.query, oldValue.query, "----");
-      },
+      handler: function(newValue, oldValue) {},
       deep: true
     }
   }
@@ -1375,6 +1286,7 @@ export default {
   margin: 10px;
   text-align: left;
   color: #666;
+  min-width: 500px;
 }
 
 .title {
@@ -1486,7 +1398,7 @@ export default {
 }
 .pd-title .addCode {
   position: relative;
-  top: -10px;
+  top: -30px;
 }
 // .environmentbody  .cell input{
 //   // position: absolute ;
@@ -1566,6 +1478,25 @@ export default {
   border-radius: 2px;
   border: 2px solid #ebeef5;
 }
+
+.Environment{
+  position: relative;
+    float: right;
+    right: -6px;
+    /* top: 10px; */
+    top: -14px;
+    margin-bottom: -30px;
+  .EnvironmentIcon{
+    font-size: 15px;
+    padding: 12px;
+    margin-left: 5px;
+  }
+  .EnvironmentIcon:hover{
+    background: rgb(194, 193, 193);
+    color: #409EFF;
+  }
+  
+}
 </style>
 <style>
 .IR .el-form-item__label {
@@ -1643,4 +1574,7 @@ export default {
   .el-table_3_column_14  {
     position: relative;
   } */
+  .environmentbody .el-table .el-table__body-wrapper .el-table__body  tbody tr td{
+    padding: 0 !important;
+  }
 </style>

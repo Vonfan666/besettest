@@ -54,8 +54,61 @@ export const postMethods=(params)=>{
     return getRequest("/users/post_methods/",params)
 }
 
+//添加文件夹
 export const addFile=(params)=>{
     return postRequest("/users/add_file/",params)
 }
 
+//删除文件夹
+export const RemoveFile=(params)=>{
+    return postRequest("/users/remove_file/",params)
+}
 
+//编辑接口文件夹
+export const EditFilesName=(params)=>{
+    return postRequest("/users/edit_file/",params)
+}
+
+
+//查询文件夹以及文件夹下所有内容
+export const SelectFile=(params)=>{
+    return getRequest("/users/select_file/",params)
+}
+
+
+//新增接口文件
+export const addFiles=(params)=>{
+    return postRequest("/users/add_files/",params)
+}
+
+//编辑接口文件
+export const EditFiles=(params)=>{
+    return postRequest("/users/edit_files/",params)
+}
+
+//删除接口文件
+export const RmoveFiles=(params)=>{
+    return postRequest("/users/remove_files/",params)
+}
+
+//复制接口文件
+export const CopyFiles=(params)=>{
+    return postRequest("/users/copy_files/",params)
+}
+
+
+//获取当前接口详情
+export const InterfaceDetailGet=(params)=>{
+    return getRequest("/users/interface_detail/",params)
+}
+
+
+//修改接口文档数据
+export const EditInterfaceDetail=(params)=>{
+    return postRequest("/users/edit_interface_detail/",params)
+}
+
+//模拟请求
+export const MockPost=(params)=>{
+    return postRequest("/users/mock_requests/",params)
+}

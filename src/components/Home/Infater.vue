@@ -29,8 +29,8 @@
               <p
                 v-for="(item,index) in code"
                 :key="index"
-                @click="searchResult(item.fatherid,item.id)"
-              >{{item.name}}____name</p>
+                @click="searchResult(item.fid,item.id)"
+              >{{item.name}}____{{item.createUserName}}</p>
             </div>
           </div>
           <div class="it-left-context" v-if="contextStatus">
@@ -67,10 +67,10 @@
                   :id="'s'+item1.id"
                   @click="changeBack($event,item.id,item1.id)"
                 >
-                <!-- 这里点击右边文档需要重新请求 -->
+                  <!-- 这里点击右边文档需要重新请求 -->
                   <!-- <div class="ddtext"> -->
                   <div class="ddName-father">
-                    <span class="ddName">{{item1.name}}____name</span>
+                    <span class="ddName">{{item1.name}}____{{item1.createUserName}}</span>
                   </div>
 
                   <div class="dd2-father">
@@ -148,9 +148,20 @@
 
 <script>
 import InfaterContext from "./IntfaterContext.vue";
-import storage from '../../libs/storage';
-import { addFile } from "../../axios/api.js";
-
+import storage from "../../libs/storage";
+import {
+  addFile,
+  SelectFile,
+  RemoveFile,
+  EditFilesName,
+  addFiles,
+  EditFiles,
+  RmoveFiles,
+  CopyFiles,
+  InterfaceDetailGet
+} from "../../axios/api.js";
+import { Message } from "element-ui";
+import Bus from "../../libs/Bus.js";
 export default {
   components: {
     "ir-con": InfaterContext,
@@ -158,6 +169,7 @@ export default {
   },
   data() {
     return {
+      currentid:"",
       styleCode: "height:300px;width:500px", //弹出框大小
       mbFielsStutas: false, //新增文件蒙层状态
       copeCode: {},
@@ -188,51 +200,51 @@ export default {
         ]
       },
       list: [
-        {
-          id: 1,
-          name: "首页",
-          Clist: [
-            {
-              id: 11,
-              name:
-                "获取商家列表获取商家列表获取商家列表获取商家列表获取商家列表获取商家列表"
-            },
-            { id: 12, name: "获取商家信息" },
-            { id: 13, name: "获取商家评论" }
-          ]
-        },
-        {
-          id: 2,
-          name:
-            "获取商家列表获取商家列表获取商家列表获取商家列表获取商家列表获取商家列表",
-          Clist: [
-            {
-              id: 21,
-              name:
-                "获取商家列表获取商家列表获取商家列表获取商家列表获取商家列表获取商家列表"
-            },
-            { id: 22, name: "获取用户所在城市" },
-            { id: 23, name: "获取用户收货地址" },
-            { id: 24, name: "优惠券" }
-          ]
-        },
-        {
-          id: 3,
-          name: "个人中心",
-          Clist: []
-        }
+        // {
+        //   id: 1,
+        //   name: "首页",
+        //   Clist: [
+        //     {
+        //       id: 11,
+        //       name:
+        //         "获取商家列表获取商家列表获取商家列表获取商家列表获取商家列表获取商家列表"
+        //     },
+        //     { id: 12, name: "获取商家信息" },
+        //     { id: 13, name: "获取商家评论" }
+        //   ]
+        // },
+        // {
+        //   id: 2,
+        //   name:
+        //     "获取商家列表获取商家列表获取商家列表获取商家列表获取商家列表获取商家列表",
+        //   Clist: [
+        //     {
+        //       id: 21,
+        //       name:
+        //         "获取商家列表获取商家列表获取商家列表获取商家列表获取商家列表获取商家列表"
+        //     },
+        //     { id: 22, name: "获取用户所在城市" },
+        //     { id: 23, name: "获取用户收货地址" },
+        //     { id: 24, name: "优惠券" }
+        //   ]
+        // },
+        // {
+        //   id: 3,
+        //   name: "个人中心",
+        //   Clist: []
+        // }
       ],
       //模拟返回数据
       code: [
-        {
-          fatherid: 2,
-          id: 21,
-          name:
-            "获取用户头像获取用户头像获取用户头像获取用户头像获取用户头像获取用户头像获取用户头像"
-        },
-        { fatherid: 2, id: 22, name: "获取用户所在城市" },
-        { fatherid: 2, id: 23, name: "获取用户收货地址" },
-        { fatherid: 2, id: 24, name: "优惠券" }
+        // {
+        //   fatherid: 2,
+        //   id: 21,
+        //   name:
+        //     "获取用户头像获取用户头像获取用户头像获取用户头像获取用户头像获取用户头像获取用户头像"
+        // },
+        // { fatherid: 2, id: 22, name: "获取用户所在城市" },
+        // { fatherid: 2, id: 23, name: "获取用户收货地址" },
+        // { fatherid: 2, id: 24, name: "优惠券" }
       ]
     };
   },
@@ -246,9 +258,9 @@ export default {
       });
     },
     FatherSet(command) {
+      //操作文件夹
       if (command[0] == "a") {
         this.openAdd(command, "添加文件", "文件名称", "添加成功", "取消添加");
-        console.log(this.directions);
       }
       if (command[0] == "b") {
         this.openAdd(
@@ -260,39 +272,52 @@ export default {
         );
       }
       if (command[0] == "c") {
-        this.list.splice(command[2], 1);
-        this.open2("删除成功");
+        RemoveFile({
+          id: command[1]
+        }).then(res => {
+          if ((res.status = 200)) {
+            this.list.splice(command[2], 1);
+            Message.success("删除成功");
+          }
+        });
+        // this.open2("删除成功");
       }
     },
     addFielsSubmit() {
-      
+      // 新增文件夹
       this.$refs.refAddfiles.validate(valid => {
         if (valid) {
-           addFile({
-        name:this.updateFiels.fielsName,
-        projectId:storage.get("projectId")
-      }).then(res=>{
-        console.log(res)
-      }).catch()
-          let id = 4; //假设后台返回id=4
-          this.$set(this.list, this.list.length, {
-            id: id,
+          addFile({
             name: this.updateFiels.fielsName,
-            Clist: []
-          });
-          //新建文件时需要---标记该文件是否打开 箭头 iconOpen  以及 directions
-          this.mbFielsStutas = !this.mbFielsStutas;
-          this.$set(this.iconOpen, this.iconOpen.length, "el-icon-caret-right");
-          this.$set(this.directions, this.directions.length, false);
-        } else {
-          return false;
+            projectId: storage.get("projectId")
+          })
+            .then(res => {
+              if ((res.status = 200)) {
+                let id = res.data.id; //后台返回id
+                this.$set(this.list, this.list.length, {
+                  id: id,
+                  name: this.updateFiels.fielsName,
+                  Clist: []
+                });
+                //新建文件时需要---标记该文件是否打开 箭头 iconOpen  以及 directions
+                this.mbFielsStutas = !this.mbFielsStutas;
+                this.$set(
+                  this.iconOpen,
+                  this.iconOpen.length,
+                  "el-icon-caret-right"
+                );
+                this.$set(this.directions, this.directions.length, false);
+                this.updateFiels.fielsName = "";
+              } else {
+                return false;
+              }
+            })
+            .catch();
         }
       });
     },
     addFiles() {
       this.mbFielsStutas = !this.mbFielsStutas;
-     
-
     },
     addContext(id, index) {
       //文件夹下添加接口
@@ -314,9 +339,6 @@ export default {
         this.$set(this.iconOpen, index, "el-icon-caret-right");
         this.$set(this.directions, index, false);
       }
-
-      console.log(this.directions);
-      console.log(this.iconOpen);
     },
     test() {
       console.log(this.searchName);
@@ -328,8 +350,22 @@ export default {
       });
     },
     searchNameMethod() {
-      console.log(this.code);
-      if (this.code.length > 1 && this.searchName != "") {
+      console.log(this.list);
+      this.searchName;
+      this.list.for;
+      // var filterArr = this.list.filter(row => row.name.includes(this.searchName))
+      var filterArr = this.list.map(row =>
+        row.Clist.filter(rows => rows.name.includes(this.searchName))
+      );
+      console.log(filterArr);
+      var filterArr1 = filterArr.filter(
+        row => row.length > 0 && Array.isArray(filterArr)
+      );
+      if(filterArr1.length>0){
+        this.code = filterArr1[0];
+      }
+      
+      if (this.code.length >= 1 && this.searchName != "") {
         this.contextStatus = false;
         this.searchStatus = true;
       } else {
@@ -355,6 +391,9 @@ export default {
                 console.log(document.getElementById("s24"));
                 document.getElementById(ele).classList.add("backColor");
               }, 10);
+              this.InterfaceDetailGet(cid)
+              this.searchName=""
+             
             }
           });
         } else {
@@ -363,16 +402,63 @@ export default {
         }
       });
     },
-    
-    changeBack(envet,fatherId,childId) {//跳转--并传fileId给到下一个接口
+
+    changeBack(envet, fatherId, childId) {
+      //切换不同的接口文档
       // console.log(indexFather,indexChild)
-      console.log(this.$route.query)
+      this.$refs.irCon.jsonDemo1=null
+      console.log(this.$route.query,"111");
       if (document.querySelector(".backColor")) {
         document.querySelector(".backColor").classList.remove("backColor");
       }
       envet.currentTarget.classList.add("backColor");
-      this.$router.push({name:"infaterTextFile",query:{projectId:storage.get("projectId"),fileId:childId}})
+      this.$router.push({ //选择不同的接口文档-切换路由id
+        name: "infaterTextFile",
+        query: { projectId: storage.get("projectId"), childId: childId }
+      });
+      this.InterfaceDetailGet(childId)
 
+    },
+    InterfaceDetailGet(childId){  //请求接口文档详情接口
+      InterfaceDetailGet({
+        projectId:storage.get("projectId"),
+        id:childId
+      }).then(res=>{
+        if(res.status===200){
+          //如果这里请求到接口文档详情数据则-直接修改父组件相关内容
+          this.currentid=res.results[0].id //获取当前所在的id，当删除接口文档的id等于当前所在的id需要重新请求
+
+          this.$refs.irCon.postheaders=this.$refs.irCon.SplitData(res.results[0].post_header)
+          
+          this.$refs.irCon.postDatas=this.$refs.irCon.SplitData(res.results[0].post_data)
+          this.$refs.irCon.resHeaders=this.$refs.irCon.SplitData(res.results[0].res_header)
+
+          this.$refs.irCon.resDatas=this.$refs.irCon.SplitData(res.results[0].res_data)
+          this.$refs.irCon.model.postMethods=res.results[0].post_methods
+          this.$refs.irCon.model.postType=res.results[0].post_type
+          this.$refs.irCon.model.resType=res.results[0].res_type
+          this.$refs.irCon.model.infaterName=res.results[0].filesName
+          this.$refs.irCon.model.postAttr=res.results[0].post_attr
+          this.$refs.irCon.model.interDetail=res.results[0].interface_detail
+          this.$refs.irCon.model.mockAttr=res.results[0].mock_attr
+
+
+          if(this.$refs.irCon.postheaders==null){
+            this.$refs.irCon.postheaders=[]
+          }
+          if(this.$refs.irCon.postDatas==null){
+            this.$refs.irCon.postDatas=[]
+          }
+          if(this.$refs.irCon.resHeaders==null){
+            this.$refs.irCon.resHeaders=[]
+          }
+          if(this.$refs.irCon.resDatas==null){
+            this.$refs.irCon.resDatas=[]
+          }
+
+          
+        }
+      })
     },
     reName(command) {
       //修改文件名称
@@ -391,16 +477,28 @@ export default {
         );
       }
       if (command.type == "b") {
+        console.log(command, "hehe");
         //先提交后台修改名称成功之后--然后在执行--否则直接失败
+
         this.dialogFormVisible = true;
-        console.log("zhixing-----");
         // console.log(this.updateFiels)
         this.copeCode = command;
       }
       if (command.type == "c") {
         //先提交后台删除成功之后--然后在执行--否则直接失败
         // this.$set(,command.index1)
-        this.list[command.index].Clist.splice(command.index1, 1);
+        RmoveFiles({
+          id: command["cid"]
+        }).then(res => {
+          if (res.status === 200) {
+            this.list[command.index].Clist.splice(command.index1, 1);
+            Message.success("删除成功");
+            if(cid==this.currentid){
+              console.log("删除直接展示所有的接口文档，加一个页面")
+            }
+
+          }
+        });
       }
     },
     copeFiels(index) {
@@ -409,17 +507,29 @@ export default {
         if (valid) {
           this.dialogFormVisible = false;
           console.log(index);
-          console.log(this.copeCode, "接口请求到后台--返回成功就继续下面操作");
-          var copeAfter = this.list[this.copeCode.index].Clist[
-            this.copeCode.index1
-          ]; //找到复制的接口
-          console.log(copeAfter, typeof index);
-          console.log(this.list[index], "zheshi ");
-          this.$set(
-            this.list[index].Clist,
-            this.list[index].Clist.length,
-            copeAfter
+          console.log(
+            this.copeCode["cid"],
+            "接口请求到后台--返回成功就继续下面操作"
           );
+          CopyFiles({
+            id: this.copeCode["cid"],
+            fileId: this.list[index].id,
+            userId: storage.get("userId")
+          }).then(res => {
+            if (res.status === 200) {
+              var copeAfter = this.list[this.copeCode.index].Clist[
+                this.copeCode.index1
+              ]; //找到复制的接口
+              copeAfter.id=res.results.id
+              console.log(copeAfter, typeof index);
+              console.log(this.list[index], "zheshi ");
+              this.$set(
+                this.list[index].Clist,
+                this.list[index].Clist.length,
+                copeAfter
+              );
+            }
+          });
         } else {
           return false;
         }
@@ -431,12 +541,21 @@ export default {
         cancelButtonText: "取消"
       })
         .then(({ value }) => {
-          console.log(value);
-          this.$message({
-            type: "success",
-            message: msgSucsess
+          console.log(command, "33333333");
+          console.log(command["cid"]);
+          EditFiles({
+            id: command["cid"],
+            name: value
+          }).then(res => {
+            if (res.status === 200) {
+              this.$message({
+                type: "success",
+                message: msgSucsess
+              });
+              this.list[command.index].Clist[command.index1].name = value;
+              console.log("添加成功之后--默认选中当前添加的接口文档以及展示它的数据")
+            }
           });
-          this.list[command.index].Clist[command.index1].name = value;
         })
         .catch(() => {
           this.$message({
@@ -457,19 +576,47 @@ export default {
             message: msgSucsess
           });
           if (command[0] == "a") {
-            console.log(command);
-            var count = this.list[command[2]].Clist.length;
-            console.log(this.list[command[2]]);
-            this.$set(this.directions, command[2], true);
-            this.$set(this.iconOpen, command[2], "el-icon-caret-bottom");
+            //新增文件夹下的 接口文件
+            console.log(command, "2121");
+            addFiles({
+              createUserId: storage.get("userId"),
+              fileId: command[1],
+              filesName: value,
+              projectId: storage.get("projectId")
+            })
+              .then(res => {
+                if ((res.status = 200)) {
+                  var count = this.list[command[2]].Clist.length;
+                  console.log(this.list[command[2]]);
+                  this.$set(this.directions, command[2], true);
+                  this.$set(this.iconOpen, command[2], "el-icon-caret-bottom");
 
-            this.$set(this.list[command[2]].Clist, count, {
-              id: count,
-              name: value
-            });
+                  this.$set(this.list[command[2]].Clist, count, {
+                    id: res.results.id,
+                    name: value,
+                    createUserName: res.results.create_user
+                  });
+                }
+              })
+              .catch(res => {
+                Message.error("服务器错误");
+              });
           }
           if (command[0] == "b") {
-            this.list[command[2]].name = value;
+            console.log("修改接口文档名称");
+            EditFilesName({
+              id: command[1],
+              name: value
+            })
+              .then(res => {
+                if (res.status === 200) {
+                  console.log(this.list);
+                  this.list[command[2]].name = value;
+                }
+              })
+              .catch(res => {
+                Message.error("服务器异常");
+              });
           }
         })
         .catch(() => {
@@ -478,54 +625,89 @@ export default {
             message: msgFail
           });
         });
+    },
+    SelectFileMethod() {
+      this.list.splice(0, this.list.length);
+      SelectFile({
+        projectId: storage.get("projectId")
+      }).then(res => {
+        if (res.status == 200) {
+          // console.log("res_results", res.results);
+          this.list = res.results;
+          // this.$set(
+          //           this.iconOpen,
+          //           this.iconOpen.length,
+          //           "el-icon-caret-right"
+          //         );
+          this.iconOpen.splice(0, this.iconOpen.length);
+          res.results.forEach((item, index) => {
+            this.iconOpen.push("el-icon-caret-right");
+          });
+        }
+      });
+    },
+    watchList(val) {
+      this.list = val;
+      this.SelectFileMethod();
     }
   },
-  created(){
-    this.aa()
+  created() {
+    this.aa();
+  },
+  mounted() {
+    // console.log("执行了")
+    var watchList = this.watchList;
+    Bus.$on("listValue", function(val) {
+      //监听first组件的txt事件
+      watchList(val);
+    });
+
+    this.SelectFileMethod();
   },
 
   watch: {
     $route: {
       handler: function(val, oldVal) {
-        console.log(val.query.projectId, oldVal.query.projectId);
         if (val.query.projectId != oldVal.query.projectId) {
-          console.log("假装请求接口",val,typeof val)
-          if(val.query.projectId==1){
-            console.log("更改list")
-            this.list.splice(0,this.list.length, {
-          id: 1,
-          name: "首页",
-          Clist: [
-            {
-              id: 11,
-              name:
-                "1111"
-            },
-            { id: 12, name: "11" },
-            { id: 13, name: "获取商111家评论" }
-          ]
-        },
-        {
-          id: 2,
-          name:
-            "获3家列表获取商家列表获取商家列表获取商家列表",
-          Clist: [
-            {
-              id: 21,
-              name:
-                "获取商家列表获取商家列表获取商家列表获取商家列表获取商家列表获取商家列表"
-            },
-            { id: 22, name: "获取用户所在城市" },
-            { id: 23, name: "获取用户收货地址" },
-            { id: 24, name: "优惠券" }
-          ]
-        },
-        {
-          id: 3,
-          name: "个人中心",
-          Clist: []
-        })
-          }
+          // console.log("假装请求接口", val, typeof val);
+          // if (val.query.projectId == 1) {
+          //   console.log("更改list");
+          //   this.list.splice(
+          //     0,
+          //     this.list.length,
+          //     {
+          //       id: 1,
+          //       name: "首页",
+          //       Clist: [
+          //         {
+          //           id: 11,
+          //           name: "1111"
+          //         },
+          //         { id: 12, name: "11" },
+          //         { id: 13, name: "获取商111家评论" }
+          //       ]
+          //     },
+          //     {
+          //       id: 2,
+          //       name: "获3家列表获取商家列表获取商家列表获取商家列表",
+          //       Clist: [
+          //         {
+          //           id: 21,
+          //           name:
+          //             "获取商家列表获取商家列表获取商家列表获取商家列表获取商家列表获取商家列表"
+          //         },
+          //         { id: 22, name: "获取用户所在城市" },
+          //         { id: 23, name: "获取用户收货地址" },
+          //         { id: 24, name: "优惠券" }
+          //       ]
+          //     },
+          //     {
+          //       id: 3,
+          //       name: "个人中心",
+          //       Clist: []
+          //     }
+          //   );
+          // }
         }
       },
       // 深度观察监听
@@ -745,6 +927,14 @@ dl {
 //   margin-right: 3px;
 
 // }
+.search-context p:hover {
+  background: grey;
+  // padding: 3px  0;
+}
+.search-context p{
+    padding: 10px  0;
+    margin: -5px 0;
+}
 </style>
 <style >
 .other .el-dialog__header {

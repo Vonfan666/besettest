@@ -27,10 +27,12 @@ export default {
       flagstatus:false,
       count: 1,
       navChildStatus: [], //判断下面有是否存在子级list
-      navOpenStatus: [] //判断父级是否展开
+      navOpenStatus: [], //判断父级是否展开
+      
     };
   },
   methods: {
+    
     judgechild() {
       this.listCode.forEach((item, index) => {
         //  document.querySelector("h4").add("h")
@@ -64,8 +66,9 @@ export default {
     },
     postNav(value, index) {
       //传入参数index判断-是否有下级--有下级则不请求
-      if (!this.navChildStatus[index]) 
-        { 
+      // if (!this.navChildStatus[index]) 
+        // {
+          console.log(value,"zheshivalue")
           switch(value){
             case "11":this.$router.push({name:"infaterText",query:{"projectId":storage.get("projectId")}});break;
             case "12":this.$router.push("/BesetTest/home/infater/projectPop");break;
@@ -82,9 +85,9 @@ export default {
             case "11":this.$router.push("/BesetTest/home/infater/text");break;
             default:console.log(111)
           }
-          }else{
-            console.log(value,"111");
-          }
+          // }else{
+          //   console.log(value,"111");
+          // }
           
 
         //请求接

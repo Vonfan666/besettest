@@ -192,10 +192,12 @@ import {
   projectRemove,
   projectEdit,
   projectLast,
-  lastUseProject
+  lastUseProject,
+  SelectFile 
 } from "@/axios/api.js";
 import { Message } from "element-ui";
 import storage  from '@/libs/storage.js'
+import Bus from '../../libs/Bus.js';
 export default {
   components: {
     "nav-list": Nav,
@@ -203,6 +205,7 @@ export default {
   },
   data() {
     return {
+      list:[], //这是选择项目是返回的接口文件列表以及文件下的接口文件
       last_projectId:null,
       pageStatus:true,
       currentPage: null, //当前是第几页
@@ -273,6 +276,7 @@ export default {
   methods: {
     changeProject(a, b) {
       //左上角选择项目
+      
       storage.set("projectId", a);
       lastUseProject({
         userId:storage.get("userId"),
@@ -281,6 +285,7 @@ export default {
         if(res.status==200){
           this.last_projectId=a
           this.$router.push({ query: { projectId: storage.get("projectId") } });
+          this.SelectFileMethod()
 
         }
       }).catch(res=>{
@@ -523,6 +528,27 @@ export default {
     },
     cao(){
     },
+    SelectFileMethod() {
+      this.list.splice(0, this.list.length);
+      SelectFile({
+        projectId: storage.get("projectId")
+      }).then(res => {
+        if (res.status == 200) {
+          console.log("res_results111", res.results);
+          this.list = res.results;
+          Bus.$emit("listValue",this.list)
+          // this.$set(
+          //           this.iconOpen,
+          //           this.iconOpen.length,
+          //           "el-icon-caret-right"
+          //         );
+          // this.iconOpen.splice(0, this.iconOpen.length);
+          // res.results.forEach((item, index) => {
+          //   this.iconOpen.push("el-icon-caret-right");
+          // });
+        }
+      });
+    }
   },
 
   mounted() {
