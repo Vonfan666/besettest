@@ -112,3 +112,8 @@ export const EditInterfaceDetail=(params)=>{
 export const MockPost=(params)=>{
     return postRequest("/users/mock_requests/",params)
 }
+
+// 修改mock返回类型以及对应的返回数据
+export const MockResData=(params)=>{
+    return postRequest("/users/mock_update_type/",params)
+}

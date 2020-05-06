@@ -10,8 +10,12 @@
       <slot name="environment">
         <!-- 变量 -->
       </slot>
+      
       <slot name="project">
         
+      </slot>
+      <slot name="mockData">
+        <!-- mock数据页面 -->
       </slot>
 
     </div>

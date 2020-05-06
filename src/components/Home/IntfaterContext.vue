@@ -4,20 +4,18 @@
       <span class="t-info">基本信息</span>
       <div class="Environment">
         <el-form class="top-el-form" :model="model">
-          <el-form-item label="" label-width="63px" label-height="20px" class="top-eft">
+          <el-form-item label label-width="63px" label-height="20px" class="top-eft">
             <el-select v-model="model.postMethods">
-              <el-option 
+              <el-option
                 v-for="(item,index) in dataList.methods"
                 :key="index"
                 :label="item.name"
                 :value="item.id"
               ></el-option>
-              
             </el-select>
             <span class="el-icon-plus EnvironmentIcon" @click="EnvironmentIcon()"></span>
           </el-form-item>
         </el-form>
-        
       </div>
     </div>
     <div class="top">
@@ -114,9 +112,60 @@
       <div class="pd-title">
         <span @click="changeBottomColor2($event,'header-com2')">响应头(header)</span>
         <span @click="changeBottomColor2($event,'data-com2')" class="colorCode2">响应参数(body)</span>
-        <el-button type="primary" size="small">
-          <span class="mockRequests"></span>&#12288;模拟返回
+        <el-button type="primary" size="small" class="mockRequestsButton" @click="mockStatus=true">
+          <span class="mockRequests"></span>&#12288;mock返回数据
         </el-button>
+      </div>
+      <div class="mockData" v-if="mockStatus">
+        <mock-box :styleCode="styleCode" v-slot:mockData>
+          <div class="mockDataTitle">
+            <h3 style="text-align:center">mock数据返回</h3>
+          </div>
+          <div class="mockDataBody">
+            <div class="mockDataBody1">
+              <template>
+                <span class="t1">选择返回类型：</span>
+                <el-radio v-model="mockRadio" label="1">文档返回</el-radio>
+                <el-radio v-model="mockRadio" label="2">自定义返回</el-radio>
+              </template>
+            </div>
+            <div class="mockDataBody2">
+              <span class="t2">自定义返回数据：</span>
+              <div v-if="mockRadio==1">
+                <!-- <el-form :model="mockDatas" :rules="rulesMock" ref="mockDataRef" >
+                <el-form-item prop="mockData">-->
+                <el-input
+                  type="textarea"
+                  :autosize="{ minRows: 6, maxRows: 6}"
+                  placeholder="请输入标准的json数据"
+                  v-model="mockDatas.mockData"
+                  resize="none"
+                  clearable
+                ></el-input>
+                <!-- </el-form-item>
+                </el-form>-->
+              </div>
+              <div v-else>
+                <el-form :model="mockDatas" :rules="rulesMock" ref="mockDataRef">
+                  <el-form-item prop="mockData">
+                    <el-input
+                      type="textarea"
+                      :autosize="{ minRows: 6, maxRows: 6}"
+                      placeholder="请输入标准的json数据"
+                      v-model="mockDatas.mockData"
+                      resize="none"
+                      clearable
+                    ></el-input>
+                  </el-form-item>
+                </el-form>
+              </div>
+            </div>
+          </div>
+          <div class="mockDataFoot">
+            <el-button type="primary" size="small" @click="mockStatus=false">取消</el-button>
+            <el-button type="primary" size="small" @click="mockDataSubmit()">确认</el-button>
+          </div>
+        </mock-box>
       </div>
       <div class="hd-com">
         <keep-alive>
@@ -385,7 +434,8 @@ import {
   postMethods,
   SelectFile,
   EditInterfaceDetail,
-  MockPost
+  MockPost,
+  MockResData
 } from "../../axios/api.js";
 import { Message } from "element-ui";
 import storage from "../../libs/storage";
@@ -396,10 +446,16 @@ export default {
     "header-com2": () => import("./IrPost/postHeader.vue"),
     "data-com2": () => import("./IrPost/PostData"),
     "message-box": () => import("../public/MessageBox.vue"),
-    "environment-box": () => import("../public/MessageBox.vue")
+    "environment-box": () => import("../public/MessageBox.vue"),
+    "mock-box": () => import("../public/MessageBox.vue")
   },
   data() {
     return {
+      mockDatas: {
+        mockData: null
+      },
+      mockRadio: "1",
+      mockStatus: true,
       // postIndent:[],
       l: [], //将后台返回数据转化为一级目录的数据
       disabled: false,
@@ -597,6 +653,11 @@ export default {
           { required: true, message: "请输入请求地址", trigger: "blur" }
         ]
       },
+      rulesMock: {
+        mockData: [
+          { required: true, message: "请输入标准的json数据", trigger: "blur" }
+        ]
+      },
 
       //后台返回的数据
       dataList: {
@@ -617,21 +678,12 @@ export default {
       //只有一级的数据包含id和parentId
       //前端输入返回请求头字段
 
-      postheaders: [
-
-      ],
-      postDatas: [
- 
-      ],
-      resHeaders: [
-       
-      ],
-      resDatas: [
-      
-      ],
+      postheaders: [],
+      postDatas: [],
+      resHeaders: [],
+      resDatas: [],
       requestsResDatas: [
         //  实际请求返回参数
-       
       ],
       type: [
         { id: 1, name: "string" },
@@ -1201,9 +1253,53 @@ export default {
         }
       });
     },
-    EnvironmentIcon(){
-      this.clickEnvironment()
+    mockDataSubmit() {
+      console.log(storage.get("projectId"));
+      var obj = {
+        id: this.$route.query.childId,
+        mock_type: "1",
+        mock_data: null
+      };
+      if (this.mockRadio === "2") {
+        this.$refs.mockDataRef.validate(valid => {
+          if (valid) {
+            obj["mock_type"] = "2";
+            obj["mock_data"] = this.mockDatas.mockData;
+
+            if (
+              Object.prototype.toString.call(
+                JSON.parse(this.mockDatas.mockData)
+              ) === "[object Object]"
+            ) {
+              MockResData(obj).then(res => {
+                res.status === 200 ? ( Message.success(res.msg),this.mockStatus=false) : Message.error(msg);
+              });
+            } else {
+              Message.error("数据格式错误");
+            }
+          } else {
+            return false;
+          }
+        });
+      }
+      if (this.mockRadio === "1") {
+        this.mockDatas.mockData != null && this.mockDatas.mockData != ""
+          ? Object.prototype.toString.call(
+              JSON.parse(this.mockDatas.mockData)
+            ) == "[object Object]"
+            ? ((obj["mock_data"] = this.mockDatas.mockData),
+              MockResData(obj).then(res => {
+                res.status === 200 ? ( Message.success(res.msg),this.mockStatus=false) : Message.error(msg);
+              }))
+            : Message.error("请输入标准的json数据,或者清空数据后提交")
+          : MockResData(obj).then(res => {
+              res.status === 200 ?  ( Message.success(res.msg),this.mockStatus=false) : Message.error(msg);
+            });
+      }
     },
+    EnvironmentIcon() {
+      this.clickEnvironment();
+    }
   },
 
   created() {
@@ -1479,26 +1575,49 @@ export default {
   border: 2px solid #ebeef5;
 }
 
-.Environment{
+.Environment {
   position: relative;
-    float: right;
-    right: -6px;
-    /* top: 10px; */
-    top: -14px;
-    margin-bottom: -30px;
-  .EnvironmentIcon{
+  float: right;
+  right: -6px;
+  /* top: 10px; */
+  top: -14px;
+  margin-bottom: -30px;
+  .EnvironmentIcon {
     font-size: 15px;
     padding: 12px;
     margin-left: 5px;
   }
-  .EnvironmentIcon:hover{
+  .EnvironmentIcon:hover {
     background: rgb(194, 193, 193);
-    color: #409EFF;
+    color: #409eff;
   }
-  
+  .mockRequestsButton {
+    padding: 0px 0px !important ;
+  }
 }
 </style>
 <style>
+.mockData .mockDataBody1 {
+  margin: 20px 40px;
+  font-size: 17px;
+}
+
+.mockData .mockDataBody .mockDataBody2 {
+  font-size: 17px;
+  margin: 20px;
+}
+
+.mockData .mockDataBody .mockDataBody2 .t2 {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.mockDataFoot {
+  text-align: center;
+}
+.mockRequestsButton {
+  padding: 9px 0px !important ;
+}
 .IR .el-form-item__label {
   color: #666;
   text-align: right;
@@ -1574,7 +1693,7 @@ export default {
   .el-table_3_column_14  {
     position: relative;
   } */
-  .environmentbody .el-table .el-table__body-wrapper .el-table__body  tbody tr td{
-    padding: 0 !important;
-  }
+.environmentbody .el-table .el-table__body-wrapper .el-table__body tbody tr td {
+  padding: 0 !important;
+}
 </style>
