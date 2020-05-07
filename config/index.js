@@ -12,7 +12,7 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/users': {
-       target: 'http://192.168.0.100:8081',
+       target: 'http://192.168.0.66:8081',
        changeOrigin: true,
        pathRewrite: {
         '^/users': '/users' // pathRewrite方法重写url, 这样配置出来的url为http://localhost:8081/api/seller
@@ -22,7 +22,7 @@ module.exports = {
      },
 
     // Various Dev Server settings
-    host: '192.168.0.100', // can be overwritten by process.env.HOST
+    host: '192.168.0.66', // can be overwritten by process.env.HOST
     port: 8080, // can be overwritten by process.env.PORT, if port is in use, a free one will be determined
     autoOpenBrowser: false,
     errorOverlay: true,

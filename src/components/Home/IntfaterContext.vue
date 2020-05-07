@@ -117,7 +117,7 @@
         </el-button>
       </div>
       <div class="mockData" v-if="mockStatus">
-        <mock-box :styleCode="styleCode" v-slot:mockData>
+        <mock-box :styleCode="styleCode" :statusCode.sync="mockStatus" v-slot:mockData>
           <div class="mockDataTitle">
             <h3 style="text-align:center">mock数据返回</h3>
           </div>
@@ -218,16 +218,18 @@
                 </div>
                 <div class="environmentsbody">
                   <div class="environmentsName" v-for="(item,index) in Environments" :key="index">
-                    <span
-                      class="name"
+                    <div
                       @click="EnvironmentsMethod(item.children,item.name);addStatus=1;EnvironmentsIndex=index"
-                    >{{item.name}}</span>
-                    <div class="EnvironmentsFloat">
-                      <span class="environmentsType" v-if="item.type==0 ">环境变量</span>
-                      <span class="environmentsType" v-else>全局变量</span>
+                    >
+                      <span class="name">{{item.name}}</span>
+                    </div>
+
+                    <div class="EnvironmentsFloat " @click="environmentsDelete(index)">
+                      <!-- <span class="environmentsType" v-if="item.type==0 ">环境变量</span>
+                      <span class="environmentsType" v-else>全局变量</span>-->
                       <span
                         class="environmentsDelete el-icon-close"
-                        @click="environmentsDelete(index)"
+                        
                       ></span>
                     </div>
                   </div>
@@ -455,7 +457,7 @@ export default {
         mockData: null
       },
       mockRadio: "1",
-      mockStatus: true,
+      mockStatus: false,
       // postIndent:[],
       l: [], //将后台返回数据转化为一级目录的数据
       disabled: false,
@@ -1272,7 +1274,9 @@ export default {
               ) === "[object Object]"
             ) {
               MockResData(obj).then(res => {
-                res.status === 200 ? ( Message.success(res.msg),this.mockStatus=false) : Message.error(msg);
+                res.status === 200
+                  ? (Message.success(res.msg), (this.mockStatus = false))
+                  : Message.error(msg);
               });
             } else {
               Message.error("数据格式错误");
@@ -1289,11 +1293,15 @@ export default {
             ) == "[object Object]"
             ? ((obj["mock_data"] = this.mockDatas.mockData),
               MockResData(obj).then(res => {
-                res.status === 200 ? ( Message.success(res.msg),this.mockStatus=false) : Message.error(msg);
+                res.status === 200
+                  ? (Message.success(res.msg), (this.mockStatus = false))
+                  : Message.error(msg);
               }))
             : Message.error("请输入标准的json数据,或者清空数据后提交")
           : MockResData(obj).then(res => {
-              res.status === 200 ?  ( Message.success(res.msg),this.mockStatus=false) : Message.error(msg);
+              res.status === 200
+                ? (Message.success(res.msg), (this.mockStatus = false))
+                : Message.error(msg);
             });
       }
     },
@@ -1302,11 +1310,13 @@ export default {
     }
   },
 
-  created() {
+  beforeMount() {
+    this.bindCom = "header-com";
     // this.restaurants=[]
     // this.postheaders.forEach((item,index)=>{
     //   this.restaurants.push({"value":item.cname})
     // })
+    // this.bindCom
   },
   updated() {
     // this.jsonDemo1=JSON.stringify(this.jsonDemo, null, 4),
@@ -1532,12 +1542,22 @@ export default {
 
 .environmentsbody .environmentsName:hover > .name {
   color: #409eff;
+  
 }
 .EnvironmentsFloat {
   display: inline-block;
   right: 0px;
   position: absolute;
   top: 0px;
+  
+}
+
+// .EnvironmentsFloat  {
+//   // padding: 0 20px 4px 20px;
+  
+// }
+.EnvironmentsFloat  :hover{
+  background: grey;
 }
 .environmentsType {
   padding: 16px 0px !important;
@@ -1545,9 +1565,12 @@ export default {
   color: rgb(196, 193, 193);
 }
 .environmentsDelete {
-  padding: 16px 0px !important;
+  padding: 18.5px 15px !important;
   margin-right: 0px !important;
   margin-left: 10px !important;
+}
+.environmentsName:hover  .name{
+  color: #1e87f0;
 }
 
 .enviromentClass {

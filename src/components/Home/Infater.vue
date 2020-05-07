@@ -35,8 +35,8 @@
           </div>
           <div class="it-left-context" v-if="contextStatus">
             <dl v-for="(item,index) in list" :key="index">
-              <dt class="it-father">
-                <div class="it-direction" @click="ItDirection($event,index)">
+              <dt class="it-father"  @click="ItDirection($event,index)">
+                <div class="it-direction">
                   <span :class="iconOpen[index]"></span>
                   <span class="name" :id="item.id">{{item.name}}</span>
                 </div>

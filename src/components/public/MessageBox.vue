@@ -1,8 +1,8 @@
 <template>
-  <div class="messageBox">
+  <div class="messageBox" @click="clickAll($event)">
     <div class="ms-text"></div>
 
-    <div class="mb-text"  :style="styleCode">
+    <div class="mb-text"  :style="styleCode" >
       <slot name="addFiels">
       </slot>
       <slot name="postJsonData">
@@ -24,13 +24,26 @@
 
 <script>
 export default {
-  props:["styleCode"],
+  props:["styleCode","statusCode"],
   data() {
     return {
       test: "ceshi"
       
     };
   },
+  methods:{
+    clickAll(a){
+      
+      var ele=document.querySelector(".mb-text")
+      if(ele){
+
+        if(!ele.contains(a.target)){
+          // this.statusCode=!this.statusCode
+          this.$emit("update:statusCode",!this.statusCode)
+        }
+      }
+    }
+  }
   // created(){
   //   console.log(this.styleCode,"11111")
   // }
