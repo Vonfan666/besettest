@@ -224,13 +224,10 @@
                       <span class="name">{{item.name}}</span>
                     </div>
 
-                    <div class="EnvironmentsFloat " @click="environmentsDelete(index)">
+                    <div class="EnvironmentsFloat" @click="environmentsDelete(index)">
                       <!-- <span class="environmentsType" v-if="item.type==0 ">环境变量</span>
                       <span class="environmentsType" v-else>全局变量</span>-->
-                      <span
-                        class="environmentsDelete el-icon-close"
-                        
-                      ></span>
+                      <span class="environmentsDelete el-icon-close"></span>
                     </div>
                   </div>
                 </div>
@@ -1340,6 +1337,7 @@ export default {
     console.log(this.$route.query, "---");
   },
   mounted() {
+
     this.restaurants = [];
     this.valueStatus = [];
     this.requestsResDatas.forEach((item, index) => {
@@ -1357,6 +1355,7 @@ export default {
           this.dataList.methods = res.res_post_methods;
           this.dataList.type = res.res_post_type;
           this.dataList.resType = res.res_res_type;
+
         } else {
           Message.error("服务器异常");
         }
@@ -1542,21 +1541,19 @@ export default {
 
 .environmentsbody .environmentsName:hover > .name {
   color: #409eff;
-  
 }
 .EnvironmentsFloat {
   display: inline-block;
   right: 0px;
   position: absolute;
   top: 0px;
-  
 }
 
 // .EnvironmentsFloat  {
 //   // padding: 0 20px 4px 20px;
-  
+
 // }
-.EnvironmentsFloat  :hover{
+.EnvironmentsFloat :hover {
   background: grey;
 }
 .environmentsType {
@@ -1569,7 +1566,7 @@ export default {
   margin-right: 0px !important;
   margin-left: 10px !important;
 }
-.environmentsName:hover  .name{
+.environmentsName:hover .name {
   color: #1e87f0;
 }
 

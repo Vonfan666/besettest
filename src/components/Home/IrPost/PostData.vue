@@ -6,7 +6,7 @@
 // dragenter - 当被鼠标拖动的对象进入其容器范围内时触发此事件
     // dragend - 用户完成元素拖动后触发-->
     <el-table :data="postData" style="wight:100%" border>
-      <el-table-column label="操作">
+      <el-table-column label="操作" width="110">
         <template slot-scope="scope">
           <span class="el-icon-close" @click="removeTS(scope.$index)"></span>
           <span class="el-icon-plus" style="margin:0px  15px" @click="addTS(scope.$index,$event)"></span>
@@ -23,7 +23,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="参数名称" draggable="true">
+      <el-table-column label="参数名称" draggable="true" width="200">
         <template slot-scope="scope">
           <input
             type="text"
@@ -34,7 +34,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="是否必填" draggable="true">
+      <el-table-column label="是否必填" draggable="true" width="100">
         <template slot-scope="scope">
           <el-select v-model="postData[scope.$index].isrequired">
             <el-option label="true" value="true"></el-option>
@@ -43,19 +43,19 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="类型">
+      <el-table-column label="类型" width="110">
         <template slot-scope="scope">
           <el-select v-model="postData[scope.$index].type">
             <el-option   
             v-for="(item,index) in type"
             :key="index"
             :label="item.name" 
-            :value="item.id">
+            :value="item.type">
             </el-option>
          </el-select>
         </template>
       </el-table-column>
-      <el-table-column label="mock数据">
+      <el-table-column label="mock数据" width="200">
         <template slot-scope="scope">
           <input
             type="text"
@@ -402,4 +402,5 @@ export default {
   width: 20px;
   margin-right: 10px;
 }
+
 </style>
