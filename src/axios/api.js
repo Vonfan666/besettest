@@ -117,3 +117,19 @@ export const MockPost=(params)=>{
 export const MockResData=(params)=>{
     return postRequest("/users/mock_update_type/",params)
 }
+//新增环境变量
+export const EnvironmentsAdd=(params)=>{
+    return postRequest("/users/environment_add/",params)
+}
+
+
+//查询环境变量
+export const EnvironmentsSelect=(params)=>{
+    return getRequest("/users/environment_select/",params)
+}
+
+//删除环境变量
+export const EnvironmentsDelete=(params)=>{
+    return postRequest("/users/environment_delete/",params)
+}
+
