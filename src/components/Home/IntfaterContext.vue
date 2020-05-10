@@ -868,14 +868,51 @@ export default {
       }
       return postheadersCommit;
     },
+    // chageId(data){
+    //   if(data){
+    //     data[data.length-1][id]+1
+    //   }
+        
+    //   else{
+    //     return 1
+    //   }
+      
+    // },
+    chageId(data){
+      var maxId=0
+      data.length>0 ? data.forEach((item,index)=>{
+        item.id>maxId ? maxId=item.id : null
+      }) : null
+      console.log(maxId)
+      return maxId+1
+    },
 
     jsonMethod(newData, oldData) {
+      
       //newData传进来的json数据
+      //重新改变老的oldData的id
+      // var oldDataCode=JSON.parse(JSON.stringify(oldData))
+      // console.log("oldDataCode",oldDataCode)
+      // for  (var n =0;n<oldDataCode.length;n++){
+      //   oldDataCode[n]["id"]=n+1
+      //   var idCode=oldDataCode[n].id
+      //   oldDataCode.splice(n,1)
+      //   n--
+      //   for (var m=0;m<oldDataCode.length;m++){
+      //     if (idCode==oldDataCode[m].parentId){
+      //       oldDataCode[m]["parentId"]=idCode
+      //     }
+      //   }
+      // }
+      // oldDataCode.map(row=>
+      //   oldData.push(row)
+      // )
+      // console.log("oldData",oldData)
       var falg = 0;
       var fatherList = Object.keys(newData);
       console.log("fatherList", fatherList);
       fatherList.forEach((item, index) => {
-        var id = oldData.length + 1; //改过
+        var id = this.chageId(oldData); //改过      11
         if (typeof newData[item] == "object") {
           if (newData[item] instanceof Object) {
             var typeCode = "object";
@@ -896,12 +933,14 @@ export default {
           this.$refs.child.indent.push(falg); //如果是对象则先把这个字段加入对应的边距列表，
           this.forE(newData[item], falg + 15, oldData, id); //然后继续遍历其下的内容  ---去掉newData参数
         } else {
+          var id = this.chageId(oldData)
           oldData.splice(oldData.length, 0, {
+            
             cname: item,
             isrequired: "ture",
             type: typeof item,
             detail: "",
-            id: oldData.length + 1, //改动
+            id: id, //改动
             parentId: 0,
             children: [],
             mockValue: ""
@@ -911,7 +950,6 @@ export default {
       });
     },
     forE(obj, falg, oldData, parentId) {
-      // debugger
       //改动
       // 三种情况  1 对象包含list  list包含对象   对象list并存
       if (obj instanceof Array) {
@@ -921,17 +959,20 @@ export default {
         obj.splice(0, n);
         //以上两句是   列表里面一般都是包含不同的对象--但是每个对象的字段名字都是一样的-我们只需要最后一个就得字段就可以了
         obj.forEach((item, index) => {
+           var id = this.chageId(oldData)
           if (typeof obj[index] == "object") {
+            // var id = this.chageId(oldData)
             // oldData.splice({ cname: item, isrequired: "ture", type: "ture", detail: "" })  //如果是对象则先把这个字段加入对应列表
             // this.$refs.child.indent.push(falg) //如果是对象则先把这个字段加入对应的边距列表，
-            this.forE(obj[index], falg, oldData, oldData.length); //然后继续遍历其下的内容  gaihuo
+            this.forE(obj[index], falg, oldData, parentId); //然后继续遍历其下的内容  gaihuo
           } else {
+           
             oldData.splice(oldData.length, 0, {
-              cname: item,
+              cname: item+"222",
               isrequired: "ture",
               type: typeof item,
               detail: "",
-              id: oldData.length + 1,
+              id: id,
               parentId: parentId,
               children: [],
               mockValue: ""
@@ -943,6 +984,7 @@ export default {
         Object.keys(obj).forEach((item, index) => {
           //如果是非列表
           //如果里面包含字典
+          var id = this.chageId(oldData) //改过     id等于oldData也就是存解析数据列表的长度-也就是最大id+1
           if (typeof obj[item] == "object") {
             //是一个对象
             var typeCode = typeof obj[item]; // 定义类型
@@ -950,10 +992,10 @@ export default {
               //如果是列表
               var typeCode = "Array"; //定义类型为列表
             }
-            var id = oldData.length + 1; //改过     id等于oldData也就是存解析数据列表的长度-也就是最大id+1
+            
             oldData.splice(oldData.length, 0, {
               //如果是对象则先把这个key加入对应列表
-              cname: item,
+              cname: item+"111",
               isrequired: "ture",
               type: typeCode,
               detail: "",
@@ -966,12 +1008,13 @@ export default {
             this.forE(obj[item], falg + 15, oldData, id); //然后继续遍历其下的内容
           } else {
             //如果里面只有键值对-则直接把每个key插入即可
+            // var id = this.chageId(oldData)
             oldData.splice(oldData.length, 0, {
-              cname: item,
+              cname: item+"3333",
               isrequired: "ture",
               type: typeof item,
               detail: "",
-              id: oldData.length + 1,
+              id: id,
               parentId: parentId,
               children: [],
               mockValue: ""

@@ -50,7 +50,7 @@
             v-for="(item,index) in type"
             :key="index"
             :label="item.name" 
-            :value="item.type">
+            :value="item.id">
             </el-option>
          </el-select>
         </template>
@@ -225,14 +225,20 @@ export default {
     },
     bb() {
     },
+
+
+    
+
     addTS(index, event) {
+      
       console.log(this.$parent.postType)
        if(this.$parent.postType="data-com"){
-        var id=this.postData.length+1  //修改初始id
+         
+        var id=this.$parent.chageId(this.postData)  //修改初始id
         var parentId=this.postData[index].id
       }
       if(this.$parent.postType="data-com2"){
-        var id=this.postData.length+1
+        var id=this.$parent.chageId(this.postData)
         var parentId=this.postData[index].id
       }
       this.postData.splice(index + 1, 0, {
@@ -250,10 +256,10 @@ export default {
     },
     addTT() {
       if(this.$parent.postType="data-com"){
-        var id=this.postData.length+1
+        var id=this.$parent.chageId(this.postData)
       }
       if(this.$parent.postType="data-com2"){
-        var id=this.postData.length+1
+        var id=this.$parent.chageId(this.postData)
       }
       this.postData.push({
         cname: "",
@@ -267,7 +273,7 @@ export default {
       });
       this.indent.push(0);
       this.open2();
-      console.log(this.indent)
+      console.log(this.postData)
     },
     open2() {
       this.$message({
@@ -276,16 +282,40 @@ export default {
         duration: 500
       });
     },
+    // chageId(aa,index){
+    //   var  data=JSON.parse(JSON.stringify(aa))
+    //   data.forEach((item,index1) => {
+    //     if(index1>index-1){
+    //       var oldId=item.id
+    //       console.log(oldId)
+    //       item["id"]=item.id-1
+    //       for (var n=0;n<data.length;n++){
+    //           if(data[n].parentId==oldId){
+    //           data[n]["parentId"]=data[n]["id"]
+    //           data.splice(n,1)
+    //           n--
+    //         }
+    //       }
+         
+          
+    //     }
+    //   });
+    //   aa.splice(0,aa.length)
+    //   data.map(rew=>aa.push(rew))
+    // },
     removeTS(index) {
-      console.log(this.indent)
+
+      console.log("postData",JSON.stringify(this.postData))
       var id = this.postData[index].id
 
       this.postData.splice(index, 1);
       this.indent.splice(index, 1);
+      // this.chageId(this.postData,index)
+      
       if (id!=0){  //Id等于0就删除所有字段了
         this.findChild(id)
       }
-      
+      console.log("postData",JSON.stringify(this.postData))
       
     },
     findChild(id){
@@ -296,6 +326,8 @@ export default {
           this.findChild(this.postData[n].id) //如果找到和删除id相关的之后-继续遍历以找到的这个，直到找完位置
 
           this.postData.splice(n, 1);  //找完之后再做删除--先做删除索引会变
+          // this.chageId(this.postData,n)
+
           this.indent.splice(n, 1);
           n--
         }
@@ -315,6 +347,7 @@ export default {
     },
 
     indentMarginLeft(data,mariginLeft) {
+      console.log(this.postData)
       for(var n=0;data.length>n;n++){
           this.indent.push(mariginLeft)
           this.indentMarginLeftChild(data,data[n].id,mariginLeft+15)

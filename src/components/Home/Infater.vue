@@ -771,7 +771,7 @@ export default {
   background: #eee;
 }
 .resize-bar {
-  width: 400px;
+  width: 225px;
   height: inherit;
   resize: horizontal;
   cursor: ew-resize;

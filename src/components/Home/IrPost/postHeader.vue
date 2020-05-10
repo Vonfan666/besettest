@@ -50,7 +50,7 @@
             v-for="(item,index) in type"
             :key="index"
             :label="item.name"
-             :value="item.id">
+            :value="item.id">
              </el-option>
             
           </el-select>
