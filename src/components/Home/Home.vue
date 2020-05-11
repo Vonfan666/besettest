@@ -7,7 +7,6 @@
             <el-select
               v-model="data.project"
               @change="changeProject(data.project,data.projectId)"
-              
               placeholder="请选择项目"
             >
               <el-option
@@ -98,7 +97,11 @@
             </el-table-column>
           </el-table>
         </div>
-        <div class="block" style="margin-top:10px" v-if="projectProductStatus==1 && pageStatus==true">
+        <div
+          class="block"
+          style="margin-top:10px"
+          v-if="projectProductStatus==1 && pageStatus==true"
+        >
           <!-- <span class="demonstration">完整功能</span> -->
           <el-pagination
             @size-change="handleSizeChange"
@@ -193,11 +196,11 @@ import {
   projectEdit,
   projectLast,
   lastUseProject,
-  SelectFile 
+  SelectFile
 } from "@/axios/api.js";
 import { Message } from "element-ui";
-import storage  from '@/libs/storage.js'
-import Bus from '../../libs/Bus.js';
+import storage from "@/libs/storage.js";
+import Bus from "../../libs/Bus.js";
 export default {
   components: {
     "nav-list": Nav,
@@ -205,9 +208,9 @@ export default {
   },
   data() {
     return {
-      list:[], //这是选择项目是返回的接口文件列表以及文件下的接口文件
-      last_projectId:null,
-      pageStatus:true,
+      list: [], //这是选择项目是返回的接口文件列表以及文件下的接口文件
+      last_projectId: null,
+      pageStatus: true,
       currentPage: null, //当前是第几页
       page: 1, //选择第几页
       total: null, //数据总条数
@@ -244,7 +247,7 @@ export default {
       projectList: [
         //后台返回的项目列表
       ],
-      projectLists:[],
+      projectLists: [],
 
       nav: [
         //左侧导航
@@ -258,7 +261,16 @@ export default {
             { id: "14", name: "历史记录" }
           ]
         },
-        { id: "2", name: "测试任务", list: [{ id: "21", name: "接口文档" }] },
+        {
+          id: "2",
+          name: "测试任务",
+          list: [
+            { id: "21", name: "用例管理" },
+            { id: "22", name: "执行用例" },
+            { id: "23", name: "执行日志" },
+            { id: "24", name: "Sql 管理" },
+          ]
+        },
         { id: "3", name: "环境配置" },
         { id: "4", name: "测试报告" },
         { id: "5", name: "定时任务" },
@@ -276,22 +288,24 @@ export default {
   methods: {
     changeProject(a, b) {
       //左上角选择项目
-      
+
       storage.set("projectId", a);
       lastUseProject({
-        userId:storage.get("userId"),
-        projectId:storage.get("projectId")
-      }).then(res=>{
-        if(res.status==200){
-          this.last_projectId=a
-          this.$router.push({ query: { projectId: storage.get("projectId") } });
-          this.SelectFileMethod()
-
-        }
-      }).catch(res=>{
-        Message.error("服务异常")
+        userId: storage.get("userId"),
+        projectId: storage.get("projectId")
       })
-      
+        .then(res => {
+          if (res.status == 200) {
+            this.last_projectId = a;
+            this.$router.push({
+              query: { projectId: storage.get("projectId") }
+            });
+            this.SelectFileMethod();
+          }
+        })
+        .catch(res => {
+          Message.error("服务异常");
+        });
     },
     openIcon(self) {
       this.leftStatus = !this.leftStatus;
@@ -350,16 +364,13 @@ export default {
               })
                 .then(res => {
                   if (res.status == 200) {
-                    
                     this.total = res.total;
                     this.projectList.unshift(res.results);
-                    if(this.projectList.length<=this.page_size){
-                      
-                    }else{
+                    if (this.projectList.length <= this.page_size) {
+                    } else {
                       this.projectList.pop(res.results);
                     }
-                    
-                    
+
                     Message.success(res.msg);
                   }
                 })
@@ -383,7 +394,7 @@ export default {
         .then(res => {
           if (res.status == 200) {
             this.projectList[this.projectIndex] = this.addProjectObj;
-            this.projectLists[this.projectIndex].name=this.addProjectObj.name
+            this.projectLists[this.projectIndex].name = this.addProjectObj.name;
             // this.projectLists.splice(this.projectIndex,1,this.addProjectObj)
             this.projectProductStatus = 1;
             if (this.data.projectId == this.projectList[this.projectIndex].id) {
@@ -416,15 +427,14 @@ export default {
       })
         .then(res => {
           if (res.status == 200) {
-            this.projectLists.forEach((item,index)=>{
-              if(this.last_projectId==item.id){  
-                this.last_projectId=null
-                this.projectLists.splice(index,1)   //删除历史访问ID
-                
+            this.projectLists.forEach((item, index) => {
+              if (this.last_projectId == item.id) {
+                this.last_projectId = null;
+                this.projectLists.splice(index, 1); //删除历史访问ID
               }
-            })
+            });
             this.total = res.total;
-            if (parseInt(res.page_size) <parseInt(this.currentPage)) {
+            if (parseInt(res.page_size) < parseInt(this.currentPage)) {
               this.currentPage = res.page_size;
               projectList({
                 page: this.currentPage,
@@ -452,11 +462,10 @@ export default {
         });
     },
     closeProject() {
-      this.addProjectStatus=false;
-      this.projectProductStatus=1;
-      this.addProjectObj={}
-       projectLast({ userId: storage.get("userId") })
-      .then(res => {
+      this.addProjectStatus = false;
+      this.projectProductStatus = 1;
+      this.addProjectObj = {};
+      projectLast({ userId: storage.get("userId") }).then(res => {
         if (res.status == 200) {
           // this.last_projectId=t
           projectList()
@@ -464,13 +473,13 @@ export default {
               //加载该组件则请求项目列表接口
               if (res.status == 200) {
                 res.results.forEach((item, index) => {
-                  this.projectLists.splice(index,1,item)
+                  this.projectLists.splice(index, 1, item);
                   if (this.last_projectId == item.id) {
                     this.data.project = item.name;
                     this.data.projectId = item.id;
                     storage.set("projectId", item.id);
                     this.$router.push({
-                      query: { projectId: storage.get("projectId")}
+                      query: { projectId: storage.get("projectId") }
                     });
                   }
                 });
@@ -488,12 +497,9 @@ export default {
               Message.error("系统异常");
             });
         }
-      
-
-    })
+      });
     },
     handleSizeChange(val) {
-
       this.page_size = val;
       this.projectList.splice(0, this.projectList.length);
       projectList({
@@ -511,7 +517,6 @@ export default {
       });
     },
     handleCurrentChange(val) {
-      
       this.page = val;
       projectList({
         page: val,
@@ -526,8 +531,7 @@ export default {
         }
       });
     },
-    cao(){
-    },
+    cao() {},
     SelectFileMethod() {
       this.list.splice(0, this.list.length);
       SelectFile({
@@ -536,7 +540,7 @@ export default {
         if (res.status == 200) {
           console.log("res_results111", res.results);
           this.list = res.results;
-          Bus.$emit("listValue",this.list)
+          Bus.$emit("listValue", this.list);
           // this.$set(
           //           this.iconOpen,
           //           this.iconOpen.length,
@@ -563,16 +567,13 @@ export default {
         if (res.status == 200) {
           this.last_projectId = res.results.user_last_project;
 
-          projectList({
-
-          })
+          projectList({})
             .then(res => {
               //加载该组件则请求项目列表接口
               if (res.status == 200) {
-
                 res.results.forEach((item, index) => {
                   this.projectLists.push(item);
-                  
+
                   if (this.last_projectId == item.id) {
                     this.data.project = item.name;
                     this.data.projectId = item.id;
@@ -605,17 +606,15 @@ export default {
 
     //默认记录用户上次访问的id后台返回-然后第一次直接projectId=用户最后一次访问的id
   },
-  watch:{
-    total(newValue,oldValue){
-      if(newValue<=this.page_size){
-        this.pageStatus=false
-      }else{
-        this.pageStatus=true
+  watch: {
+    total(newValue, oldValue) {
+      if (newValue <= this.page_size) {
+        this.pageStatus = false;
+      } else {
+        this.pageStatus = true;
       }
-      
     }
   }
-  
 };
 </script>
 

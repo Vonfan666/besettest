@@ -5,7 +5,7 @@ import HelloWorld from '@/components/HelloWorld'
 Vue.use(Router)
 
 export default new Router({
-  mode:'history',
+  mode: 'history',
   routes: [
     {
       path: '/',
@@ -13,35 +13,49 @@ export default new Router({
       component: HelloWorld
     },
     {
-      path:"/BesetTest/login",
-      name:"Login",
-      component:()=>import("@/components/Login/login")
+      path: "/BesetTest/login",
+      name: "Login",
+      component: () => import("@/components/Login/login")
 
     },
-    // {  //注册--会注释
-    //   path:"/BesetTest/regist",
-    //   component:()=>import("@/components/Login/regist")
-    // },
-    // {
-    //   path:"/BesetTest/test",
-    //   component:()=>import("@/components/Login/test")
-    // }
     {
-      path:"/BesetTest/home",
-      name:"Home",
-      component:()=>import("@/components/Home/Home"),
-      children:[
-        {name:"infaterText",path:"/BesetTest/home/infater/text",component:()=>import("@/components/Home/Infater"),
-        children:[
-          {name:"infaterTextFile",path:"/BesetTest/home/infater/file",component:()=>import("@/components/Home/IntfaterContext")}
-        ]
-      },
-        {path:"/BesetTest/home/infater/projectPop",component:()=>import("@/components/Home/ProjectPop")},
-        {path:"/BesetTest/home/infater/globalVariables",component:()=>import("@/components/Home/GlobalVar")},
-        {path:"/BesetTest/home/infater/history",component:()=>import("@/components/Home/History")}
-      
+      path: "/BesetTest/home",
+      name: "Home",
+      component: () => import("@/components/Home/Home"),
+      children: [
+        {
+          name: "infaterText", path: "/BesetTest/home/infater/text", component: () => import("@/components/Home/Infater"),
+          children: [
+            { name: "infaterTextFile", path: "/BesetTest/home/infater/file", component: () => import("@/components/Home/IntfaterContext") }
+          ]
+        },
+        { path: "/BesetTest/home/infater/projectPop", component: () => import("@/components/Home/ProjectPop") },
+        { path: "/BesetTest/home/infater/globalVariables", component: () => import("@/components/Home/GlobalVar") },
+        { path: "/BesetTest/home/infater/history", component: () => import("@/components/Home/History") },
+        {
+          path: "/BesetTest/case",
+          name: "case",
+          component: () => import("@/components/Infater/manageCase")
+        },
+        {
+          path: "/BesetTest/runCase",
+          name: "runCase",
+          component: () => import("@/components/Infater/runCase")
+        },
+        {
+          path: "/BesetTest/runLog",
+          name: "runLog",
+          component: () => import("@/components/Infater/runLog")
+        },
+        {
+          path: "/BesetTest/manageSql",
+          name: "manageSql",
+          component: () => import("@/components/Infater/manageSql")
+        },
       ]
+
     },
+
 
 
   ]

@@ -908,7 +908,7 @@ dl {
   margin: -2px 0;
 }
 .it-con-text:hover {
-  background: grey;
+  background: #bbb;
 }
 
 // .dd2-father:hover {
@@ -916,7 +916,7 @@ dl {
 // }
 
 .it-father:hover {
-  background: grey;
+  background: #bbb;
 }
 // .ddName{
 //   width: 80%
@@ -928,7 +928,7 @@ dl {
 
 // }
 .search-context p:hover {
-  background: grey;
+  background: #bbb;
   // padding: 3px  0;
 }
 .search-context p{
