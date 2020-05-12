@@ -10,6 +10,7 @@
               <el-form>
                 <el-form-item>
                   <el-input
+                    prefix-icon="el-icon-search"
                     v-model="searchName"
                     placeholder="搜索接口……"
                     clearable

@@ -13,6 +13,7 @@
           <el-form>
             <el-form-item>
               <el-input
+                prefix-icon="el-icon-search"
                 v-model="searchName"
                 placeholder="搜索接口……"
                 clearable
@@ -80,7 +81,25 @@
         </div>
       </div>
     </div>
-    <div class="manageCase-right">右侧的内容，右侧的内容，右侧的内容，右侧的内容</div>
+    <div class="manageCase-right">
+      <div class="right-title">
+        <div class="right-title-detail">
+          <div class="title-detail">
+            <span class="tt">基本信息</span>
+          </div>
+          <div class="title-detail-context">
+            <div class="interfaName">
+              <el-form :model="datas" :rules="rules" ref="refFrom" label-width="100px">
+                <el-form-item label="接口名称" prop="interfaceNameValid">
+                  <el-input placeholder="请输入接口名称" v-model="datas.interfaceName"></el-input>
+                </el-form-item>
+              </el-form>
+            </div>
+            <div class="title-detail-class"></div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -88,7 +107,7 @@
 export default {
   data() {
     return {
-      searchName:"",    //接口搜索名称
+      searchName: "", //接口搜索名称
       manageCaseLefStatus: true, //左侧是否展示
       //文件列表,其包含子级接口文档
       FilesList: [
@@ -163,59 +182,56 @@ export default {
       ],
       //文件名称箭头方向 el-icon-caret-bottom向下，默认向右
       fileNameIcon: [],
-      fileNameChildStatus:[],//添加false数量默认为文件夹个数
+      fileNameChildStatus: [], //添加false数量默认为文件夹个数
+      datas: {
+        interfaceName: ""
+      },
+      rules: 
+        {
+          interfaceNameValid: [
+            { required: true, message: "请输入接口名称", trigger: "blur" }
+          ]
+        }
+      
     };
   },
   methods: {
     changeColor(self) {
       //添加修改接口文件的背景颜色
       console.log(self);
-      var ele =self.currentTarget
-      console.log(ele.classList)
+      var ele = self.currentTarget;
+      console.log(ele.classList);
       var eles = document.querySelectorAll(".fileName .activeColor");
-      ele.classList.length==1
-        ? (
-          ele.classList.add("activeColor"),
-          eles.forEach((item,index)=>{
-              item.classList.remove("activeColor")
-          })
-          )
-
+      ele.classList.length == 1
+        ? (ele.classList.add("activeColor"),
+          eles.forEach((item, index) => {
+            item.classList.remove("activeColor");
+          }))
         : ele.classList.remove("activeColor");
     },
-    isOpen(self,index){
-    //判断接口文件箭头方向
+    isOpen(self, index) {
+      //判断接口文件箭头方向
 
-    this.fileNameIcon[index]=="el-icon-caret-right"
-    ? (this.fileNameIcon.splice(index,1,"el-icon-caret-bottom"),
-        this.fileNameChildStatus.splice(index,1,true)
-        )
-    : (this.fileNameIcon.splice(index,1,"el-icon-caret-right"),this.fileNameChildStatus.splice(index,1,false))
+      this.fileNameIcon[index] == "el-icon-caret-right"
+        ? (this.fileNameIcon.splice(index, 1, "el-icon-caret-bottom"),
+          this.fileNameChildStatus.splice(index, 1, true))
+        : (this.fileNameIcon.splice(index, 1, "el-icon-caret-right"),
+          this.fileNameChildStatus.splice(index, 1, false));
     },
-    filesLen(){
-        //判断文件个数,并根据个数导入fileNameChildStatus-从而控制每个文件下的文档展示或者显示
-        this.FilesList.map(row=>this.fileNameChildStatus.push(false))
-        this.FilesList.map(row=>this.fileNameIcon.push("el-icon-caret-right"))
+    filesLen() {
+      //判断文件个数,并根据个数导入fileNameChildStatus-从而控制每个文件下的文档展示或者显示
+      this.FilesList.map(row => this.fileNameChildStatus.push(false));
+      this.FilesList.map(row => this.fileNameIcon.push("el-icon-caret-right"));
     },
-    searchNameMethod(){
-
-    },
-    addFiles(){
-
-    },
-    ChildAction(){
-
-    },
-    FatherAction(){
-
-    },
-
+    searchNameMethod() {},
+    addFiles() {},
+    ChildAction() {},
+    FatherAction() {}
   },
-  mounted(){
-      this.filesLen()
-      console.log(this.fileNameChildStatus,"11")
+  mounted() {
+    this.filesLen();
+    console.log(this.fileNameChildStatus, "11");
   }
-    
 };
 </script>
 
@@ -234,7 +250,7 @@ export default {
 }
 .manageCase-right {
   height: 100%;
-  padding: 16px;
+  // padding: 16px;
   background-color: #eee;
   box-sizing: border-box;
   overflow: hidden;
@@ -274,6 +290,7 @@ export default {
 .resize-bar:active ~ .resize-line {
   border-left: 1px dashed skyblue;
 }
+
 .resize-bar::-webkit-scrollbar {
   width: 200px;
   height: inherit;
@@ -361,5 +378,49 @@ export default {
   .activeColor {
     background-color: grey;
   }
+}
+.manageCase-right {
+  padding: 20px;
+  .right-title {
+    height: 100%;
+
+    .title-detail {
+      padding-bottom: 15px;
+      border-bottom: 1px solid #c9b2b2;
+      text-align: left;
+      .tt {
+        padding: 0 10px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #1e87f0;
+      }
+    }
+    .title-detail-context {
+      width: 100%;
+      margin-top: 10px;
+      text-align: left;
+      display: flex;
+
+      .interfaName {
+        display: inline-block;
+        width: 300px;
+        height: 30px;
+      }
+      .title-detail-class {
+        display: inline-block;
+        background-color: royalblue;
+        width: 300px;
+        height: 30px;
+      }
+    }
+  }
+}
+</style>
+
+<style>
+.interfaName .el-input__inner {
+  height: 30px !important;
+}
+.interfaName .el-form-item__content {
+  line-height: 30px;
 }
 </style>
