@@ -1012,7 +1012,7 @@ export default {
            }).then(res=>{
              if(res.status==200){
                Message.success("操作成功")
-               this.Environments[this.currentEnvironmentIndex].value=res.results.value
+               this.Environments.splice([this.currentEnvironmentIndex],1,res.results)
                this.currentEnvironmentId=null
                this.currentEnvironmentIndex=null
 
