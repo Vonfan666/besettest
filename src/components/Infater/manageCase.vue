@@ -114,9 +114,11 @@
                 </el-form-item>
               </div>
               <div></div>
-              <div class="interfaName">
-                <el-form-item label="用例名称" prop="interfaceName">
-                  <el-input placeholder="请输入接口名称" v-model="datas.interfaceName"></el-input>
+              <div class="interfaName" @mouseenter   ="test3()" @mouseleave="test4()">
+                <el-form-item label="用例名称" prop="interfaceName" >
+                  <el-input placeholder="请输入接口名称" v-model="datas.interfaceName" @focus="test111($event)" @blur="test2($event)" v-if="inputStatus">
+                  </el-input>
+                  
                 </el-form-item>
               </div>
               <div class="interfaName">
@@ -180,8 +182,8 @@
               <span class="tt">请求参数</span>
             </div>
             <div class="requests-detail">
-              <div class="requests-title">
-                  <span>前置条件</span>
+              <div class="requests-title" contenteditable="true">
+                  <span class="a">前置条件</span>
                   <span>请求头</span>
                   <span>请求参数</span>
                   <span>后置条件</span>
@@ -198,6 +200,7 @@
 export default {
   data() {
     return {
+       inputStatus:1,   //input输入替换成div输入-显示引用的环境变量的颜色
       searchName: "", //接口搜索名称
       manageCaseLefStatus: true, //左侧是否展示
       //分组列表,其包含子级用例,当该项目用例分组为空时，则默认展示所有接口分组name
@@ -211,457 +214,7 @@ export default {
               createUserName: "冯凡",
               fid: 9
             },
-            {
-              id: 119,
-              name: "test",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 120,
-              name: "test1",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 121,
-              name: "更新名称",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 123,
-              name: "11",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 124,
-              name: "test3",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 118,
-              name: "登录",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 119,
-              name: "test",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 120,
-              name: "test1",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 121,
-              name: "更新名称",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 123,
-              name: "11",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 124,
-              name: "test3",
-              createUserName: "冯凡",
-              fid: 9
-            },            {
-              id: 118,
-              name: "登录",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 119,
-              name: "test",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 120,
-              name: "test1",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 121,
-              name: "更新名称",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 123,
-              name: "11",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 124,
-              name: "test3",
-              createUserName: "冯凡",
-              fid: 9
-            },            {
-              id: 118,
-              name: "登录",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 119,
-              name: "test",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 120,
-              name: "test1",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 121,
-              name: "更新名称",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 123,
-              name: "11",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 124,
-              name: "test3",
-              createUserName: "冯凡",
-              fid: 9
-            },            {
-              id: 118,
-              name: "登录",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 119,
-              name: "test",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 120,
-              name: "test1",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 121,
-              name: "更新名称",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 123,
-              name: "11",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 124,
-              name: "test3",
-              createUserName: "冯凡",
-              fid: 9
-            },            {
-              id: 118,
-              name: "登录",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 119,
-              name: "test",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 120,
-              name: "test1",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 121,
-              name: "更新名称",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 123,
-              name: "11",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 124,
-              name: "test3",
-              createUserName: "冯凡",
-              fid: 9
-            },            {
-              id: 118,
-              name: "登录",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 119,
-              name: "test",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 120,
-              name: "test1",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 121,
-              name: "更新名称",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 123,
-              name: "11",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 124,
-              name: "test3",
-              createUserName: "冯凡",
-              fid: 9
-            },            {
-              id: 118,
-              name: "登录",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 119,
-              name: "test",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 120,
-              name: "test1",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 121,
-              name: "更新名称",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 123,
-              name: "11",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 124,
-              name: "test3",
-              createUserName: "冯凡",
-              fid: 9
-            },            {
-              id: 118,
-              name: "登录",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 119,
-              name: "test",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 120,
-              name: "test1",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 121,
-              name: "更新名称",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 123,
-              name: "11",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 124,
-              name: "test3",
-              createUserName: "冯凡",
-              fid: 9
-            },            {
-              id: 118,
-              name: "登录",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 119,
-              name: "test",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 120,
-              name: "test1",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 121,
-              name: "更新名称",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 123,
-              name: "11",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 124,
-              name: "test3",
-              createUserName: "冯凡",
-              fid: 9
-            },            {
-              id: 118,
-              name: "登录",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 119,
-              name: "test",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 120,
-              name: "test1",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 121,
-              name: "更新名称",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 123,
-              name: "11",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 124,
-              name: "test3",
-              createUserName: "冯凡",
-              fid: 9
-            },            {
-              id: 118,
-              name: "登录",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 119,
-              name: "test",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 120,
-              name: "test1",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 121,
-              name: "更新名称",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 123,
-              name: "11",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 124,
-              name: "test3",
-              createUserName: "冯凡",
-              fid: 9
-            },            {
-              id: 118,
-              name: "登录",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 119,
-              name: "test",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 120,
-              name: "test1",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 121,
-              name: "更新名称",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 123,
-              name: "11",
-              createUserName: "冯凡",
-              fid: 9
-            },
-            {
-              id: 124,
-              name: "test3",
-              createUserName: "冯凡",
-              fid: 9
-            },
+   
           ],
           name: "登录注册",
           project_id: 80
@@ -717,8 +270,12 @@ export default {
       ],
       //提交数据
       datas: {
+       
         isInterfaceId: "", //关联的接口id
-        interfaceName: "", //接口名称
+        interfaceName: "冯凡", //用例名称
+        globarl:{
+          token:"1121321"
+        },
         interfaceIsOk: 0, //当前用例状态
         caseGroupId: "", //用例分组id
         urlHttp: 1, //请求协议
@@ -771,7 +328,19 @@ export default {
     searchNameMethod() {},
     addFiles() {},
     ChildAction() {},
-    FatherAction() {}
+    FatherAction() {},
+    test111(a){
+      console.log(a)
+    },
+    test2(a){
+      console.log(a)
+    },
+    test3(){
+      console.log(111)
+    },
+    test4(){
+      console.log("likai ")
+    }
   },
   mounted() {
     this.filesLen();
@@ -940,7 +509,7 @@ export default {
   }
 }
 .manageCase-right {
-  padding: 20px;
+  padding-left: 10px;
   .right-title {
     height: 100%;
 
@@ -959,7 +528,7 @@ export default {
       margin: 10px 0;
       text-align: left;
       height: 280px;
-      background-color: silver;
+      // background-color: silver;
       // display: flex;
 
       .interfaName,
@@ -1011,8 +580,14 @@ export default {
     .requests-detail {
       width: 100%;
       height: 500px;
-      background-color: silver;
+      // background-color: silver;
       margin: 10px 0;
+      .requests-title{
+        text-align: left;
+      }
+      .a{
+        color: red;
+      }
     }
   }
 }
