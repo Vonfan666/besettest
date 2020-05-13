@@ -114,11 +114,13 @@
                 </el-form-item>
               </div>
               <div></div>
-              <div class="interfaName" @mouseenter   ="test3()" @mouseleave="test4()">
-                <el-form-item label="用例名称" prop="interfaceName" >
-                  <el-input placeholder="请输入接口名称" v-model="datas.interfaceName" @focus="test111($event)" @blur="test2($event)" v-if="inputStatus">
-                  </el-input>
-                  
+              <div class="interfaName">
+                <el-form-item label="用例名称" prop="interfaceName">
+                  <el-input placeholder="请输入接口名称" v-model="datas.interfaceName" v-if="inputStatus"></el-input>
+                  <!-- <div contenteditable="true" class="inputStatus" v-if="!inputStatus" :model="datas.interfaceName">
+                    <span class="colors">111</span>
+                    <span>3232</span>
+                  </div>-->
                 </el-form-item>
               </div>
               <div class="interfaName">
@@ -182,11 +184,35 @@
               <span class="tt">请求参数</span>
             </div>
             <div class="requests-detail">
-              <div class="requests-title" contenteditable="true">
-                  <span class="a">前置条件</span>
-                  <span>请求头</span>
-                  <span>请求参数</span>
-                  <span>后置条件</span>
+              <div class="requests-title">
+                <span @click="requestsTitile1()">前置处理</span>
+                <span @click="requestsTitile2()">请求头</span>
+                <span @click="requestsTitile3()">请求参数</span>
+                <span @click="requestsTitile4()">后置条件</span>
+              </div>
+              <div class="t1">
+                <span>名称</span>
+                <span>数据处理</span>
+                <span>描述</span>
+                <span>操作</span>
+              </div>
+              <div class="requestsTitile">
+                <el-form :model="datas" :rules="rules">
+                  <el-form-item prop="beforeName" class="requestsTitile1">
+                    <el-input v-model="datas.beforeName"></el-input>
+                  </el-form-item>
+                  <el-form-item class="requestsTitile2">
+                    <el-select>
+                      <el-option></el-option>
+                    </el-select>
+                  </el-form-item>
+                  <el-form-item class="requestsTitile3">
+                    <el-input></el-input>
+                  </el-form-item>
+                  <el-form-item class="requestsTitile4">
+                    <el-input></el-input>
+                  </el-form-item>
+                </el-form>
               </div>
             </div>
           </div>
@@ -197,10 +223,11 @@
 </template>
 
 <script>
+import globarlRe from "../../libs/reGlobarl";
 export default {
   data() {
     return {
-       inputStatus:1,   //input输入替换成div输入-显示引用的环境变量的颜色
+      inputStatus: 1, //input输入替换成div输入-显示引用的环境变量的颜色
       searchName: "", //接口搜索名称
       manageCaseLefStatus: true, //左侧是否展示
       //分组列表,其包含子级用例,当该项目用例分组为空时，则默认展示所有接口分组name
@@ -213,8 +240,7 @@ export default {
               name: "登录",
               createUserName: "冯凡",
               fid: 9
-            },
-   
+            }
           ],
           name: "登录注册",
           project_id: 80
@@ -243,7 +269,7 @@ export default {
           ],
           name: "哈哈",
           project_id: 80
-        },
+        }
       ],
       //文件名称箭头方向 el-icon-caret-bottom向下，默认向右
       fileNameIcon: [],
@@ -268,13 +294,13 @@ export default {
         { id: 1, name: "GET" },
         { id: 2, name: "POST" }
       ],
+
       //提交数据
       datas: {
-       
         isInterfaceId: "", //关联的接口id
         interfaceName: "冯凡", //用例名称
-        globarl:{
-          token:"1121321"
+        globarl: {
+          token: "1121321"
         },
         interfaceIsOk: 0, //当前用例状态
         caseGroupId: "", //用例分组id
@@ -282,7 +308,8 @@ export default {
         urlAttr: "", //请求主机地址
         urlPort: "", //端口
         urlPostType: 1, //请求类型
-        caseDetail: "" //用例描述
+        caseDetail: "", //用例描述
+        beforeName: "" //前置处理器名称
       },
       rules: {
         interfaceName: [
@@ -291,7 +318,8 @@ export default {
         caseGroupId: [{ required: true, message: "请输入接口名称" }],
         urlHttp: [{ required: true, message: "请选择协议" }],
         urlAttr: [{ required: true, message: "请填写主机地址" }],
-        urlPostType: [{ required: true, message: "请选择请求类型" }]
+        urlPostType: [{ required: true, message: "请选择请求类型" }],
+        beforeName: [{ required: true, message: "请输入名称" }]
       }
     };
   },
@@ -329,18 +357,10 @@ export default {
     addFiles() {},
     ChildAction() {},
     FatherAction() {},
-    test111(a){
-      console.log(a)
-    },
-    test2(a){
-      console.log(a)
-    },
-    test3(){
-      console.log(111)
-    },
-    test4(){
-      console.log("likai ")
-    }
+    requestsTitile1() {},
+    requestsTitile2() {},
+    requestsTitile3() {},
+    requestsTitile4() {}
   },
   mounted() {
     this.filesLen();
@@ -371,7 +391,7 @@ export default {
   // box-sizing: border-box;
   // overflow-y: scroll;
   // margin: 0 16px 0 0;
-    height: 100%;
+  height: 100%;
   padding: 5px;
   background-color: #eee;
   box-sizing: border-box;
@@ -395,7 +415,7 @@ export default {
   background: #eee;
 }
 .resize-bar {
-   width: 225px;
+  width: 225px;
   height: inherit;
   resize: horizontal;
   cursor: ew-resize;
@@ -579,14 +599,45 @@ export default {
 
     .requests-detail {
       width: 100%;
-      height: 500px;
+      //   height: 500px;
       // background-color: silver;
       margin: 10px 0;
-      .requests-title{
+      .requests-title {
         text-align: left;
+        span {
+          padding: 10px 10px;
+          font-size: 15px;
+        }
       }
-      .a{
-        color: red;
+      .requestsTitile {
+        margin-top: 10px;
+        // position: relative;
+        overflow-x: hidden;
+        width: 65%;
+        height: 300px;
+        margin-right: -20px;
+        font-size: 0;
+
+        .requestsTitile1,
+        .requestsTitile2,
+        .requestsTitile3,
+        .requestsTitile4 {
+          display: inline-block;
+          vertical-align: top;
+          font-size: 16px;
+          height: 100px;
+          width: calc(25% - 20px);
+          margin-right: 20px;
+        }
+      }
+    }
+    .t1 {
+      width: 65%;
+      display: flex;
+      justify-content: space-around;
+      margin-top: 10px;
+      span {
+        margin-left: -5%;
       }
     }
   }
@@ -594,9 +645,9 @@ export default {
 </style>
 
 <style>
-.interfaName .el-input__inner,
-.interfaName-1 .el-input__inner,
-.interfaName-2 .el-input__inner {
+.right-title .el-input__inner,
+.right-title-1 .el-input__inner,
+.right-title-2 .el-input__inner {
   height: 30px !important;
 }
 /* .right-title-detail .el-form-item__content {
@@ -605,7 +656,7 @@ export default {
 .right-title-detail .el-form-item__label {
   color: black;
 }
-.right-title-detail  .el-form-item__error {
+.right-title-detail .el-form-item__error {
   padding-top: 0px !important;
 }
 </style>
