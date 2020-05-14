@@ -191,45 +191,76 @@
                 <span @click="requestsTitile4()">后置条件</span>
               </div>
               <div class="t1">
-                <span class="requestsTitile1">顺序</span>
+                <span class="requestsTitile1">序号</span>
                 <span class="requestsTitile2">名称</span>
                 <span class="requestsTitile3">处理类型</span>
                 <span class="requestsTitile4">数据处理</span>
                 <span class="requestsTitile5">描述</span>
               </div>
               <div class="requestsTitile">
-                <el-form v-model="beforeAction" :rules="rules">
-                  <el-form-item class="requestsTitile1" >
-                    <el-input placeholder="序号" v-model="beforeAction.beforeIndex"></el-input>
-                  </el-form-item>
-                  <el-form-item  class="requestsTitile2" >
-                    <el-input v-model="beforeAction.beforeName" placeholder="前置条件名称"></el-input>
-                  </el-form-item>
-                  <el-form-item class="requestsTitile3" >
-                    <el-select placeholder="选择处理类型" v-model="beforeAction.beforeType">
-                      <el-option 
-                      v-for="(item,index)  in beforeTypeList"
-                      :key="index"
-                      :label="item.name"
-                      :value="item.id"
-                      ></el-option>
-                    </el-select>
-                  </el-form-item>
-                  <el-form-item class="requestsTitile4" >
-                    <el-select placeholder="选择前置处理" v-model="beforeAction.beforePlan">
-                      <el-option 
-                      v-for="(item,index)  in beforePlanList"
-                      :key="index"
-                      :label="item.name"
-                      :value="item.id"
-                      ></el-option>
-                    </el-select>
-                  </el-form-item>
-                  <el-form-item class="requestsTitile5" >
-                    <el-input placeholder="简要描述前置处理" v-model="beforeAction.beforeDetail"></el-input>
-                  </el-form-item>
-                  <div class="delete">
-                    <span>删除</span>
+                <el-form :model="beforeAction" ref="beforeAction">
+                  <div v-for="(item,index) in beforeAction.keys" :key="item.key">
+                    <el-form-item
+                      
+                      hide-required-asterisk
+                      class="requestsTitile1"
+                      :prop="'keys.' + index + '.beforeIndex'"
+                      :rules="{ required: true, message: '必填' }"
+                      
+                    >
+                      <el-input placeholder="序号" v-model="item.beforeIndex" @change="changeIndex(index)"></el-input>
+                    </el-form-item>
+                    <el-form-item
+                      class="requestsTitile2"
+                      :prop="'keys.'+index+ '.beforeName'"
+                      hide-required-asterisk
+                      :rules="{ required: true, message: '必填' }"
+                    >
+                      <el-input v-model="item.beforeName" placeholder="条件名称"></el-input>
+                    </el-form-item>
+                    <el-form-item
+                      class="requestsTitile3"
+                      :prop="'keys.'+index+ '.beforeType'"
+                      hide-required-asterisk
+                      :rules="{ required: true, message: '必填' }"
+                    >
+                      <el-select placeholder="选择处理类型" v-model="item.beforeType">
+                        <el-option
+                          v-for="(item1,index1)  in beforeTypeList"
+                          :key="index1"
+                          :label="item1.name"
+                          :value="item1.id"
+                        ></el-option>
+                      </el-select>
+                    </el-form-item>
+                    <el-form-item
+                      class="requestsTitile4"
+                      :prop="'keys.'+index+ '.beforePlan'"
+                      hide-required-asterisk
+                      :rules="{ required: true, message: '必填' }"
+                    >
+                      <el-select placeholder="选择前置处理" v-model="item.beforePlan">
+                        <el-option
+                          v-for="(item1,index2)  in beforePlanList"
+                          :key="index2"
+                          :label="item1.name"
+                          :value="item1.id"
+                        ></el-option>
+                      </el-select>
+                    </el-form-item>
+                    <el-form-item class="requestsTitile5">
+                      <el-input placeholder="简要描述前置处理" v-model="item.beforeDetail"></el-input>
+                    </el-form-item>
+                    <!-- <div class="delete">
+                      <span @click="addBefore(index)">新增</span>
+                      <span @click.prevent="removeBefore(item)">删除</span>
+                    </div> -->
+                    <!-- v-if="index===beforeAction.keys.length-1" 只有最后一个有添加删除按钮 -->
+                    <el-form-item class="delete" >
+                        <el-button @click.prevent="addBefore(index)">添加</el-button>
+                        <el-button @click.prevent="removeBefore(item)" v-if="index!=0">删除</el-button>
+                      
+                    </el-form-item>
                   </div>
                 </el-form>
               </div>
@@ -243,6 +274,7 @@
 
 <script>
 import globarlRe from "../../libs/reGlobarl";
+import { Message } from "element-ui";
 export default {
   data() {
     return {
@@ -327,22 +359,24 @@ export default {
         caseDetail: "" //用例描述
       },
       //前置处理器
-      beforeAction: [
-        {
-          beforeIndex: "", //前置条件中执行顺序
-          beforeName: "", //前置条件名称
-          beforeType: "", //前置条件类型---如文件操作、数据库操作等
-          beforePlan: "", //前置处理--选择文件操作中的具体事务，或者数据库中的具体事务
-          beforeDetail: "" //简要描述
-        }
+      beforeAction: {
+        keys: [
+          {
+            beforeIndex: "", //前置条件中执行顺序
+            beforeName: "", //前置条件名称
+            beforeType: "", //前置条件类型---如文件操作、数据库操作等
+            beforePlan: "", //前置处理--选择文件操作中的具体事务，或者数据库中的具体事务
+            beforeDetail: "" //简要描述
+          }
+        ]
+      },
+      beforeTypeList: [
+        { id: 1, name: "文件处理" },
+        { id: 2, name: "数据库操作" }
       ],
-      beforeTypeList:[
-        {id:1,name:"文件处理"},
-        {id:2,name:"数据库操作"},
-      ],
-      beforePlanList:[
-        {Pid:1,id:1,name:"上传文件"},
-        {Pid:2,id:2,name:"新增数据"},
+      beforePlanList: [
+        { Pid: 1, id: 1, name: "上传文件" },
+        { Pid: 2, id: 2, name: "新增数据" }
       ],
       rules: {
         interfaceName: [
@@ -351,10 +385,13 @@ export default {
         caseGroupId: [{ required: true, message: "请输入接口名称" }],
         urlHttp: [{ required: true, message: "请选择协议" }],
         urlAttr: [{ required: true, message: "请填写主机地址" }],
-        urlPostType: [{ required: true, message: "请选择请求类型" }],
+        urlPostType: [{ required: true, message: "必填" }],
+        beforeIndex: [{ required: true, message: "必填" }],
+        beforeName: [{ required: true, message: "必填" }],
+        beforeType: [{ required: true, message: "必填" }],
+        beforePlan: [{ required: true, message: "必填" }]
         // beforeName: [{ required: true, message: "请输入名称" }]
-      },
-    
+      }
     };
   },
   methods: {
@@ -387,6 +424,35 @@ export default {
         this.fileNameIcon.push("el-icon-caret-right")
       );
     },
+    //新增前置处理项
+    addBefore(index) {
+      this.beforeAction.keys.splice(index+1,0, {
+        beforeIndex: "",
+        beforeName: "",
+        beforeType: "",
+        beforePlan: "",
+        beforeDetail: "",
+        key: Date.now()
+      });
+    },
+    //删除前置处理项
+    removeBefore(item) {
+      var index = this.beforeAction.keys.indexOf(item);
+      if (index !== 0) {
+        this.beforeAction.keys.splice(index, 1);
+      }
+    },
+    //编辑顺序时判断是否重复
+    changeIndex(index) {
+      var list = this.beforeAction.keys;
+      var isHave = list.map(row => row.beforeIndex);
+      console.log("输入的", typeof list[index].beforeIndex);
+      isHave.splice(index, 1); //删掉当前输入的,isHave就只剩当前以外的，然后判断当前输入的在不在之前的列表即可判断是否重复
+      console.log(isHave)
+      isHave.indexOf(list[index].beforeIndex) >= 0
+        ? Message.error("执行顺序不能重复")
+        : null;
+    },
     searchNameMethod() {},
     addFiles() {},
     ChildAction() {},
@@ -394,28 +460,13 @@ export default {
     requestsTitile1() {},
     requestsTitile2() {},
     requestsTitile3() {},
-    requestsTitile4() {},
+    requestsTitile4() {}
     //检测前置处理---参数列表最后一个如果有不为空的则新增一个
   },
-  Update(){
-    console.log(this.beforeAction)
-    var item=Object.values(this.beforeAction[this.beforeAction.length-1])
-    item.some((item,index)=>{
-      item != "" ? this.beforeAction.push(
-         {
-          beforeIndex: "", 
-          beforeName: "", 
-          beforeType: "", 
-          beforePlan: "", 
-          beforeDetail: "" 
-        }
-      )  : console.log("beforeTypeList")
-    })
-  },
+  Update() {},
   mounted() {
     this.filesLen();
     console.log(this.fileNameChildStatus, "11");
-    
   }
 };
 </script>
@@ -667,6 +718,7 @@ export default {
         position: relative;
         text-align: left;
         margin-left: 10px;
+        margin-bottom: 10px;
       }
       .requestsTitile {
         // margin-top: 10px;
@@ -706,8 +758,24 @@ export default {
       .delete {
         display: inline-block;
         margin-left: 10px;
-        color: red;
         cursor: pointer;
+        span:nth-child(1) {
+          margin-left: 1px;
+          color: #1e87f0;
+          cursor: pointer;
+        }
+        span:nth-child(1):hover {
+          color: rgb(128, 186, 252);
+        }
+
+        span:nth-child(2) {
+          margin-left: 1px;
+          color: red;
+          cursor: pointer;
+        }
+        span:nth-child(2):hover {
+          color: rgb(248, 125, 125);
+        }
       }
     }
     // .t1 {
@@ -739,4 +807,15 @@ export default {
 .right-title-detail .el-form-item__error {
   padding-top: 0px !important;
 }
+
+.requestsTitile .el-form-item {
+  margin-bottom: 5px;
+}
+.requestsTitile .el-form-item__error {
+  margin-top: -2px;
+}
+.manageCase-right .el-button{
+  padding: 8px 10px;
+}
+
 </style>
