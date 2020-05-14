@@ -191,27 +191,46 @@
                 <span @click="requestsTitile4()">后置条件</span>
               </div>
               <div class="t1">
-                <span>名称</span>
-                <span>数据处理</span>
-                <span>描述</span>
-                <span>操作</span>
+                <span class="requestsTitile1">顺序</span>
+                <span class="requestsTitile2">名称</span>
+                <span class="requestsTitile3">处理类型</span>
+                <span class="requestsTitile4">数据处理</span>
+                <span class="requestsTitile5">描述</span>
               </div>
               <div class="requestsTitile">
-                <el-form :model="datas" :rules="rules">
-                  <el-form-item prop="beforeName" class="requestsTitile1">
-                    <el-input v-model="datas.beforeName"></el-input>
+                <el-form v-model="beforeAction" :rules="rules">
+                  <el-form-item class="requestsTitile1" >
+                    <el-input placeholder="序号" v-model="beforeAction.beforeIndex"></el-input>
                   </el-form-item>
-                  <el-form-item class="requestsTitile2">
-                    <el-select>
-                      <el-option></el-option>
+                  <el-form-item  class="requestsTitile2" >
+                    <el-input v-model="beforeAction.beforeName" placeholder="前置条件名称"></el-input>
+                  </el-form-item>
+                  <el-form-item class="requestsTitile3" >
+                    <el-select placeholder="选择处理类型" v-model="beforeAction.beforeType">
+                      <el-option 
+                      v-for="(item,index)  in beforeTypeList"
+                      :key="index"
+                      :label="item.name"
+                      :value="item.id"
+                      ></el-option>
                     </el-select>
                   </el-form-item>
-                  <el-form-item class="requestsTitile3">
-                    <el-input></el-input>
+                  <el-form-item class="requestsTitile4" >
+                    <el-select placeholder="选择前置处理" v-model="beforeAction.beforePlan">
+                      <el-option 
+                      v-for="(item,index)  in beforePlanList"
+                      :key="index"
+                      :label="item.name"
+                      :value="item.id"
+                      ></el-option>
+                    </el-select>
                   </el-form-item>
-                  <el-form-item class="requestsTitile4">
-                    <el-input></el-input>
+                  <el-form-item class="requestsTitile5" >
+                    <el-input placeholder="简要描述前置处理" v-model="beforeAction.beforeDetail"></el-input>
                   </el-form-item>
+                  <div class="delete">
+                    <span>删除</span>
+                  </div>
                 </el-form>
               </div>
             </div>
@@ -299,18 +318,32 @@ export default {
       datas: {
         isInterfaceId: "", //关联的接口id
         interfaceName: "冯凡", //用例名称
-        globarl: {
-          token: "1121321"
-        },
         interfaceIsOk: 0, //当前用例状态
         caseGroupId: "", //用例分组id
         urlHttp: 1, //请求协议
         urlAttr: "", //请求主机地址
         urlPort: "", //端口
         urlPostType: 1, //请求类型
-        caseDetail: "", //用例描述
-        beforeName: "" //前置处理器名称
+        caseDetail: "" //用例描述
       },
+      //前置处理器
+      beforeAction: [
+        {
+          beforeIndex: "", //前置条件中执行顺序
+          beforeName: "", //前置条件名称
+          beforeType: "", //前置条件类型---如文件操作、数据库操作等
+          beforePlan: "", //前置处理--选择文件操作中的具体事务，或者数据库中的具体事务
+          beforeDetail: "" //简要描述
+        }
+      ],
+      beforeTypeList:[
+        {id:1,name:"文件处理"},
+        {id:2,name:"数据库操作"},
+      ],
+      beforePlanList:[
+        {Pid:1,id:1,name:"上传文件"},
+        {Pid:2,id:2,name:"新增数据"},
+      ],
       rules: {
         interfaceName: [
           { required: true, message: "请选择分组", trigger: "blur" }
@@ -319,8 +352,9 @@ export default {
         urlHttp: [{ required: true, message: "请选择协议" }],
         urlAttr: [{ required: true, message: "请填写主机地址" }],
         urlPostType: [{ required: true, message: "请选择请求类型" }],
-        beforeName: [{ required: true, message: "请输入名称" }]
-      }
+        // beforeName: [{ required: true, message: "请输入名称" }]
+      },
+    
     };
   },
   methods: {
@@ -360,11 +394,28 @@ export default {
     requestsTitile1() {},
     requestsTitile2() {},
     requestsTitile3() {},
-    requestsTitile4() {}
+    requestsTitile4() {},
+    //检测前置处理---参数列表最后一个如果有不为空的则新增一个
+  },
+  Update(){
+    console.log(this.beforeAction)
+    var item=Object.values(this.beforeAction[this.beforeAction.length-1])
+    item.some((item,index)=>{
+      item != "" ? this.beforeAction.push(
+         {
+          beforeIndex: "", 
+          beforeName: "", 
+          beforeType: "", 
+          beforePlan: "", 
+          beforeDetail: "" 
+        }
+      )  : console.log("beforeTypeList")
+    })
   },
   mounted() {
     this.filesLen();
     console.log(this.fileNameChildStatus, "11");
+    
   }
 };
 </script>
@@ -609,37 +660,66 @@ export default {
           font-size: 15px;
         }
       }
-      .requestsTitile {
-        margin-top: 10px;
+      .t1 {
+        margin-top: 20px;
         // position: relative;
+        width: 100%;
+        position: relative;
+        text-align: left;
+        margin-left: 10px;
+      }
+      .requestsTitile {
+        // margin-top: 10px;
+        // position: absolute;
         overflow-x: hidden;
-        width: 65%;
+        width: 100%;
         height: 300px;
-        margin-right: -20px;
-        font-size: 0;
-
-        .requestsTitile1,
-        .requestsTitile2,
-        .requestsTitile3,
-        .requestsTitile4 {
-          display: inline-block;
-          vertical-align: top;
-          font-size: 16px;
-          height: 100px;
-          width: calc(25% - 20px);
-          margin-right: 20px;
-        }
+        text-align: left;
+        margin-left: 10px;
+        // position: relative;
+      }
+      .requestsTitile1 {
+        width: 5%;
+        display: inline-block;
+      }
+      .requestsTitile2 {
+        width: 10%;
+        display: inline-block;
+        margin-left: 10px;
+      }
+      .requestsTitile3 {
+        width: 10%;
+        display: inline-block;
+        margin-left: 10px;
+      }
+      .requestsTitile4 {
+        width: 10%;
+        display: inline-block;
+        margin-left: 10px;
+      }
+      .requestsTitile5 {
+        width: 20%;
+        display: inline-block;
+        margin-left: 10px;
+        // left: 460px;
+      }
+      .delete {
+        display: inline-block;
+        margin-left: 10px;
+        color: red;
+        cursor: pointer;
       }
     }
-    .t1 {
-      width: 65%;
-      display: flex;
-      justify-content: space-around;
-      margin-top: 10px;
-      span {
-        margin-left: -5%;
-      }
-    }
+    // .t1 {
+    //   font-size: 10px;
+    //   width: 45%;
+    //   display: flex;
+    //   justify-content: space-around;
+    //   margin-top: 10px;
+    //   span {
+    //     margin-left: -6%;
+    //   }
+    // }
   }
 }
 </style>
