@@ -372,7 +372,9 @@ export default {
       },
       beforeTypeList: [
         { id: 1, name: "文件处理" },
-        { id: 2, name: "数据库操作" }
+        { id: 2, name: "数据库操作" },
+        { id: 2, name: "执行py脚本" },
+        { id: 2, name: "请求接口" },
       ],
       beforePlanList: [
         { Pid: 1, id: 1, name: "上传文件" },
