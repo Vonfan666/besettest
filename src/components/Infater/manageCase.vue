@@ -185,84 +185,89 @@
             </div>
             <div class="requests-detail">
               <div class="requests-title">
-                <span @click="requestsTitile1()">前置处理</span>
-                <span @click="requestsTitile2()">请求头</span>
-                <span @click="requestsTitile3()">请求参数</span>
-                <span @click="requestsTitile4()">后置条件</span>
+                <span @click="requestsTitile1()" class="t2">前置处理</span>
+                <span @click="requestsTitile2()" class="t2">请求头</span>
+                <span @click="requestsTitile3()" class="t2">请求参数</span>
+                <span @click="requestsTitile4()" class="t2">后置条件</span>
               </div>
-              <div class="t1">
-                <span class="requestsTitile1">序号</span>
-                <span class="requestsTitile2">名称</span>
-                <span class="requestsTitile3">处理类型</span>
-                <span class="requestsTitile4">数据处理</span>
-                <span class="requestsTitile5">描述</span>
-              </div>
-              <div class="requestsTitile">
-                <el-form :model="beforeAction" ref="beforeAction">
-                  <div v-for="(item,index) in beforeAction.keys" :key="item.key">
-                    <el-form-item
-                      
-                      hide-required-asterisk
-                      class="requestsTitile1"
-                      :prop="'keys.' + index + '.beforeIndex'"
-                      :rules="{ required: true, message: '必填' }"
-                      
-                    >
-                      <el-input placeholder="序号" v-model="item.beforeIndex" @change="changeIndex(index)"></el-input>
-                    </el-form-item>
-                    <el-form-item
-                      class="requestsTitile2"
-                      :prop="'keys.'+index+ '.beforeName'"
-                      hide-required-asterisk
-                      :rules="{ required: true, message: '必填' }"
-                    >
-                      <el-input v-model="item.beforeName" placeholder="条件名称"></el-input>
-                    </el-form-item>
-                    <el-form-item
-                      class="requestsTitile3"
-                      :prop="'keys.'+index+ '.beforeType'"
-                      hide-required-asterisk
-                      :rules="{ required: true, message: '必填' }"
-                    >
-                      <el-select placeholder="选择处理类型" v-model="item.beforeType">
-                        <el-option
-                          v-for="(item1,index1)  in beforeTypeList"
-                          :key="index1"
-                          :label="item1.name"
-                          :value="item1.id"
-                        ></el-option>
-                      </el-select>
-                    </el-form-item>
-                    <el-form-item
-                      class="requestsTitile4"
-                      :prop="'keys.'+index+ '.beforePlan'"
-                      hide-required-asterisk
-                      :rules="{ required: true, message: '必填' }"
-                    >
-                      <el-select placeholder="选择前置处理" v-model="item.beforePlan">
-                        <el-option
-                          v-for="(item1,index2)  in beforePlanList"
-                          :key="index2"
-                          :label="item1.name"
-                          :value="item1.id"
-                        ></el-option>
-                      </el-select>
-                    </el-form-item>
-                    <el-form-item class="requestsTitile5">
-                      <el-input placeholder="简要描述前置处理" v-model="item.beforeDetail"></el-input>
-                    </el-form-item>
-                    <!-- <div class="delete">
+              <div class="requestsContext">
+                <div class="requestsBefore" v-show="statusIng.requestsBefore">
+                  <div class="t1">
+                    <span class="requestsTitile1">序号</span>
+                    <span class="requestsTitile2">名称</span>
+                    <span class="requestsTitile3">处理类型</span>
+                    <span class="requestsTitile4">数据处理</span>
+                    <span class="requestsTitile5">描述</span>
+                  </div>
+                  <div class="requestsTitile">
+                    <el-form :model="beforeAction" ref="beforeAction" class="beforeFrom">
+                      <div v-for="(item,index) in beforeAction.keys" :key="item.key">
+                        <el-form-item
+                          hide-required-asterisk
+                          class="requestsTitile1"
+                          :prop="'keys.' + index + '.beforeIndex'"
+                          :rules="{ required: true, message: '必填' }"
+                        >
+                          <el-input
+                            placeholder="序号"
+                            v-model="item.beforeIndex"
+                            @change="changeIndex(index)"
+                          ></el-input>
+                        </el-form-item>
+                        <el-form-item
+                          class="requestsTitile2"
+                          :prop="'keys.'+index+ '.beforeName'"
+                          hide-required-asterisk
+                          :rules="{ required: true, message: '必填' }"
+                        >
+                          <el-input v-model="item.beforeName" placeholder="条件名称"></el-input>
+                        </el-form-item>
+                        <el-form-item
+                          class="requestsTitile3"
+                          :prop="'keys.'+index+ '.beforeType'"
+                          hide-required-asterisk
+                          :rules="{ required: true, message: '必填' }"
+                        >
+                          <el-select placeholder="选择处理类型" v-model="item.beforeType">
+                            <el-option
+                              v-for="(item1,index1)  in beforeTypeList"
+                              :key="index1"
+                              :label="item1.name"
+                              :value="item1.id"
+                            ></el-option>
+                          </el-select>
+                        </el-form-item>
+                        <el-form-item
+                          class="requestsTitile4"
+                          :prop="'keys.'+index+ '.beforePlan'"
+                          hide-required-asterisk
+                          :rules="{ required: true, message: '必填' }"
+                        >
+                          <el-select placeholder="选择前置处理" v-model="item.beforePlan">
+                            <el-option
+                              v-for="(item1,index2)  in beforePlanList"
+                              :key="index2"
+                              :label="item1.name"
+                              :value="item1.id"
+                            ></el-option>
+                          </el-select>
+                        </el-form-item>
+                        <el-form-item class="requestsTitile5">
+                          <el-input placeholder="简要描述前置处理" v-model="item.beforeDetail"></el-input>
+                        </el-form-item>
+                        <!-- <div class="delete">
                       <span @click="addBefore(index)">新增</span>
                       <span @click.prevent="removeBefore(item)">删除</span>
-                    </div> -->
-                    <!-- v-if="index===beforeAction.keys.length-1" 只有最后一个有添加删除按钮 -->
-                    <el-form-item class="delete" >
-                        <el-button @click.prevent="addBefore(index)">添加</el-button>
-                        <el-button @click.prevent="removeBefore(item)" v-if="index!=0">删除</el-button>
-                      
-                    </el-form-item>
+                        </div>-->
+                        <!-- v-if="index===beforeAction.keys.length-1" 只有最后一个有添加删除按钮 -->
+                        <el-form-item class="delete">
+                          <el-button @click.prevent="addBefore(index)">添加</el-button>
+                          <el-button @click.prevent="removeBefore(item)" v-if="index!=0">删除</el-button>
+                        </el-form-item>
+                      </div>
+                    </el-form>
                   </div>
-                </el-form>
+                </div>
               </div>
             </div>
           </div>
@@ -278,6 +283,9 @@ import { Message } from "element-ui";
 export default {
   data() {
     return {
+      statusIng:{
+        requestsBefore:false
+      },
       inputStatus: 1, //input输入替换成div输入-显示引用的环境变量的颜色
       searchName: "", //接口搜索名称
       manageCaseLefStatus: true, //左侧是否展示
@@ -373,8 +381,8 @@ export default {
       beforeTypeList: [
         { id: 1, name: "文件处理" },
         { id: 2, name: "数据库操作" },
-        { id: 2, name: "执行py脚本" },
-        { id: 2, name: "请求接口" },
+        { id: 3, name: "执行py脚本" },
+        { id: 4, name: "请求接口" }
       ],
       beforePlanList: [
         { Pid: 1, id: 1, name: "上传文件" },
@@ -428,7 +436,7 @@ export default {
     },
     //新增前置处理项
     addBefore(index) {
-      this.beforeAction.keys.splice(index+1,0, {
+      this.beforeAction.keys.splice(index + 1, 0, {
         beforeIndex: "",
         beforeName: "",
         beforeType: "",
@@ -447,13 +455,17 @@ export default {
     //编辑顺序时判断是否重复
     changeIndex(index) {
       var list = this.beforeAction.keys;
-      var isHave = list.map(row => row.beforeIndex);
-      console.log("输入的", typeof list[index].beforeIndex);
-      isHave.splice(index, 1); //删掉当前输入的,isHave就只剩当前以外的，然后判断当前输入的在不在之前的列表即可判断是否重复
-      console.log(isHave)
-      isHave.indexOf(list[index].beforeIndex) >= 0
-        ? Message.error("执行顺序不能重复")
-        : null;
+      if (parseInt(list[index].beforeIndex) > parseInt(99)) {
+        Message.error("最大值不能超过99");
+      } else {
+        var isHave = list.map(row => row.beforeIndex);
+        console.log("输入的", typeof list[index].beforeIndex);
+        isHave.splice(index, 1); //删掉当前输入的,isHave就只剩当前以外的，然后判断当前输入的在不在之前的列表即可判断是否重复
+        console.log(isHave);
+        isHave.indexOf(list[index].beforeIndex) >= 0
+          ? Message.error("执行顺序不能重复")
+          : null;
+      }
     },
     searchNameMethod() {},
     addFiles() {},
@@ -652,6 +664,7 @@ export default {
       margin: 10px 0;
       text-align: left;
       height: 280px;
+      background-color: whitesmoke;
       // background-color: silver;
       // display: flex;
 
@@ -729,24 +742,32 @@ export default {
         width: 100%;
         height: 300px;
         text-align: left;
-        margin-left: 10px;
+        background-color: whitesmoke;
+        // margin-left: 10px;
         // position: relative;
+        .beforeFrom {
+          margin-left: 10px;
+        }
       }
       .requestsTitile1 {
         width: 5%;
+        min-width: 60px;
         display: inline-block;
       }
       .requestsTitile2 {
+        min-width: 90px;
         width: 10%;
         display: inline-block;
         margin-left: 10px;
       }
       .requestsTitile3 {
+        min-width: 120px;
         width: 10%;
         display: inline-block;
         margin-left: 10px;
       }
       .requestsTitile4 {
+        min-width: 110px;
         width: 10%;
         display: inline-block;
         margin-left: 10px;
@@ -756,6 +777,13 @@ export default {
         display: inline-block;
         margin-left: 10px;
         // left: 460px;
+      }
+      .t2:hover{
+        cursor: pointer;
+        background-color: #ecf5ff;
+        color: #409EFF;
+        border-radius: 3px ;
+        border: 2px solid  #ecf5ff;
       }
       .delete {
         display: inline-block;
@@ -816,8 +844,7 @@ export default {
 .requestsTitile .el-form-item__error {
   margin-top: -2px;
 }
-.manageCase-right .el-button{
+.manageCase-right .el-button {
   padding: 8px 10px;
 }
-
 </style>
