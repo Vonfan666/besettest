@@ -185,22 +185,22 @@
             </div>
             <div class="requests-detail">
               <div class="requests-title">
-                <span @click="requestsTitile1()" class="t2">前置处理</span>
-                <span @click="requestsTitile2()" class="t2">请求头</span>
-                <span @click="requestsTitile3()" class="t2">请求参数</span>
-                <span @click="requestsTitile4()" class="t2">后置条件</span>
+                <span @click="clickReqTitle($event,0)" class="t2">前置操作</span>
+                <span @click="clickReqTitle($event,1)" class="t2">请求头</span>
+                <span @click="clickReqTitle($event,2)" class="t2">请求参数</span>
+                <span @click="clickReqTitle($event,3)" class="t2">后置操作</span>
               </div>
               <div class="requestsContext">
-                <div class="requestsBefore" v-show="statusIng.requestsBefore">
+                <div class="requestsFrom" v-show="statusIng.requestsStatus[0]">
                   <div class="t1">
                     <span class="requestsTitile1">序号</span>
-                    <span class="requestsTitile2">名称</span>
-                    <span class="requestsTitile3">处理类型</span>
-                    <span class="requestsTitile4">数据处理</span>
-                    <span class="requestsTitile5">描述</span>
+                    <span class="requestsTitile2">操作名称</span>
+                    <span class="requestsTitile3">操作类型</span>
+                    <span class="requestsTitile4">操作处理</span>
+                    <span class="requestsTitile5">操作描述</span>
                   </div>
                   <div class="requestsTitile">
-                    <el-form :model="beforeAction" ref="beforeAction" class="beforeFrom">
+                    <el-form :model="beforeAction" ref="refFrom" class="beforeFrom">
                       <div v-for="(item,index) in beforeAction.keys" :key="item.key">
                         <el-form-item
                           hide-required-asterisk
@@ -211,7 +211,7 @@
                           <el-input
                             placeholder="序号"
                             v-model="item.beforeIndex"
-                            @change="changeIndex(index)"
+                            @change="changeIndex(index,0)"
                           ></el-input>
                         </el-form-item>
                         <el-form-item
@@ -243,7 +243,7 @@
                           hide-required-asterisk
                           :rules="{ required: true, message: '必填' }"
                         >
-                          <el-select placeholder="选择前置处理" v-model="item.beforePlan">
+                          <el-select placeholder="选择前置操作" v-model="item.beforePlan">
                             <el-option
                               v-for="(item1,index2)  in beforePlanList"
                               :key="index2"
@@ -253,7 +253,7 @@
                           </el-select>
                         </el-form-item>
                         <el-form-item class="requestsTitile5">
-                          <el-input placeholder="简要描述前置处理" v-model="item.beforeDetail"></el-input>
+                          <el-input placeholder="简要描述前置操作" v-model="item.beforeDetail"></el-input>
                         </el-form-item>
                         <!-- <div class="delete">
                       <span @click="addBefore(index)">新增</span>
@@ -261,8 +261,103 @@
                         </div>-->
                         <!-- v-if="index===beforeAction.keys.length-1" 只有最后一个有添加删除按钮 -->
                         <el-form-item class="delete">
-                          <el-button @click.prevent="addBefore(index)">添加</el-button>
-                          <el-button @click.prevent="removeBefore(item)" v-if="index!=0">删除</el-button>
+                          <el-button @click.prevent="addDictToList(index,0)">添加</el-button>
+                          <el-button @click.prevent="removeListToDict(item,0)" v-if="index!=0">删除</el-button>
+                        </el-form-item>
+                      </div>
+                    </el-form>
+                  </div>
+                </div>
+                <div class="requestsFrom" v-show="statusIng.requestsStatus[1]">
+                  <div class="t1">
+                    <span class="requestsTitile1">KEY</span>
+                    <span class="requestsTitile2">VALUE</span>
+                    <span class="requestsTitile3">描述</span>
+                  </div>
+                  <div class="requestsTitile">
+                    <el-form :model="requestsHeader" ref="refFrom" class="beforeFrom">
+                      
+                      <el-form-item class="beforeFrom">
+                        <el-input></el-input>
+                      </el-form-item>
+                      <el-form-item class="beforeFrom">
+                        <el-input></el-input>
+                      </el-form-item>
+                    </el-form>
+                  </div>
+                </div>
+                <div class="requestsFrom" v-show="statusIng.requestsStatus[3]">
+                  <div class="t1">
+                    <span class="requestsTitile1">序号</span>
+                    <span class="requestsTitile2">操作名称</span>
+                    <span class="requestsTitile3">操作类型</span>
+                    <span class="requestsTitile4">操作数据</span>
+                    <span class="requestsTitile5">操作描述</span>
+                  </div>
+                  <div class="requestsTitile">
+                    <el-form :model="afterAction" ref="refFrom" class="beforeFrom">
+                      <div v-for="(item,index) in afterAction.keys" :key="item.key">
+                        <el-form-item
+                          hide-required-asterisk
+                          class="requestsTitile1"
+                          :prop="'keys.' + index + '.beforeIndex'"
+                          :rules="{ required: true, message: '必填' }"
+                        >
+                          <el-input
+                            placeholder="序号"
+                            v-model="item.beforeIndex"
+                            @change="changeIndex(index,3)"
+                          ></el-input>
+                        </el-form-item>
+                        <el-form-item
+                          class="requestsTitile2"
+                          :prop="'keys.'+index+ '.beforeName'"
+                          hide-required-asterisk
+                          :rules="{ required: true, message: '必填' }"
+                        >
+                          <el-input v-model="item.beforeName" placeholder="条件名称"></el-input>
+                        </el-form-item>
+                        <el-form-item
+                          class="requestsTitile3"
+                          :prop="'keys.'+index+ '.beforeType'"
+                          hide-required-asterisk
+                          :rules="{ required: true, message: '必填' }"
+                        >
+                          <el-select placeholder="选择处理类型" v-model="item.beforeType">
+                            <el-option
+                              v-for="(item1,index1)  in beforeTypeList"
+                              :key="index1"
+                              :label="item1.name"
+                              :value="item1.id"
+                            ></el-option>
+                          </el-select>
+                        </el-form-item>
+                        <el-form-item
+                          class="requestsTitile4"
+                          :prop="'keys.'+index+ '.beforePlan'"
+                          hide-required-asterisk
+                          :rules="{ required: true, message: '必填' }"
+                        >
+                          <el-select placeholder="选择后置操作" v-model="item.beforePlan">
+                            <el-option
+                              v-for="(item1,index2)  in beforePlanList"
+                              :key="index2"
+                              :label="item1.name"
+                              :value="item1.id"
+                            ></el-option>
+                          </el-select>
+                        </el-form-item>
+                        <el-form-item class="requestsTitile5">
+                          <el-input placeholder="简要描述后置操作" v-model="item.beforeDetail"></el-input>
+                        </el-form-item>
+                        <!-- <div class="delete">
+                      <span @click="addBefore(index)">新增</span>
+                      <span @click.prevent="removeBefore(item)">删除</span>
+                        </div>-->
+                        <!-- v-if="index===beforeAction.keys.length-1" 只有最后一个有添加删除按钮 -->
+                        <el-form-item class="delete">
+                          <el-button @click.prevent="addDictToList(index,3)">添加</el-button>
+                          <el-button @click.prevent="removeListToDict(item,3)" v-if="index!=0">删除</el-button>
                         </el-form-item>
                       </div>
                     </el-form>
@@ -283,8 +378,8 @@ import { Message } from "element-ui";
 export default {
   data() {
     return {
-      statusIng:{
-        requestsBefore:false
+      statusIng: {
+        requestsStatus: [true, false, false, false]
       },
       inputStatus: 1, //input输入替换成div输入-显示引用的环境变量的颜色
       searchName: "", //接口搜索名称
@@ -378,6 +473,39 @@ export default {
           }
         ]
       },
+      requestsHeader: {
+        keys: [
+          {
+            beforeIndex: "", //前置条件中执行顺序
+            beforeName: "", //前置条件名称
+            beforeType: "", //前置条件类型---如文件操作、数据库操作等
+            beforePlan: "", //前置处理--选择文件操作中的具体事务，或者数据库中的具体事务
+            beforeDetail: "" //简要描述
+          }
+        ]
+      },
+      requestsData: {
+        keys: [
+          {
+            beforeIndex: "", //前置条件中执行顺序
+            beforeName: "", //前置条件名称
+            beforeType: "", //前置条件类型---如文件操作、数据库操作等
+            beforePlan: "", //前置处理--选择文件操作中的具体事务，或者数据库中的具体事务
+            beforeDetail: "" //简要描述
+          }
+        ]
+      },
+      afterAction: {
+        keys: [
+          {
+            beforeIndex: "", //前置条件中执行顺序
+            beforeName: "", //前置条件名称
+            beforeType: "", //前置条件类型---如文件操作、数据库操作等
+            beforePlan: "", //前置处理--选择文件操作中的具体事务，或者数据库中的具体事务
+            beforeDetail: "" //简要描述
+          }
+        ]
+      },
       beforeTypeList: [
         { id: 1, name: "文件处理" },
         { id: 2, name: "数据库操作" },
@@ -405,9 +533,8 @@ export default {
     };
   },
   methods: {
+    //点击用例--修改接口文件的背景颜色
     changeColor(self) {
-      //添加修改接口文件的背景颜色
-      console.log(self);
       var ele = self.currentTarget;
       console.log(ele.classList);
       var eles = document.querySelectorAll(".fileName .activeColor");
@@ -418,25 +545,40 @@ export default {
           }))
         : ele.classList.remove("activeColor");
     },
+    //点击分组文件-判断接口文件箭头方向
     isOpen(self, index) {
-      //判断接口文件箭头方向
-
       this.fileNameIcon[index] == "el-icon-caret-right"
         ? (this.fileNameIcon.splice(index, 1, "el-icon-caret-bottom"),
           this.fileNameChildStatus.splice(index, 1, true))
         : (this.fileNameIcon.splice(index, 1, "el-icon-caret-right"),
           this.fileNameChildStatus.splice(index, 1, false));
     },
+    //判断文件个数,并根据个数导入fileNameChildStatus-从而控制每个文件下的文档展示或者显示
     filesLen() {
-      //判断文件个数,并根据个数导入fileNameChildStatus-从而控制每个文件下的文档展示或者显示
-      this.caseGroupList.map(row => this.fileNameChildStatus.push(false));
-      this.caseGroupList.map(row =>
-        this.fileNameIcon.push("el-icon-caret-right")
+      this.caseGroupList.map(row => this.fileNameChildStatus.push(false)); //默认不展示
+      this.caseGroupList.map(
+        row => this.fileNameIcon.push("el-icon-caret-right") //箭头方向向右
       );
     },
+    //判断当前数据请求的是前置操作-请求头-请求参数-后置操作中的哪一个
+    isBeforeEle(a) {
+      var ele = null;
+      a === 0
+        ? (ele = this.beforeAction)
+        : a === 1
+        ? (ele = this.requestsHeader)
+        : a === 2
+        ? (ele = this.requestsData)
+        : a === 3
+        ? (ele = this.afterAction)
+        : null;
+      return ele;
+    },
     //新增前置处理项
-    addBefore(index) {
-      this.beforeAction.keys.splice(index + 1, 0, {
+    addDictToList(index, a) {
+      var ele = this.isBeforeEle(a);
+      console.log(ele);
+      ele.keys.splice(index + 1, 0, {
         beforeIndex: "",
         beforeName: "",
         beforeType: "",
@@ -445,16 +587,20 @@ export default {
         key: Date.now()
       });
     },
+
     //删除前置处理项
-    removeBefore(item) {
-      var index = this.beforeAction.keys.indexOf(item);
+    removeListToDict(item, a) {
+      var ele = this.isBeforeEle(a);
+      console.log(ele);
+      var index = ele.keys.indexOf(item);
       if (index !== 0) {
-        this.beforeAction.keys.splice(index, 1);
+        ele.keys.splice(index, 1);
       }
     },
     //编辑顺序时判断是否重复
-    changeIndex(index) {
-      var list = this.beforeAction.keys;
+    changeIndex(index, a) {
+      var ele = this.isBeforeEle(a);
+      var list = ele.keys;
       if (parseInt(list[index].beforeIndex) > parseInt(99)) {
         Message.error("最大值不能超过99");
       } else {
@@ -467,6 +613,23 @@ export default {
           : null;
       }
     },
+    //点击前置处理-请求头-请求参数-后置条件修改样式以及v-show
+    clickReqTitle(self, index) {
+      var ele = self.currentTarget;
+      var childEle = ele.parentElement.children;
+      for (var n = 0; n < childEle.length; n++) {
+        childEle[n].style.cssText = "background-color:;color:;";
+      }
+      ele.style.cssText =
+        "background-color:rgb(98, 161, 239);color:rgb(248, 248, 251);border-radius: 5px";
+
+      this.statusIng.requestsStatus.forEach((item, index1) => {
+        index === index1
+          ? this.statusIng.requestsStatus.splice(index1, 1, true)
+          : this.statusIng.requestsStatus.splice(index1, 1, false);
+      });
+    },
+
     searchNameMethod() {},
     addFiles() {},
     ChildAction() {},
@@ -474,12 +637,27 @@ export default {
     requestsTitile1() {},
     requestsTitile2() {},
     requestsTitile3() {},
-    requestsTitile4() {}
+    requestsTitile4() {},
     //检测前置处理---参数列表最后一个如果有不为空的则新增一个
+
+    //默认选中前置处理-且改变现实类别
+
+    changeRequstsBeforeOneColor() {
+      // requestsBefore: true,
+      //   requestsHeader: false,
+      //   requestsData: false,
+      //   requestsAfter: false
+
+      var Ele = document.getElementsByClassName("requests-title")[0]
+        .children[0];
+      Ele.style.cssText =
+        "background-color:rgb(98, 161, 239);color:rgb(248, 248, 251);border-radius: 5px";
+    }
   },
   Update() {},
   mounted() {
     this.filesLen();
+    this.changeRequstsBeforeOneColor();
     console.log(this.fileNameChildStatus, "11");
   }
 };
@@ -718,7 +896,7 @@ export default {
       width: 100%;
       //   height: 500px;
       // background-color: silver;
-      margin: 10px 0;
+      margin: 25px 0;
       .requests-title {
         text-align: left;
         span {
@@ -778,12 +956,12 @@ export default {
         margin-left: 10px;
         // left: 460px;
       }
-      .t2:hover{
+      .t2:hover {
         cursor: pointer;
         background-color: #ecf5ff;
-        color: #409EFF;
-        border-radius: 3px ;
-        border: 2px solid  #ecf5ff;
+        color: #409eff;
+        border: 1px solid rgb(98, 161, 239);
+        border-radius: 5px;
       }
       .delete {
         display: inline-block;
