@@ -351,22 +351,27 @@ export default {
       });
     },
     searchNameMethod() {
-      console.log(this.list);
-      this.searchName;
-      this.list.for;
+      // console.log(this.list);
+      // this.searchName;
+      // this.list.for;
       // var filterArr = this.list.filter(row => row.name.includes(this.searchName))
       var filterArr = this.list.map(row =>
         row.Clist.filter(rows => rows.name.includes(this.searchName))
       );
-      console.log(filterArr);
       var filterArr1 = filterArr.filter(
         row => row.length > 0 && Array.isArray(filterArr)
       );
+      console.log(filterArr1,"filterArr1")
+      this.code.splice(0,this.code.length)
       if(filterArr1.length>0){
-        this.code = filterArr1[0];
+        filterArr1.forEach((item,index)=>{
+          this.code=this.code.concat(item)
+        })
+        // this.code = filterArr1[0];
       }
       
       if (this.code.length >= 1 && this.searchName != "") {
+        console.log(this.code)
         this.contextStatus = false;
         this.searchStatus = true;
       } else {

@@ -33,7 +33,7 @@ export default {
   },
   methods:{
     clickAll(a){
-      
+      console.log(a.target)
       var ele=document.querySelector(".mb-text")
       if(ele){
 

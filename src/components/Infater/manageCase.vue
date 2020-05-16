@@ -22,13 +22,23 @@
             </el-form-item>
           </el-form>
         </div>
+        <div class="searchPopOver" v-if="statusIng.searchStatus">
+          <div class="search-context">
+            <p
+              v-for="(item,index) in searchList"
+              :key="index"
+              
+              @click="searchResult(item.fid,item.id)"
+            >{{item.name}}</p>
+          </div>
+        </div>
         <!-- 新建一级分组 -->
-        <div class="addFiles" @click="addFiles()">
+        <div class="addFiles" @click="addFiles()" v-show="!statusIng.searchStatus">
           <span class="el-icon-plus"></span>
           <span>新建文件夹</span>
         </div>
         <!-- 文档内容 -->
-        <div class="FilesContext">
+        <div class="FilesContext" v-show="!statusIng.searchStatus">
           <div class="fileName" v-for="(item,index) in caseGroupList" :key="index">
             <div class="fileName-father" @click="isOpen($event,index)">
               <span :class="fileNameIcon[index]">{{item.name}}</span>
@@ -53,6 +63,7 @@
             <div
               class="fileNameChild"
               v-for="(item1,index1) in item.Clist"
+              :name="item1.id"
               :key="index1"
               @click="changeColor($event)"
               v-show="fileNameChildStatus[index]"
@@ -331,9 +342,7 @@
                         <el-form-item class="dataTitle">
                           <el-input v-model="item.dataKey" placeholder="Key"></el-input>
                         </el-form-item>
-                        <el-form-item
-                          class="dataTitle"
-                        >
+                        <el-form-item class="dataTitle">
                           <el-input v-model="item.dataValue" placeholder="Value"></el-input>
                         </el-form-item>
                         <el-form-item class="dataTitle">
@@ -442,23 +451,21 @@
 import globarlRe from "../../libs/reGlobarl";
 import { Message } from "element-ui";
 
-import {
-  SelectFile, 
-  }from "../../axios/api.js";
+import { SelectFile } from "../../axios/api.js";
 import storage from "../../libs/storage";
 export default {
   data() {
     return {
       statusIng: {
-        requestsStatus: [true, false, false, false]
+        requestsStatus: [true, false, false, false],
+        searchStatus: false
       },
       inputStatus: 1, //input输入替换成div输入-显示引用的环境变量的颜色
       searchName: "", //接口搜索名称
+      searchList: [], //搜索出来的列表
       manageCaseLefStatus: true, //左侧是否展示
       //分组列表,其包含子级用例,当该项目用例分组为空时，则默认展示所有接口分组name
-      caseGroupList: [
-
-      ],
+      caseGroupList: [],
       //文件名称箭头方向 el-icon-caret-bottom向下，默认向右
       fileNameIcon: [],
       fileNameChildStatus: [], //添加false数量默认为文件夹个数
@@ -715,6 +722,7 @@ export default {
           : this.statusIng.requestsStatus.splice(index1, 1, false);
       });
     },
+    //这个是为了操作 点击操作操作选项之后--把前置操作的值给去掉
     clearBeforePlan(index) {
       this.beforeAction.keys[index].beforePlan = "";
     },
@@ -727,7 +735,49 @@ export default {
         return this.beforeTypeList[index1 - 1].children;
       }
     },
-    searchNameMethod() {},
+    //左侧用例组搜索--
+    searchNameMethod() {
+      console.log("揍你", this.searchName, typeof this.searchName);
+      var searList = this.caseGroupList.map(row =>
+        row.Clist.filter(rows => rows.name.includes(this.searchName))
+      );
+      console.log("searList", searList);
+      var endSearList = searList.filter(
+        row => row.length > 0 && Array.isArray(row)
+      );
+      this.searchList.splice(0, this.searchList.length);
+      console.log(endSearList);
+      if (endSearList.length > 0) {
+        endSearList.forEach((item, index) => {
+          this.searchList = this.searchList.concat(item);
+        });
+      }
+      this.searchList.length > 0 && this.searchName != ""
+        ? (this.statusIng.searchStatus = true)
+        : (this.statusIng.searchStatus = false);
+    },
+    //点击搜索出来的用例--跳转到对应的组-并打开对应的组-以及当前的背景颜色
+    searchResult(fid, cid) {
+      console.log(fid,cid);
+      this.statusIng.searchStatus = !this.statusIng.searchStatus;
+      this.caseGroupList.forEach((item, index) => {
+        if (item.id === fid) {
+          this.fileNameIcon.splice(index, 1, "el-icon-caret-bottom");
+          this.fileNameChildStatus.splice(index, 1, true);
+          item.Clist.forEach((item1, index1) => {
+            console.log(item1.id,cid)
+            if (item1.id === cid) {
+              var eles = document.querySelectorAll(".fileName .activeColor");
+              eles.forEach((item, index) => {
+                item.classList.remove("activeColor");
+
+              });
+              document.getElementsByName(String(cid))[0].classList.add("activeColor")
+            }
+          });
+        }
+      });
+    },
     addFiles() {},
     ChildAction() {},
     FatherAction() {},
@@ -751,11 +801,11 @@ export default {
         "background-color:rgb(98, 161, 239);color:rgb(248, 248, 251);border-radius: 5px";
     },
     //遍历左侧接口文件下的 接口文档并选择
-    filesNames(){
-      console.log("111",this.caseGroupList)
-      this.caseGroupList.forEach((item,index)=>{
-        this.filesName=this.filesName.concat(item.Clist)
-      })
+    filesNames() {
+      console.log("111", this.caseGroupList);
+      this.caseGroupList.forEach((item, index) => {
+        this.filesName = this.filesName.concat(item.Clist);
+      });
     },
 
     //选择文档之后同步相应数据
@@ -763,31 +813,27 @@ export default {
     //以下方法为接口请求
 
     //查询该项目下的接口文件以及对象的接口文档
-    SelectFile(){
+    SelectFile() {
       SelectFile({
-                 projectId: storage.get("projectId")
-      }).then(res=>{
-        res.status===200
-        ?
-        (this.caseGroupList=res.results,
-        this.filesLen(),
-        this.filesNames()
-        )
-        :null
-      })
+        projectId: storage.get("projectId")
+      }).then(res => {
+        res.status === 200
+          ? ((this.caseGroupList = res.results),
+            this.filesLen(),
+            this.filesNames())
+          : null;
+      });
     }
-      
   },
   Update() {},
   mounted() {
     this.filesLen();
     this.changeRequstsBeforeOneColor();
-    this.SelectFile()
-    
-    
+    this.SelectFile();
   },
   computed() {
-    this.filesNames()
+    this.filesNames();
+    console.log(JSON.stringify(this.caseGroupList));
   }
 };
 </script>
@@ -898,6 +944,20 @@ export default {
 //         background-color: #bbb;;
 //     }
 // }
+
+.search-context {
+  text-align: left;
+  // font-size:13px ;
+  // margin-left: 10px;
+  p {
+    padding: 5px 10px;
+    margin: -3px 0px;
+    cursor: pointer;
+  }
+  p:hover {
+    background-color: #bbb;
+  }
+}
 .manageCase-left-context {
   // overflow-y: hidden;
   .it-search {
@@ -1123,11 +1183,11 @@ export default {
       display: inline-block;
       width: 25%;
     }
-    .dataTitle1{
+    .dataTitle1 {
       display: inline-block;
       width: 60px;
     }
-    .dataTitle{
+    .dataTitle {
       display: inline-block;
       width: 20%;
     }
@@ -1160,5 +1220,4 @@ export default {
 .manageCase-right .el-button {
   padding: 8px 10px;
 }
-
 </style>
