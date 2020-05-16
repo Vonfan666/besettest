@@ -228,7 +228,11 @@
                           hide-required-asterisk
                           :rules="{ required: true, message: '必填' }"
                         >
-                          <el-select placeholder="选择处理类型" v-model="item.beforeType">
+                          <el-select
+                            placeholder="选择处理类型"
+                            v-model="item.beforeType"
+                            @change="clearBeforePlan(index)"
+                          >
                             <el-option
                               v-for="(item1,index1)  in beforeTypeList"
                               :key="index1"
@@ -245,7 +249,7 @@
                         >
                           <el-select placeholder="选择前置操作" v-model="item.beforePlan">
                             <el-option
-                              v-for="(item1,index2)  in beforePlanList"
+                              v-for="(item1,index2)  in selection(index)"
                               :key="index2"
                               :label="item1.name"
                               :value="item1.id"
@@ -270,19 +274,81 @@
                 </div>
                 <div class="requestsFrom" v-show="statusIng.requestsStatus[1]">
                   <div class="t1">
-                    <span class="requestsTitile1">KEY</span>
-                    <span class="requestsTitile2">VALUE</span>
-                    <span class="requestsTitile3">描述</span>
+                    <span class="requestsHeaderTitle">KEY</span>
+                    <span class="requestsHeaderTitle">VALUE</span>
+                    <span class="requestsHeaderTitle">描述</span>
                   </div>
                   <div class="requestsTitile">
                     <el-form :model="requestsHeader" ref="refFrom" class="beforeFrom">
-                      
-                      <el-form-item class="beforeFrom">
-                        <el-input></el-input>
-                      </el-form-item>
-                      <el-form-item class="beforeFrom">
-                        <el-input></el-input>
-                      </el-form-item>
+                      <div v-for="(item,index) in requestsHeader.keys" :key="index">
+                        <el-form-item class="headerInput">
+                          <el-input
+                            v-model="requestsHeader.keys[index].headerKey"
+                            clearable
+                            placeholder="请输入key"
+                          ></el-input>
+                        </el-form-item>
+                        <el-form-item class="headerInput">
+                          <el-input
+                            v-model="requestsHeader.keys[index].headerValue"
+                            clearable
+                            placeholder="请输入value"
+                          ></el-input>
+                        </el-form-item>
+                        <el-form-item class="headerInput">
+                          <el-input
+                            v-model="requestsHeader.keys[index].headerDetail"
+                            clearable
+                            placeholder="请输入描述"
+                          ></el-input>
+                        </el-form-item>
+                        <el-form-item class="delete">
+                          <el-button @click.prevent="addDictToList(index,1)">添加</el-button>
+                          <el-button @click.prevent="removeListToDict(item,1)" v-if="index!=0">删除</el-button>
+                        </el-form-item>
+                      </div>
+                    </el-form>
+                  </div>
+                </div>
+                <div class="requestsFrom" v-show="statusIng.requestsStatus[2]">
+                  <div class="t1">
+                    <span class="dataTitle1"></span>
+                    <span class="dataTitle">Key</span>
+                    <span class="dataTitle">Value</span>
+                    <span class="dataTitle">操作描述</span>
+                    <span class="dataTitle">导入json</span>
+                  </div>
+                  <div class="requestsTitile">
+                    <el-form :model="requestsData" ref="refFrom" class="beforeFrom">
+                      <div v-for="(item,index) in requestsData.keys" :key="index">
+                        <el-form-item class="dataTitle1">
+                          <el-switch
+                            v-model="item.isRequestsData"
+                            active-color="#13ce66"
+                            inactive-color="#ff4949"
+                          ></el-switch>
+                        </el-form-item>
+                        <el-form-item class="dataTitle">
+                          <el-input v-model="item.dataKey" placeholder="Key"></el-input>
+                        </el-form-item>
+                        <el-form-item
+                          class="dataTitle"
+                        >
+                          <el-input v-model="item.dataValue" placeholder="Value"></el-input>
+                        </el-form-item>
+                        <el-form-item class="dataTitle">
+                          <el-input placeholder="简要描述前置操作" v-model="item.beforeDetail"></el-input>
+                        </el-form-item>
+                        <!-- <div class="delete">
+                      <span @click="addBefore(index)">新增</span>
+                      <span @click.prevent="removeBefore(item)">删除</span>
+                        </div>-->
+                        <!-- v-if="index===beforeAction.keys.length-1" 只有最后一个有添加删除按钮 -->
+                        <el-form-item class="delete">
+                          <el-button @click.prevent="addDictToList(index,2)">添加</el-button>
+                          <el-button @click.prevent="removeListToDict(item,2)" v-if="index!=0">删除</el-button>
+                        </el-form-item>
+                      </div>
                     </el-form>
                   </div>
                 </div>
@@ -375,6 +441,11 @@
 <script>
 import globarlRe from "../../libs/reGlobarl";
 import { Message } from "element-ui";
+
+import {
+  SelectFile, 
+  }from "../../axios/api.js";
+import storage from "../../libs/storage";
 export default {
   data() {
     return {
@@ -386,44 +457,7 @@ export default {
       manageCaseLefStatus: true, //左侧是否展示
       //分组列表,其包含子级用例,当该项目用例分组为空时，则默认展示所有接口分组name
       caseGroupList: [
-        {
-          id: 9,
-          Clist: [
-            {
-              id: 118,
-              name: "登录",
-              createUserName: "冯凡",
-              fid: 9
-            }
-          ],
-          name: "登录注册",
-          project_id: 80
-        },
-        {
-          id: 15,
-          Clist: [],
-          name: "这是我新增的",
-          project_id: 80
-        },
-        {
-          id: 18,
-          Clist: [],
-          name: "个人中心",
-          project_id: 80
-        },
-        {
-          id: 19,
-          Clist: [
-            {
-              id: 122,
-              name: "登录",
-              createUserName: "冯凡",
-              fid: 19
-            }
-          ],
-          name: "哈哈",
-          project_id: 80
-        }
+
       ],
       //文件名称箭头方向 el-icon-caret-bottom向下，默认向右
       fileNameIcon: [],
@@ -476,22 +510,19 @@ export default {
       requestsHeader: {
         keys: [
           {
-            beforeIndex: "", //前置条件中执行顺序
-            beforeName: "", //前置条件名称
-            beforeType: "", //前置条件类型---如文件操作、数据库操作等
-            beforePlan: "", //前置处理--选择文件操作中的具体事务，或者数据库中的具体事务
-            beforeDetail: "" //简要描述
+            headerKey: "", //请求头key
+            headerValue: "", //请求头value
+            headerDetail: "" //简要描述
           }
         ]
       },
       requestsData: {
         keys: [
           {
-            beforeIndex: "", //前置条件中执行顺序
-            beforeName: "", //前置条件名称
-            beforeType: "", //前置条件类型---如文件操作、数据库操作等
-            beforePlan: "", //前置处理--选择文件操作中的具体事务，或者数据库中的具体事务
-            beforeDetail: "" //简要描述
+            isRequestsData: true, //前置条件中执行顺序
+            dataKey: "", //前置条件名称
+            dataValue: "", //前置条件类型---如文件操作、数据库操作等
+            dataDetail: ""
           }
         ]
       },
@@ -507,15 +538,44 @@ export default {
         ]
       },
       beforeTypeList: [
-        { id: 1, name: "文件处理" },
-        { id: 2, name: "数据库操作" },
-        { id: 3, name: "执行py脚本" },
-        { id: 4, name: "请求接口" }
+        {
+          id: 1,
+          name: "文件处理",
+          children: [
+            { id: 1, name: "上传文件" },
+            { id: 2, name: "文件遍历" }
+          ]
+        },
+        {
+          id: 2,
+          name: "数据库操作",
+          children: [
+            { id: 1, name: "修改商品价格" },
+            { id: 2, name: "新增待付款订单" },
+            { id: 3, name: "订单表同步" },
+            { id: 4, name: "添加收货地址" },
+            { id: 5, name: "使用优惠券" }
+          ]
+        },
+        {
+          id: 3,
+          name: "执行py脚本",
+          children: []
+        },
+        {
+          id: 4,
+          name: "请求接口",
+          children: [
+            { id: 1, name: "获取token" },
+            { id: 2, name: "请求上一个接口" }
+          ]
+        }
       ],
       beforePlanList: [
         { Pid: 1, id: 1, name: "上传文件" },
-        { Pid: 2, id: 2, name: "新增数据" }
+        { Pid: 1, id: 2, name: "新增数据" }
       ],
+      beforePlanListCode: [],
       rules: {
         interfaceName: [
           { required: true, message: "请选择分组", trigger: "blur" }
@@ -576,16 +636,42 @@ export default {
     },
     //新增前置处理项
     addDictToList(index, a) {
+      console.log(a);
       var ele = this.isBeforeEle(a);
-      console.log(ele);
-      ele.keys.splice(index + 1, 0, {
-        beforeIndex: "",
-        beforeName: "",
-        beforeType: "",
-        beforePlan: "",
-        beforeDetail: "",
-        key: Date.now()
-      });
+      a === 0
+        ? ele.keys.splice(index + 1, 0, {
+            beforeIndex: "",
+            beforeName: "",
+            beforeType: "",
+            beforePlan: "",
+            beforeDetail: "",
+            key: Date.now()
+          })
+        : a === 1
+        ? ele.keys.splice(index + 1, 0, {
+            headerKey: "",
+            headerValue: "",
+            headerDetail: "",
+            key: Date.now()
+          })
+        : a === 3
+        ? ele.keys.splice(index + 1, 0, {
+            beforeIndex: "",
+            beforeName: "",
+            beforeType: "",
+            beforePlan: "",
+            beforeDetail: "",
+            key: Date.now()
+          })
+        : a === 2
+        ? ele.keys.splice(index + 1, 0, {
+            isRequestsData: true,
+            dataKey: "",
+            dataValue: "",
+            detaDetail: "",
+            key: Date.now()
+          })
+        : null;
     },
 
     //删除前置处理项
@@ -629,7 +715,18 @@ export default {
           : this.statusIng.requestsStatus.splice(index1, 1, false);
       });
     },
-
+    clearBeforePlan(index) {
+      this.beforeAction.keys[index].beforePlan = "";
+    },
+    //根据前置类型同步对应的前置操作
+    selection(index) {
+      var index1 = this.beforeAction.keys[index].beforeType;
+      if (!index1) {
+        return [];
+      } else {
+        return this.beforeTypeList[index1 - 1].children;
+      }
+    },
     searchNameMethod() {},
     addFiles() {},
     ChildAction() {},
@@ -652,13 +749,45 @@ export default {
         .children[0];
       Ele.style.cssText =
         "background-color:rgb(98, 161, 239);color:rgb(248, 248, 251);border-radius: 5px";
+    },
+    //遍历左侧接口文件下的 接口文档并选择
+    filesNames(){
+      console.log("111",this.caseGroupList)
+      this.caseGroupList.forEach((item,index)=>{
+        this.filesName=this.filesName.concat(item.Clist)
+      })
+    },
+
+    //选择文档之后同步相应数据
+
+    //以下方法为接口请求
+
+    //查询该项目下的接口文件以及对象的接口文档
+    SelectFile(){
+      SelectFile({
+                 projectId: storage.get("projectId")
+      }).then(res=>{
+        res.status===200
+        ?
+        (this.caseGroupList=res.results,
+        this.filesLen(),
+        this.filesNames()
+        )
+        :null
+      })
     }
+      
   },
   Update() {},
   mounted() {
     this.filesLen();
     this.changeRequstsBeforeOneColor();
-    console.log(this.fileNameChildStatus, "11");
+    this.SelectFile()
+    
+    
+  },
+  computed() {
+    this.filesNames()
   }
 };
 </script>
@@ -986,16 +1115,22 @@ export default {
         }
       }
     }
-    // .t1 {
-    //   font-size: 10px;
-    //   width: 45%;
-    //   display: flex;
-    //   justify-content: space-around;
-    //   margin-top: 10px;
-    //   span {
-    //     margin-left: -6%;
-    //   }
-    // }
+    .requestsHeaderTitle {
+      width: 25%;
+      display: inline-block;
+    }
+    .headerInput {
+      display: inline-block;
+      width: 25%;
+    }
+    .dataTitle1{
+      display: inline-block;
+      width: 60px;
+    }
+    .dataTitle{
+      display: inline-block;
+      width: 20%;
+    }
   }
 }
 </style>
@@ -1025,4 +1160,5 @@ export default {
 .manageCase-right .el-button {
   padding: 8px 10px;
 }
+
 </style>
