@@ -97,12 +97,21 @@
         <div class="right-title-detail">
           <div class="title-detail">
             <span class="tt">基本信息</span>
+            <span class="aa" @click="statusIng.enviromentStatus=!statusIng.enviromentStatus">当前环境</span>
           </div>
+          <enviroment-box v-if="statusIng.enviromentStatus" 
+          :environmentList.sync="Environments" 
+          ref="environmentBox"></enviroment-box>
           <div class="title-detail-context">
             <el-form :model="datas" :rules="rules" ref="refFrom" label-width="100px">
               <div class="interfaName-1">
                 <el-form-item label="选择接口" prop>
-                  <el-select v-model="datas.isInterfaceId" filterable placeholder="请选择接口文档">
+                  <el-select
+                    v-model="datas.isInterfaceId"
+                    filterable
+                    placeholder="请选择接口文档"
+                    @change="chiocesInterface()"
+                  >
                     <el-option
                       v-for="(item,index) in filesName"
                       :key="index"
@@ -127,7 +136,12 @@
               <div></div>
               <div class="interfaName">
                 <el-form-item label="用例名称" prop="interfaceName">
-                  <el-input placeholder="请输入接口名称" v-model="datas.interfaceName" v-if="inputStatus"></el-input>
+                  <el-input
+                    placeholder="请输入接口名称"
+                    clearable
+                    v-model="datas.interfaceName"
+                    v-if="inputStatus"
+                  ></el-input>
                   <!-- <div contenteditable="true" class="inputStatus" v-if="!inputStatus" :model="datas.interfaceName">
                     <span class="colors">111</span>
                     <span>3232</span>
@@ -147,18 +161,18 @@
                 </el-form-item>
               </div>
               <div class="interfaName-2">
-                <el-form-item label="请求地址" prop="urlAttr">
+                <el-form-item label="请求地址" prop="postMethods">
                   <div class="postAttr-1">
-                    <el-select v-model="datas.urlHttp">
+                    <el-select v-model="datas.postMethods">
                       <el-option
-                        v-for="(item,index) in urlHttp"
+                        v-for="(item,index) in postMethods"
                         :key="index"
                         :label="item.name"
                         :value="item.id"
                       ></el-option>
                     </el-select>
                   </div>
-                  <div class="postAttr-4">
+                  <!-- <div class="postAttr-4">
                     <el-select v-model="datas.urlPostType" prop="urlPostType">
                       <el-option
                         v-for="(item,index) in urlPostType"
@@ -167,14 +181,18 @@
                         :value="item.id"
                       ></el-option>
                     </el-select>
-                  </div>
+                  </div>-->
 
                   <div class="postAttr-2">
-                    <el-input placeholder="地址：192.168.0.0" v-model="datas.urlAttr"></el-input>
+                    <el-input
+                      placeholder="地址:http://192.168.0.0:8080/login"
+                      v-model="datas.urlAttr"
+                      clearable
+                    ></el-input>
                   </div>
-                  <div class="postAttr-3">
+                  <!-- <div class="postAttr-3">
                     <el-input placeholder="端口：8080" v-model="datas.urlPort"></el-input>
-                  </div>
+                  </div>-->
                 </el-form-item>
               </div>
               <div class="interfaName-3">
@@ -340,13 +358,13 @@
                           ></el-switch>
                         </el-form-item>
                         <el-form-item class="dataTitle">
-                          <el-input v-model="item.dataKey" placeholder="Key"></el-input>
+                          <el-input v-model="item.dataKey" placeholder="Key" clearable></el-input>
                         </el-form-item>
                         <el-form-item class="dataTitle">
-                          <el-input v-model="item.dataValue" placeholder="Value"></el-input>
+                          <el-input v-model="item.dataValue" placeholder="Value" clearable></el-input>
                         </el-form-item>
                         <el-form-item class="dataTitle">
-                          <el-input placeholder="简要描述前置操作" v-model="item.beforeDetail"></el-input>
+                          <el-input placeholder="简要描述前置操作" v-model="item.beforeDetail" clearable></el-input>
                         </el-form-item>
                         <!-- <div class="delete">
                       <span @click="addBefore(index)">新增</span>
@@ -449,7 +467,7 @@
       :styleCode="caseAddFilesBoxStyle"
       v-if="statusIng.caseAddFilesBoxStatus"
     >
-      <div class="caseBox" >
+      <div class="caseBox">
         <h3>新建用例分组</h3>
 
         <div class="caseBoxInput">
@@ -522,15 +540,99 @@
 import globarlRe from "../../libs/reGlobarl";
 import { Message } from "element-ui";
 
-import { SelectFile } from "../../axios/api.js";
+import {
+  SelectFile,
+  InterfaceDetailGet,
+  postMethods
+} from "../../axios/api.js";
 import storage from "../../libs/storage";
 
 export default {
   components: {
-    "caseAddFiles-box": () => import("../public/MessageBox.vue")
+    "caseAddFiles-box": () => import("../public/MessageBox.vue"),
+    "enviroment-box":()=>import("../public/environment.vue")
   },
   data() {
     return {
+
+      model:{
+        chiocsEnvironment:"",  //当前选中环境
+      },
+      Environments:[
+        {
+          id:1,
+          name:"test",
+          value:[{"A":1},{"b":2}]
+        },
+        {
+          id:1,
+          name:"test1",
+          value:[{"A":1},{"b":2}]
+        },{
+          id:1,
+          name:"test",
+          value:[{"A":1},{"b":2}]
+        },
+        {
+          id:1,
+          name:"test1",
+          value:[{"A":1},{"b":2}]
+        },{
+          id:1,
+          name:"test",
+          value:[{"A":1},{"b":2}]
+        },
+        {
+          id:1,
+          name:"test1",
+          value:[{"A":1},{"b":2}]
+        },{
+          id:1,
+          name:"test",
+          value:[{"A":1},{"b":2}]
+        },
+        {
+          id:1,
+          name:"test1",
+          value:[{"A":1},{"b":2}]
+        },{
+          id:1,
+          name:"test",
+          value:[{"A":1},{"b":2}]
+        },
+        {
+          id:1,
+          name:"test1",
+          value:[{"A":1},{"b":2}]
+        },{
+          id:1,
+          name:"test",
+          value:[{"A":1},{"b":2}]
+        },
+        {
+          id:1,
+          name:"test1",
+          value:[{"A":1},{"b":2}]
+        },{
+          id:1,
+          name:"test",
+          value:[{"A":1},{"b":2}]
+        },
+        {
+          id:1,
+          name:"test1",
+          value:[{"A":1},{"b":2}]
+        },
+      ], //环境列表
+      postMethods: [
+        // {id: 1, name: "GET"},
+        // {id: 2, name: "POST"},
+        // {id: 3, name: "PUT"},
+        // {id: 4, name: "DELETE"},
+        // {id: 5, name: "PATCH"},
+        // {id: 6, name: "COPY"},
+        // {id: 7, name: "OPTIONS"}
+      ], //请求类型 post  get
       caseBoxLable: "", //点击添加 重命名 的lable
       caseBoxTtile: "", //点击添加 重命名 的title
       commandCode: "", //存储临时变量--command
@@ -539,7 +641,8 @@ export default {
         requestsStatus: [true, false, false, false],
         searchStatus: false,
         caseAddFilesBoxStatus: false,
-        caseAddInterfaceBoxStatus: false
+        caseAddInterfaceBoxStatus: false,
+        enviromentStatus:false,
       },
       inputStatus: 1, //input输入替换成div输入-显示引用的环境变量的颜色
       searchName: "", //接口搜索名称
@@ -578,14 +681,15 @@ export default {
       //提交数据
       datas: {
         isInterfaceId: "", //关联的接口id
-        interfaceName: "冯凡", //用例名称
+        interfaceName: "", //用例名称
         interfaceIsOk: 0, //当前用例状态
         caseGroupId: "", //用例分组id
         urlHttp: 1, //请求协议
         urlAttr: "", //请求主机地址
         urlPort: "", //端口
         urlPostType: 1, //请求类型
-        caseDetail: "" //用例描述
+        caseDetail: "", //用例描述
+        postMethods: ""
       },
       //前置处理器
       beforeAction: {
@@ -611,10 +715,10 @@ export default {
       requestsData: {
         keys: [
           {
-            isRequestsData: true, //前置条件中执行顺序
-            dataKey: "", //前置条件名称
-            dataValue: "", //前置条件类型---如文件操作、数据库操作等
-            dataDetail: ""
+            isRequestsData: true, //是否选中
+            dataKey: "", //请求key
+            dataValue: "", //请求值
+            dataDetail: "" //请求详情
           }
         ]
       },
@@ -670,9 +774,9 @@ export default {
       beforePlanListCode: [],
       rules: {
         interfaceName: [
-          { required: true, message: "请选择分组", trigger: "blur" }
+          { required: true, message: "请填写用例名称", trigger: "blur" }
         ],
-        caseGroupId: [{ required: true, message: "请输入接口名称" }],
+        caseGroupId: [{ required: true, message: "请选择分组" }],
         urlHttp: [{ required: true, message: "请选择协议" }],
         urlAttr: [{ required: true, message: "请填写主机地址" }],
         urlPostType: [{ required: true, message: "必填" }],
@@ -681,7 +785,8 @@ export default {
         beforeType: [{ required: true, message: "必填" }],
         beforePlan: [{ required: true, message: "必填" }],
         addGroupName: [{ required: true, message: "必填" }],
-        addInterfaceName: [{ required: true, message: "必填" }]
+        addInterfaceName: [{ required: true, message: "必填" }],
+        postMethods: [{ required: true, message: "必填" }]
         // beforeName: [{ required: true, message: "请输入名称" }]
       }
     };
@@ -742,12 +847,13 @@ export default {
             key: Date.now()
           })
         : a === 1
-        ? ele.keys.splice(index + 1, 0, {
+        ? (ele.keys.splice(index + 1, 0, {
             headerKey: "",
             headerValue: "",
             headerDetail: "",
             key: Date.now()
-          })
+          }),
+          console.log(this.requestsHeader))
         : a === 3
         ? ele.keys.splice(index + 1, 0, {
             beforeIndex: "",
@@ -901,7 +1007,7 @@ export default {
             name: this.caseGroupDatats.addInterfaceName,
             createUserName: "test"
           });
-           //关闭后请求
+          //关闭后请求
           this.statusIng.caseAddInterfaceBoxStatus = false;
           this.commandCode = null;
           this.caseGroupDatats.addInterfaceName = null;
@@ -924,13 +1030,15 @@ export default {
         var findex = this.commandCode[2];
         var cindex = this.commandCode[4];
         if (status === "b") {
-          this.caseGroupList[findex].Clist[cindex].name = this.caseGroupDatats.addInterfaceName;
+          this.caseGroupList[findex].Clist[
+            cindex
+          ].name = this.caseGroupDatats.addInterfaceName;
         }
         //关闭后请求
-          this.statusIng.caseAddInterfaceBoxStatus = false;
-          this.commandCode = null;
-          this.caseGroupDatats.addInterfaceName = null;
-          Message.success("接口文档名称修改成功")
+        this.statusIng.caseAddInterfaceBoxStatus = false;
+        this.commandCode = null;
+        this.caseGroupDatats.addInterfaceName = null;
+        Message.success("接口文档名称修改成功");
       }
     },
     //操作接口文件
@@ -941,12 +1049,10 @@ export default {
           (this.caseBoxTtile = "用例接口重命名"),
           (this.caseBoxLable = "接口名称"),
           (this.commandCode = command))
-        : command[0]==="c"
-          ?     (this.caseGroupList[command[2]].Clist.splice(command[4],1),
-                Message.success("删除成")   )
-          : null
-        
-        ;
+        : command[0] === "c"
+        ? (this.caseGroupList[command[2]].Clist.splice(command[4], 1),
+          Message.success("删除成"))
+        : null;
     },
     //操作分组文件
     GroupFatherAction(command) {
@@ -966,15 +1072,73 @@ export default {
           Message.success("删除成功"))
         : null;
     },
+    //顶部选择接口文档
+
     requestsTitile1() {},
     requestsTitile2() {},
     requestsTitile3() {},
-    requestsTitile4() {},
+    requestsTitile4() {
+      console.log("haha");
+    },
+    EnvironmentIcon(){},
 
-    //检测前置处理---参数列表最后一个如果有不为空的则新增一个
+    ContextIsNull(oldValue, newValue) {
+      if (oldValue === "" || oldValue === null) {
+        return newValue;
+      } else {
+        return oldValue;
+      }
+    },
 
+    //选择接口文档且填充部分类容
+    chiocesInterface() {
+      this.InterfaceDetailGet();
+    },
+    //填充用例内容--请求接口详情完了之后调用--讲道理这是需要给用户选择是否全部替换-或者填充未填写内容
+    addContext(self) {
+      this.datas.urlAttr = self.post_attr; //替换请求地址
+      this.datas.caseDetail = self.interface_detail; //替换用例描述
+      this.replaceHeader(self); //替换请求头部数据
+      this.replaceData(self); //替换请求参数
+      this.datas.postMethods = self.post_methods;
+    },
+    //替换请求头部数据
+    replaceHeader(self) {
+      console.log(Array.isArray(self.post_header));
+      if (Array.isArray(self.post_header)) {
+        self.post_header.length > 0
+          ? //如果该接口post_header有数据--则先删除之前的内容
+            (this.requestsHeader.keys.splice(
+              0,
+              this.requestsHeader.keys.length
+            ),
+            self.post_header.forEach((item, index) => {
+              this.requestsHeader.keys.push({
+                headerKey: item.cname,
+                headerValue: item.mockValue,
+                headerDetail: item.detail
+              });
+            }))
+          : null;
+      }
+    },
+    //替换请求数据
+    replaceData(self) {
+      if (Array.isArray(self.res_data)) {
+        self.res_data.length > 0
+          ? (this.requestsData.keys.splice(0, this.requestsData.keys.length),
+            self.post_data.forEach((item, index) => {
+              this.requestsData.keys.push({
+                isRequestsData: true, //是否选中默认为true
+                dataKey: item.cname,
+                dataValue: item.mockValue,
+                dataDetail: item.detail
+              });
+            }))
+          : null;
+      }
+    },
     //默认选中前置处理-且改变现实类别
-
     changeRequstsBeforeOneColor() {
       // requestsBefore: true,
       //   requestsHeader: false,
@@ -1007,20 +1171,50 @@ export default {
         res.status === 200
           ? ((this.caseGroupList = res.results),
             this.filesLen(),
-            this.filesNames())
+            this.filesNames(),
+            this.postMethodss())
           : null;
+      });
+    },
+    postMethodss() {
+      postMethods().then(res => {
+        if (res.status === 200) {
+          this.postMethods = res.res_post_methods;
+        }
+      });
+    },
+    //请求该接口详情
+    InterfaceDetailGet() {
+      InterfaceDetailGet({
+        projectId: storage.get("projectId"),
+        id: this.datas.isInterfaceId
+      }).then(res => {
+        if (res.status === 200) {
+          console.log(res.results, "???");
+          this.addContext(res.results[0]); //返回接口主题内容
+        }
       });
     }
   },
   Update() {},
   mounted() {
-    this.filesLen();
     this.changeRequstsBeforeOneColor();
     this.SelectFile();
   },
-  computed() {
-    // this.filesNames();
-    // console.log(JSON.stringify(this.caseGroupList));
+  // computed() {
+  //   // this.filesNames();
+  //   // console.log(JSON.stringify(this.caseGroupList));
+  // }
+  watch: {
+    $route: {
+      handler: function(newValue, oldValue) {
+        console.log(newValue, oldValue);
+        if (newValue !== oldValue) {
+          this.SelectFile();
+        }
+      },
+      deep: true
+    }
   }
 };
 </script>
@@ -1247,8 +1441,8 @@ export default {
   }
 
   .interfaName-2 {
-    width: 1000px;
-    display: flex;
+    // width: 50%;
+    // display: flex;
     .postAttr-1,
     .postAttr-2,
     .postAttr-3,
@@ -1257,13 +1451,13 @@ export default {
     }
     .postAttr-1,
     .postAttr-4 {
-      width: 12%;
+      width: 15%;
     }
     .postAttr-2 {
-      width: 30%;
+      width: 500px;
     }
     .postAttr-3 {
-      width: 15%;
+      // width: 15%;
     }
   }
   .title-detail-class {

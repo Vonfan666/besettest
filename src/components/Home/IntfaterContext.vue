@@ -1354,7 +1354,7 @@ export default {
     // this.postheaders.forEach((item,index)=>{
     //   this.restaurants.push({"value":item.cname})
     // })
-    // this.bindCom
+    this.bindCom="data-com"
   },
   updated() {
     // this.jsonDemo1=JSON.stringify(this.jsonDemo, null, 4),
@@ -1694,7 +1694,7 @@ export default {
     height: 100%;
     
 } */
-.environmentbody
+.IR .environmentbody
   .el-table
   .el-table__body-wrapper
   .el-table__body
@@ -1716,11 +1716,11 @@ export default {
   height: 100%;
 } */
 
-.environmentbody .el-table__header .has-gutter .is-leaf .cell {
+.IR .environmentbody .el-table__header .has-gutter .is-leaf .cell {
   text-align: center;
 }
 
-.environmentbody
+.IR .environmentbody
   .el-table
   .el-table__body-wrapper
   .el-table__body
@@ -1754,7 +1754,7 @@ export default {
   .el-table_3_column_14  {
     position: relative;
   } */
-.environmentbody .el-table .el-table__body-wrapper .el-table__body tbody tr td {
+.IR .environmentbody .el-table .el-table__body-wrapper .el-table__body tbody tr td {
   padding: 0 !important;
 }
 </style>

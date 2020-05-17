@@ -21,7 +21,9 @@
       </slot>
       <slot name="caseAddInterface">
       </slot>
-
+      <slot name="Cenvironment">
+        <!-- 变量 -->
+      </slot>
     </div>
   </div>
 </template>

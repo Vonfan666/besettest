@@ -379,7 +379,7 @@ export default {
   },
   mounted(){
     //  this.indent=this.$parent.postIndent;
-    // console.log("postData",this.postData)
+    console.log("postData",this.postData)
   }
 };
 </script>
