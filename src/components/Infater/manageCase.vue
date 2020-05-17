@@ -27,7 +27,6 @@
             <p
               v-for="(item,index) in searchList"
               :key="index"
-              
               @click="searchResult(item.fid,item.id)"
             >{{item.name}}</p>
           </div>
@@ -37,6 +36,7 @@
           <span class="el-icon-plus"></span>
           <span>新建文件夹</span>
         </div>
+
         <!-- 文档内容 -->
         <div class="FilesContext" v-show="!statusIng.searchStatus">
           <div class="fileName" v-for="(item,index) in caseGroupList" :key="index">
@@ -47,15 +47,15 @@
                     <span class="el-icon-plus it-icon-addtext"></span>
                     <span class="it-box"  style="display:none">删除</span>
                 </div>-->
-                <el-dropdown class="it-text-pop" @command="FatherAction">
+                <el-dropdown class="it-text-pop" @command="GroupFatherAction">
                   <span class="el-dropdown-link">
                     <i class="el-icon-arrow-down"></i>
                   </span>
                   <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item :command="['a',item.id,index]">添加</el-dropdown-item>
-                    <el-dropdown-item :command="['b',item.id,index]">重命名</el-dropdown-item>
+                    <el-dropdown-item :command="['a',item.id,index,'father']">添加</el-dropdown-item>
+                    <el-dropdown-item :command="['b',item.id,index,'father']">重命名</el-dropdown-item>
                     <!-- <el-dropdown-item :command="['c',item.id,index]">复制</el-dropdown-item> -->
-                    <el-dropdown-item :command="['c',item.id,index]">删除</el-dropdown-item>
+                    <el-dropdown-item :command="['c',item.id,index,'father']">删除</el-dropdown-item>
                   </el-dropdown-menu>
                 </el-dropdown>
               </div>
@@ -75,15 +75,15 @@
                     <span class="el-icon-plus it-icon-addtext"></span>
                     <span class="it-box"  style="display:none">删除</span>
                 </div>-->
-                <el-dropdown class="it-text-pop" @command="ChildAction">
+                <el-dropdown class="it-text-pop" @command="GroupChildAction">
                   <span class="el-dropdown-link">
                     <i class="el-icon-arrow-down"></i>
                   </span>
                   <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item :command="['a',item1.id,index1]">添加</el-dropdown-item>
-                    <el-dropdown-item :command="['b',item1.id,index1]">重命名</el-dropdown-item>
+                    <!-- <el-dropdown-item :command="['a',item1.id,index1]">添加</el-dropdown-item> -->
+                    <el-dropdown-item :command="['b',item.id,index,item1.id,index1,'child']">重命名</el-dropdown-item>
                     <!-- <el-dropdown-item :command="['c',item.id,index]">复制</el-dropdown-item> -->
-                    <el-dropdown-item :command="['c',item1.id,index1]">删除</el-dropdown-item>
+                    <el-dropdown-item :command="['c',item.id,index,item1.id,index1,'child']">删除</el-dropdown-item>
                   </el-dropdown-menu>
                 </el-dropdown>
               </div>
@@ -444,6 +444,77 @@
         </div>
       </div>
     </div>
+    <caseAddFiles-box
+      v-slot:caseAddFiles
+      :styleCode="caseAddFilesBoxStyle"
+      v-if="statusIng.caseAddFilesBoxStatus"
+    >
+      <div class="caseBox" >
+        <h3>新建用例分组</h3>
+
+        <div class="caseBoxInput">
+          <el-form :model="caseGroupDatats" :rules="rules" ref="refFrom" label-width="80px">
+            <el-form-item label="分组名称" prop="addGroupName">
+              <el-input v-model="caseGroupDatats.addGroupName"></el-input>
+            </el-form-item>
+          </el-form>
+        </div>
+        <div class="caseBoxButton">
+          <el-button type="primary" size="small" @click="statusIng.caseAddFilesBoxStatus=false">取消</el-button>
+          <el-button type="primary" size="small" @click="caseAddGroupSubmit()">确认</el-button>
+        </div>
+      </div>
+    </caseAddFiles-box>
+    <caseAddFiles-box
+      v-slot:caseAddInterface
+      :styleCode="caseAddFilesBoxStyle"
+      v-if="statusIng.caseAddInterfaceBoxStatus"
+    >
+      <div class="caseBox">
+        <h3>{{caseBoxTtile}}</h3>
+
+        <div class="caseBoxInput">
+          <el-form :model="caseGroupDatats" :rules="rules" ref="refFrom" label-width="80px">
+            <el-form-item :label="caseBoxLable" prop="addInterfaceName">
+              <el-input v-model="caseGroupDatats.addInterfaceName"></el-input>
+            </el-form-item>
+          </el-form>
+        </div>
+        <div class="caseBoxButton">
+          <el-button
+            type="primary"
+            size="small"
+            @click="statusIng.caseAddInterfaceBoxStatus=false"
+          >取消</el-button>
+          <el-button type="primary" size="small" @click="caseAddInterfaceSubmit()">确认</el-button>
+        </div>
+      </div>
+    </caseAddFiles-box>
+    <!-- <caseAddFiles-box
+      v-slot:caseAddInterface
+      :styleCode="caseAddFilesBoxStyle"
+      v-if="statusIng.caseAddInterfaceBoxStatus"
+    >
+      <div class="caseBox">
+        <h3>{{caseBoxTtile}}</h3>
+
+        <div class="caseBoxInput">
+          <el-form :model="caseGroupDatats" :rules="rules" ref="refFrom" label-width="80px">
+            <el-form-item :label="caseBoxLable" prop="addInterfaceName">
+              <el-input v-model="caseGroupDatats.addInterfaceName"></el-input>
+            </el-form-item>
+          </el-form>
+        </div>
+        <div class="caseBoxButton">
+          <el-button
+            type="primary"
+            size="small"
+            @click="statusIng.caseAddInterfaceBoxStatus=false"
+          >取消</el-button>
+          <el-button type="primary" size="small" @click="caseAddInterfaceSubmit()">确认</el-button>
+        </div>
+      </div>
+    </caseAddFiles-box>-->
   </div>
 </template>
 
@@ -453,12 +524,22 @@ import { Message } from "element-ui";
 
 import { SelectFile } from "../../axios/api.js";
 import storage from "../../libs/storage";
+
 export default {
+  components: {
+    "caseAddFiles-box": () => import("../public/MessageBox.vue")
+  },
   data() {
     return {
+      caseBoxLable: "", //点击添加 重命名 的lable
+      caseBoxTtile: "", //点击添加 重命名 的title
+      commandCode: "", //存储临时变量--command
+      caseAddFilesBoxStyle: "height:250px;width:400px", //新建分组长宽
       statusIng: {
         requestsStatus: [true, false, false, false],
-        searchStatus: false
+        searchStatus: false,
+        caseAddFilesBoxStatus: false,
+        caseAddInterfaceBoxStatus: false
       },
       inputStatus: 1, //input输入替换成div输入-显示引用的环境变量的颜色
       searchName: "", //接口搜索名称
@@ -489,7 +570,11 @@ export default {
         { id: 1, name: "GET" },
         { id: 2, name: "POST" }
       ],
-
+      //新建分组时的数据
+      caseGroupDatats: {
+        addGroupName: "", //新建分组的名称
+        addInterfaceName: ""
+      },
       //提交数据
       datas: {
         isInterfaceId: "", //关联的接口id
@@ -594,7 +679,9 @@ export default {
         beforeIndex: [{ required: true, message: "必填" }],
         beforeName: [{ required: true, message: "必填" }],
         beforeType: [{ required: true, message: "必填" }],
-        beforePlan: [{ required: true, message: "必填" }]
+        beforePlan: [{ required: true, message: "必填" }],
+        addGroupName: [{ required: true, message: "必填" }],
+        addInterfaceName: [{ required: true, message: "必填" }]
         // beforeName: [{ required: true, message: "请输入名称" }]
       }
     };
@@ -758,33 +845,132 @@ export default {
     },
     //点击搜索出来的用例--跳转到对应的组-并打开对应的组-以及当前的背景颜色
     searchResult(fid, cid) {
-      console.log(fid,cid);
+      console.log(fid, cid);
       this.statusIng.searchStatus = !this.statusIng.searchStatus;
       this.caseGroupList.forEach((item, index) => {
         if (item.id === fid) {
           this.fileNameIcon.splice(index, 1, "el-icon-caret-bottom");
           this.fileNameChildStatus.splice(index, 1, true);
           item.Clist.forEach((item1, index1) => {
-            console.log(item1.id,cid)
+            console.log(item1.id, cid);
             if (item1.id === cid) {
               var eles = document.querySelectorAll(".fileName .activeColor");
               eles.forEach((item, index) => {
                 item.classList.remove("activeColor");
-
               });
-              document.getElementsByName(String(cid))[0].classList.add("activeColor")
+              document
+                .getElementsByName(String(cid))[0]
+                .classList.add("activeColor");
             }
           });
         }
       });
     },
-    addFiles() {},
-    ChildAction() {},
-    FatherAction() {},
+    addFiles() {
+      this.statusIng.caseAddFilesBoxStatus = true;
+    },
+    //新建文件确认提交
+    caseAddGroupSubmit() {
+      //先请求添加分组接口--成功之后
+      this.caseGroupList.push({
+        id: "",
+        name: this.caseGroupDatats.addGroupName,
+        projectId_id: "",
+        Clist: []
+      });
+      //默认添加的该文件不展开
+      this.fileNameChildStatus.push(false);
+      //默认新增分组箭头向右
+      this.fileNameIcon.push("el-icon-caret-right");
+      this.statusIng.caseAddFilesBoxStatus = false;
+    },
+    //新建用例接口,操作按钮
+    caseAddInterfaceSubmit() {
+      var type = this.commandCode.splice(-1)[0];
+      if (type === "father") {
+        console.log(this.commandCode[0]);
+        var status = this.commandCode[0];
+        var fid = this.commandCode[1];
+        var findex = this.commandCode[2];
+        if (status === "a") {
+          //如果等于a则是用例分组新增
+          //请求新增接口成功之后再push到对应的列表
+          this.caseGroupList[findex].Clist.push({
+            fid: fid,
+            id: 1,
+            name: this.caseGroupDatats.addInterfaceName,
+            createUserName: "test"
+          });
+           //关闭后请求
+          this.statusIng.caseAddInterfaceBoxStatus = false;
+          this.commandCode = null;
+          this.caseGroupDatats.addInterfaceName = null;
+        }
+        if (status === "b") {
+          //如果等于a则是用例分组新增
+          //请求新增接口成功之后再push到对应的列表
+          this.caseGroupList[
+            findex
+          ].name = this.caseGroupDatats.addInterfaceName;
+          //关闭后请求
+          this.statusIng.caseAddInterfaceBoxStatus = false;
+          this.commandCode = null;
+          this.caseGroupDatats.addInterfaceName = null;
+        }
+      }
+      if (type === "child") {
+        console.log();
+        var status = this.commandCode[0];
+        var findex = this.commandCode[2];
+        var cindex = this.commandCode[4];
+        if (status === "b") {
+          this.caseGroupList[findex].Clist[cindex].name = this.caseGroupDatats.addInterfaceName;
+        }
+        //关闭后请求
+          this.statusIng.caseAddInterfaceBoxStatus = false;
+          this.commandCode = null;
+          this.caseGroupDatats.addInterfaceName = null;
+          Message.success("接口文档名称修改成功")
+      }
+    },
+    //操作接口文件
+    GroupChildAction(command) {
+      console.log(command);
+      command[0] === "b"
+        ? ((this.statusIng.caseAddInterfaceBoxStatus = true),
+          (this.caseBoxTtile = "用例接口重命名"),
+          (this.caseBoxLable = "接口名称"),
+          (this.commandCode = command))
+        : command[0]==="c"
+          ?     (this.caseGroupList[command[2]].Clist.splice(command[4],1),
+                Message.success("删除成")   )
+          : null
+        
+        ;
+    },
+    //操作分组文件
+    GroupFatherAction(command) {
+      console.log(command);
+      command[0] === "a"
+        ? (((this.statusIng.caseAddInterfaceBoxStatus = true),
+          (this.caseBoxTtile = "新建用例接口"),
+          (this.caseBoxLable = "接口名称")),
+          (this.commandCode = command))
+        : command[0] === "b"
+        ? ((this.statusIng.caseAddInterfaceBoxStatus = true),
+          (this.caseBoxTtile = "用例分组重命名"),
+          (this.caseBoxLable = "分组名称"),
+          (this.commandCode = command))
+        : command[0] === "c"
+        ? (this.caseGroupList.splice(command[2], 1),
+          Message.success("删除成功"))
+        : null;
+    },
     requestsTitile1() {},
     requestsTitile2() {},
     requestsTitile3() {},
     requestsTitile4() {},
+
     //检测前置处理---参数列表最后一个如果有不为空的则新增一个
 
     //默认选中前置处理-且改变现实类别
@@ -814,6 +1000,7 @@ export default {
 
     //查询该项目下的接口文件以及对象的接口文档
     SelectFile() {
+      //如果用例分组返回为空则默认请求当前接口文档分组
       SelectFile({
         projectId: storage.get("projectId")
       }).then(res => {
@@ -832,8 +1019,8 @@ export default {
     this.SelectFile();
   },
   computed() {
-    this.filesNames();
-    console.log(JSON.stringify(this.caseGroupList));
+    // this.filesNames();
+    // console.log(JSON.stringify(this.caseGroupList));
   }
 };
 </script>
@@ -968,6 +1155,7 @@ export default {
     right: 10px;
     color: #1e87f0;
     margin-top: -10px;
+    cursor: pointer;
   }
   .FilesContext {
     font-size: 13px;
@@ -1191,6 +1379,11 @@ export default {
       display: inline-block;
       width: 20%;
     }
+  }
+}
+.caseBox {
+  .caseBoxInput {
+    margin: 50px 20px;
   }
 }
 </style>

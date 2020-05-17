@@ -17,6 +17,10 @@
       <slot name="mockData">
         <!-- mock数据页面 -->
       </slot>
+      <slot name="caseAddFiles">
+      </slot>
+      <slot name="caseAddInterface">
+      </slot>
 
     </div>
   </div>
@@ -33,7 +37,6 @@ export default {
   },
   methods:{
     clickAll(a){
-      console.log(a.target)
       var ele=document.querySelector(".mb-text")
       if(ele){
 
@@ -75,5 +78,10 @@ export default {
   bottom: 0px;
   top: 0px;
   margin: auto;
+}
+</style>
+<style>
+.messageBox .el-form-item__label{
+ color: black;
 }
 </style>
