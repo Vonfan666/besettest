@@ -99,10 +99,12 @@
             <span class="tt">基本信息</span>
             <span class="aa" @click="enviromentAction()">当前环境</span>
           </div>
-          <enviroment-box v-if="statusIng.enviromentStatus" 
-          :environmentList.sync="Environments" 
-          :globarl.sync="globarls"
-          ref="environmentBox"></enviroment-box>
+          <enviroment-box
+            v-if="statusIng.enviromentStatus"
+            :environmentList.sync="Environments"
+            :globarl.sync="globarls"
+            ref="environmentBox"
+          ></enviroment-box>
           <div class="title-detail-context">
             <el-form :model="datas" :rules="rules" ref="refFrom" label-width="100px">
               <div class="interfaName-1">
@@ -356,8 +358,8 @@
                             v-model="item.isRequestsData"
                             active-color="#13ce66"
                             inactive-color="#ff4949"
-                          ></el-switch> -->
-                          <el-checkbox v-model="item.isRequestsData" ></el-checkbox>
+                          ></el-switch>-->
+                          <el-checkbox v-model="item.isRequestsData"></el-checkbox>
                         </el-form-item>
                         <el-form-item class="dataTitle">
                           <el-input v-model="item.dataKey" placeholder="Key" clearable></el-input>
@@ -553,81 +555,17 @@ import storage from "../../libs/storage";
 export default {
   components: {
     "caseAddFiles-box": () => import("../public/MessageBox.vue"),
-    "enviroment-box":()=>import("../public/environment.vue")
+    "enviroment-box": () => import("../public/environment.vue")
   },
   data() {
     return {
-
-      model:{
-        chiocsEnvironment:"",  //当前选中环境
+      model: {
+        chiocsEnvironment: "" //当前选中环境
       },
-      Environments:[
-        {
-          id:1,
-          name:"test",
-          value:[{"A":1},{"b":2}]
-        },
-        {
-          id:1,
-          name:"test1",
-          value:[{"A":1},{"b":2}]
-        },{
-          id:1,
-          name:"test",
-          value:[{"A":1},{"b":2}]
-        },
-        {
-          id:1,
-          name:"test1",
-          value:[{"A":1},{"b":2}]
-        },{
-          id:1,
-          name:"test",
-          value:[{"A":1},{"b":2}]
-        },
-        {
-          id:1,
-          name:"test1",
-          value:[{"A":1},{"b":2}]
-        },{
-          id:1,
-          name:"test",
-          value:[{"A":1},{"b":2}]
-        },
-        {
-          id:1,
-          name:"test1",
-          value:[{"A":1},{"b":2}]
-        },{
-          id:1,
-          name:"test",
-          value:[{"A":1},{"b":2}]
-        },
-        {
-          id:1,
-          name:"test1",
-          value:[{"A":1},{"b":2}]
-        },{
-          id:1,
-          name:"test",
-          value:[{"A":1},{"b":2}]
-        },
-        {
-          id:1,
-          name:"test1",
-          value:[{"A":1},{"b":2}]
-        },{
-          id:1,
-          name:"test",
-          value:[{"A":1},{"b":2}]
-        },
-        {
-          id:1,
-          name:"test1",
-          value:[{"A":1},{"b":2}]
-        },
+      Environments: [
+ 
       ], //环境列表
-      globarls:[],
+      globarls: [],
       postMethods: [
         // {id: 1, name: "GET"},
         // {id: 2, name: "POST"},
@@ -646,7 +584,7 @@ export default {
         searchStatus: false,
         caseAddFilesBoxStatus: false,
         caseAddInterfaceBoxStatus: false,
-        enviromentStatus:false,
+        enviromentStatus: false
       },
       inputStatus: 1, //input输入替换成div输入-显示引用的环境变量的颜色
       searchName: "", //接口搜索名称
@@ -1084,9 +1022,10 @@ export default {
     requestsTitile4() {
       console.log("haha");
     },
-    enviromentAction(){
-      this.statusIng.enviromentStatus=!this.statusIng.enviromentStatus
-      this.EnvironmentsSelect()
+    enviromentAction() {
+      
+      this.EnvironmentsSelect();
+      
     },
 
     ContextIsNull(oldValue, newValue) {
@@ -1169,7 +1108,7 @@ export default {
     //选择文档之后同步相应数据
 
     //以下方法为接口请求
-// ________________________________________________________________
+    // ________________________________________________________________
     //查询该项目下的接口文件以及对象的接口文档
     SelectFile() {
       //如果用例分组返回为空则默认请求当前接口文档分组
@@ -1204,15 +1143,16 @@ export default {
       });
     },
     //请求环境变量接口
-     EnvironmentsSelect(){
-      EnvironmentsSelect().then(res=>{
-        if(res.status===200){
-          console.log(res.results)
-          this.Environments=res.results.E_data
-          this.globarls=res.results.G_data
+    EnvironmentsSelect() {
+      EnvironmentsSelect().then(res => {
+        if (res.status === 200) {
+          console.log(res.results);
+          this.Environments = res.results.E_data;
+          this.globarls = res.results.G_data;
+          this.statusIng.enviromentStatus = !this.statusIng.enviromentStatus;
         }
-      })
-    },
+      });
+    }
   },
   Update() {},
   mounted() {
