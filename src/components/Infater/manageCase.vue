@@ -97,10 +97,11 @@
         <div class="right-title-detail">
           <div class="title-detail">
             <span class="tt">基本信息</span>
-            <span class="aa" @click="statusIng.enviromentStatus=!statusIng.enviromentStatus">当前环境</span>
+            <span class="aa" @click="enviromentAction()">当前环境</span>
           </div>
           <enviroment-box v-if="statusIng.enviromentStatus" 
           :environmentList.sync="Environments" 
+          :globarl.sync="globarls"
           ref="environmentBox"></enviroment-box>
           <div class="title-detail-context">
             <el-form :model="datas" :rules="rules" ref="refFrom" label-width="100px">
@@ -351,11 +352,12 @@
                     <el-form :model="requestsData" ref="refFrom" class="beforeFrom">
                       <div v-for="(item,index) in requestsData.keys" :key="index">
                         <el-form-item class="dataTitle1">
-                          <el-switch
+                          <!-- <el-switch
                             v-model="item.isRequestsData"
                             active-color="#13ce66"
                             inactive-color="#ff4949"
-                          ></el-switch>
+                          ></el-switch> -->
+                          <el-checkbox v-model="item.isRequestsData" ></el-checkbox>
                         </el-form-item>
                         <el-form-item class="dataTitle">
                           <el-input v-model="item.dataKey" placeholder="Key" clearable></el-input>
@@ -543,7 +545,8 @@ import { Message } from "element-ui";
 import {
   SelectFile,
   InterfaceDetailGet,
-  postMethods
+  postMethods,
+  EnvironmentsSelect
 } from "../../axios/api.js";
 import storage from "../../libs/storage";
 
@@ -624,6 +627,7 @@ export default {
           value:[{"A":1},{"b":2}]
         },
       ], //环境列表
+      globarls:[],
       postMethods: [
         // {id: 1, name: "GET"},
         // {id: 2, name: "POST"},
@@ -1080,7 +1084,10 @@ export default {
     requestsTitile4() {
       console.log("haha");
     },
-    EnvironmentIcon(){},
+    enviromentAction(){
+      this.statusIng.enviromentStatus=!this.statusIng.enviromentStatus
+      this.EnvironmentsSelect()
+    },
 
     ContextIsNull(oldValue, newValue) {
       if (oldValue === "" || oldValue === null) {
@@ -1116,7 +1123,8 @@ export default {
               this.requestsHeader.keys.push({
                 headerKey: item.cname,
                 headerValue: item.mockValue,
-                headerDetail: item.detail
+                headerDetail: item.detail,
+                key: Date.now()
               });
             }))
           : null;
@@ -1132,7 +1140,8 @@ export default {
                 isRequestsData: true, //是否选中默认为true
                 dataKey: item.cname,
                 dataValue: item.mockValue,
-                dataDetail: item.detail
+                dataDetail: item.detail,
+                key: Date.now()
               });
             }))
           : null;
@@ -1157,11 +1166,10 @@ export default {
         this.filesName = this.filesName.concat(item.Clist);
       });
     },
-
     //选择文档之后同步相应数据
 
     //以下方法为接口请求
-
+// ________________________________________________________________
     //查询该项目下的接口文件以及对象的接口文档
     SelectFile() {
       //如果用例分组返回为空则默认请求当前接口文档分组
@@ -1194,7 +1202,17 @@ export default {
           this.addContext(res.results[0]); //返回接口主题内容
         }
       });
-    }
+    },
+    //请求环境变量接口
+     EnvironmentsSelect(){
+      EnvironmentsSelect().then(res=>{
+        if(res.status===200){
+          console.log(res.results)
+          this.Environments=res.results.E_data
+          this.globarls=res.results.G_data
+        }
+      })
+    },
   },
   Update() {},
   mounted() {
@@ -1567,7 +1585,7 @@ export default {
     }
     .dataTitle1 {
       display: inline-block;
-      width: 60px;
+      width: 20px;
     }
     .dataTitle {
       display: inline-block;

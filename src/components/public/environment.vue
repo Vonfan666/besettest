@@ -18,7 +18,28 @@
           </el-table-column>
         </el-table>
 
-        <div v-if="statusIng.globarlPage">1111</div>
+        <div v-if="statusIng.globarlPage">
+             <el-form v-model="globarlsList" ref="refFrom" class="beforeFrom">
+                      <div v-for="(item,index) in globarlsList" :key="index">
+                        <el-form-item class="headerInput">
+                          <el-input
+                            v-model="item.key"
+                            clearable
+                            placeholder="请输入key"
+                          ></el-input>
+                        </el-form-item>
+                        <el-form-item class="headerInput">
+                          <el-input
+                            v-model="item.value"
+                            clearable
+                            placeholder="请输入value"
+                          ></el-input>
+                        </el-form-item>
+                       
+                      
+                      </div>
+                    </el-form>
+        </div>
       </div>
 
       <div class="environmentPage" v-if="statusIng.homePage">
@@ -43,7 +64,7 @@
 </template>
 
 <script>
-import { EnvironmentsAdd } from "../../axios/api";
+import { EnvironmentsAdd,EnvironmentsSelect } from "../../axios/api";
 
 export default {
   components: {
@@ -52,6 +73,14 @@ export default {
   props: ["environmentList", "styleCode", "globarl"],
   data() {
     return {
+      // environmentList.E_data
+      // environmentList.G_data
+
+      // [{token: "1423"}, {4423: "432"}]转化成key+value
+      globarlsList:[
+
+      ],
+
       statusIng: {
         homePage: true,
         globarlPage: false,
@@ -66,7 +95,38 @@ export default {
     };
   },
   methods: {
+    //________________________________________________________________________
+    // EnvironmentsSelect(){
+    //   EnvironmentsSelect().then(res=>{
+    //     if(res.status===200){
+    //       console.log(res.results)
+    //       return  res.results
+    //     }
+    //   })
+    // },
+
+
+    // ___________________________________________________________________
     //选中每页展示多条，val是当前选中每页展示的条数
+    //数据转换
+    updateGlobarl(globarls){
+      console.log(JSON.stringify(globarls),"33213")
+      this.globarlsList.splice(0,this.globarlsList.length)
+      var obj=globarls[0].value.forEach((item,index) => {
+          var key=Object.keys(item)[0]
+          var value=Object.values(item)[0]
+          this.globarlsList.push({"key":key,"value":value})
+      });
+    },
+    //还原globarl
+    callbackGlobarls(){
+      var submitGlobarlList=[]
+      this.globarlsList.forEach((item,index)=>{
+        var key=item.key
+        var value=item.value
+        submitGlobarlList.push({key:value})
+      })
+    },
     handleSizeChange(val) {
       console.log(`每页 ${val} 条`);
     },
@@ -85,15 +145,21 @@ export default {
       this.statusIng.homePage = false;
       this.statusIng.globarlPage = true
       this.environmentTitle="全局变量"
+      this.updateGlobarl(this.globarl)
     },
     close(){
         this.$parent.statusIng.enviromentStatus=!this.$parent.statusIng.enviromentStatus
     },
-    Edit() {}
+    Edit(index,item) {
+
+    }
   },
+
   mounted() {
     console.log(":this.environmentList.length",this.environmentList.length)
     this.allTotal =parseInt(this.environmentList.length)
+    // this.updateGlobarl(this.globarl)
+    
   }
 };
 </script>
