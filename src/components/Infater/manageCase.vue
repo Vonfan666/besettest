@@ -326,11 +326,22 @@
                 </div>
                 <div class="requestsFrom" v-show="statusIng.requestsStatus[1]">
                   <div class="t1">
-                    <span class="requestsHeaderTitle">KEY</span>
-                    <span class="requestsHeaderTitle">VALUE</span>
+                    <span class="requestsHeaderTitle">Key</span>
+                    <span class="requestsHeaderTitle">Value</span>
                     <span class="requestsHeaderTitle">描述</span>
+                    <el-button
+                      @click="statusIng.pushHeaderStatus=false;reversePushHeader()"
+                      v-show="statusIng.pushHeaderStatus"
+                      class="requestsHeaderTitlePush"
+                    >导入</el-button>
+                    <el-button
+                      @click="statusIng.pushHeaderStatus=true;pushHeaders()"
+                      v-show="!statusIng.pushHeaderStatus"
+                      class="requestsHeaderTitlePush"
+                    >确定</el-button>
+                    <!-- <span class="requestsHeaderTitle">确定</span> -->
                   </div>
-                  <div class="requestsTitile">
+                  <div class="requestsTitile" v-show="statusIng.pushHeaderStatus">
                     <el-form :model="requestsHeader" ref="refFrom" class="beforeFrom">
                       <div v-for="(item,index) in requestsHeader.keys" :key="index">
                         <el-form-item class="headerInput">
@@ -357,22 +368,71 @@
                         <el-form-item class="delete">
                           <el-button @click.prevent="addDictToList(index,1)">添加</el-button>
                           <el-button @click.prevent="removeListToDict(item,1)" v-if="index!=0">删除</el-button>
+                          <!-- <el-button @click.prevent="pushHeader(item,1),statusIng.pushHeaderStatus=true" v-if="index===0">导入</el-button> -->
                         </el-form-item>
                       </div>
                     </el-form>
                   </div>
+                  <div class="requestsTitile" v-show="!statusIng.pushHeaderStatus">
+                    <el-input
+                      type="textarea"
+                      placeholder="请输入内容"
+                      v-model="pushHeaderText"
+                      class="pushHeader"
+                    ></el-input>
+                  </div>
                 </div>
                 <div class="requestsFrom" v-show="statusIng.requestsStatus[2]">
-                  <div class="t1">
-                    <span class="dataTitle1"></span>
+                  <div style="margin-top: 20px;text-align:left">
+                    <el-radio-group v-model="reqyestDataTypeRadio">
+                      <el-radio :label=1>x-www-form-urlencoded</el-radio>
+                      <el-radio :label=3>form-data</el-radio>
+                      <!-- <el-radio :label="5">raw</el-radio> -->
+                    </el-radio-group>
+                  </div>
+                  <!-- <div class="t1"> -->
+                  <!-- <span class="dataTitle1"></span>
                     <span class="dataTitle">Key</span>
                     <span class="dataTitle">Value</span>
-                    <span class="dataTitle">操作描述</span>
-                    <span class="dataTitle">导入json</span>
-                  </div>
-                  <div class="requestsTitile">
+                  <span class="dataTitle">操作描述</span>-->
+                  <!-- <span class="dataTitle">导入json</span> -->
+                  <!-- </div> -->
+
+                  <div class="requestsTitile" v-show="reqyestDataTypeRadio===1">
                     <el-form :model="requestsData" ref="refFrom" class="beforeFrom">
                       <div v-for="(item,index) in requestsData.keys" :key="index">
+                        <el-form-item class="dataTitle1">
+                          <!-- <el-switch
+                            v-model="item.isRequestsData"
+                            active-color="#13ce66"
+                            inactive-color="#ff4949"
+                          ></el-switch>-->
+                          <el-checkbox v-model="item.isRequestsData"></el-checkbox>
+                        </el-form-item>
+                        <el-form-item class="dataTitle">
+                          <el-input v-model="item.dataKey" placeholder="Key" clearable></el-input>
+                        </el-form-item>
+                        <el-form-item class="dataTitle">
+                          <el-input v-model="item.dataValue" placeholder="Value" clearable></el-input>
+                        </el-form-item>
+                        <el-form-item class="dataTitle">
+                          <el-input placeholder="简要描述前置操作" v-model="item.beforeDetail" clearable></el-input>
+                        </el-form-item>
+                        <!-- <div class="delete">
+                      <span @click="addBefore(index)">新增</span>
+                      <span @click.prevent="removeBefore(item)">删除</span>
+                        </div>-->
+                        <!-- v-if="index===beforeAction.keys.length-1" 只有最后一个有添加删除按钮 -->
+                        <el-form-item class="delete">
+                          <el-button @click.prevent="addDictToList(index,2)">添加</el-button>
+                          <el-button @click.prevent="removeListToDict(item,2)" v-if="index!=0">删除</el-button>
+                        </el-form-item>
+                      </div>
+                    </el-form>
+                  </div>
+                  <div class="requestsTitile" v-show="reqyestDataTypeRadio===3">
+                    <el-form :model="requestsDataf" ref="refFrom" class="beforeFrom">
+                      <div v-for="(item,index) in requestsDataf.keys" :key="index">
                         <el-form-item class="dataTitle1">
                           <!-- <el-switch
                             v-model="item.isRequestsData"
@@ -532,6 +592,14 @@
         </div>
       </div>
     </caseAddFiles-box>
+    <!-- <pushHeader-box v-slot:pushHeader :styleCode="pushHeaderStyle" v-if="statusIng.pushHeaderStatus">
+      <div class="pushHeader" style="margin:10px">
+        <el-input type="pushHeaderText" placeholder="请输入内容" v-model="pushHeaderText"></el-input>
+        <button @click="statusIng.pushHeaderStatus=false">关闭</button>
+        <button @click="test()">提交</button>
+      </div>
+    </pushHeader-box>-->
+
     <!-- <caseAddFiles-box
       v-slot:caseAddInterface
       :styleCode="caseAddFilesBoxStyle"
@@ -574,11 +642,14 @@ import storage from "../../libs/storage";
 
 export default {
   components: {
+    "pushHeader-box": () => import("../public/MessageBox.vue"),
     "caseAddFiles-box": () => import("../public/MessageBox.vue"),
     "enviroment-box": () => import("../public/environment.vue")
   },
   data() {
     return {
+      pushHeaderText: "",
+      pushHeaderStyle: "height:500px;width:500px",
       model: {
         chiocsEnvironment: "" //当前选中环境
       },
@@ -602,7 +673,8 @@ export default {
         searchStatus: false,
         caseAddFilesBoxStatus: false,
         caseAddInterfaceBoxStatus: false,
-        enviromentStatus: false
+        enviromentStatus: false,
+        pushHeaderStatus: true
       },
       inputStatus: 1, //input输入替换成div输入-显示引用的环境变量的颜色
       searchName: "", //接口搜索名称
@@ -649,6 +721,7 @@ export default {
         caseDetail: "", //用例描述
         postMethods: ""
       },
+      reqyestDataTypeRadio: 1, //提交的参数类型
       //前置处理器
       beforeAction: {
         keys: [
@@ -671,6 +744,16 @@ export default {
         ]
       },
       requestsData: {
+        keys: [
+          {
+            isRequestsData: true, //是否选中
+            dataKey: "", //请求key
+            dataValue: "", //请求值
+            dataDetail: "" //请求详情
+          }
+        ]
+      },
+      requestsDataf: {
         keys: [
           {
             isRequestsData: true, //是否选中
@@ -750,6 +833,47 @@ export default {
     };
   },
   methods: {
+    ClearBr(key) {
+      // key = key.replace(/<\/?.+?>/g, "");
+      key = key.replace(/[\r\n]/g, "||");
+
+      return key;
+    },
+    //将请求头转化为json数据导入
+    pushHeaders() {
+      console.log("开始导入");
+      var str = this.ClearBr(this.pushHeaderText);
+      var lists = str.split("||");
+
+      this.requestsHeader.keys.splice(0, this.requestsHeader.keys.length);
+
+      lists.forEach((item, index) => {
+        var dic = item.split(":");
+        console.log(dic);
+        this.requestsHeader.keys.push({
+          headerKey: dic[0], //请求头key
+          headerValue: dic[1], //请求头value
+          headerDetail: "" //简要描述
+        });
+      });
+      console.log(this.requestsHeader);
+    },
+    //将对象转化为 换行的格式
+    reversePushHeader() {
+      console.log("2",this.requestsHeader.keys)
+      if (this.requestsHeader.keys.length !== 1) {
+        //导入前先清空keys列表
+        this.pushHeaderText=""
+        var lists = [];
+        this.requestsHeader.keys.forEach((item, index) => {
+          if (index !== this.requestsHeader - 1) {
+            var str = item.headerKey.concat(":", item.headerValue);
+            lists.push(str);
+          }
+        });
+        this.pushHeaderText = lists.join("\n");
+      }
+    },
     //点击用例--修改接口文件的背景颜色
     changeColor(self) {
       var ele = self.currentTarget;
@@ -821,8 +945,16 @@ export default {
             beforeDetail: "",
             key: Date.now()
           })
-        : a === 2
+        : a === 2 && this.reqyestDataTypeRadio === 1
         ? ele.keys.splice(index + 1, 0, {
+            isRequestsData: true,
+            dataKey: "",
+            dataValue: "",
+            detaDetail: "",
+            key: Date.now()
+          })
+        : a === 2 && this.reqyestDataTypeRadio === 3
+        ? this.requestsDataf.keys.splice(index + 1, 0, {
             isRequestsData: true,
             dataKey: "",
             dataValue: "",
@@ -834,7 +966,11 @@ export default {
 
     //删除前置处理项
     removeListToDict(item, a) {
+      
       var ele = this.isBeforeEle(a);
+      if(a===2 && this.reqyestDataTypeRadio===3){
+        var ele =this.requestsDataf
+      }
       console.log(ele);
       var index = ele.keys.indexOf(item);
       if (index !== 0) {
@@ -1058,9 +1194,20 @@ export default {
     addContext(self) {
       this.datas.urlAttr = self.post_attr; //替换请求地址
       this.datas.caseDetail = self.interface_detail; //替换用例描述
+      var type=self.post_type
+      console.log(type,typeof type)
+      type!==1 && type!==3
+      ? this.reqyestDataTypeRadio = 1 :this.reqyestDataTypeRadio = type;
+      
+      console.log(this.reqyestDataTypeRadio)
       this.replaceHeader(self); //替换请求头部数据
-      this.replaceData(self); //替换请求参数
+      this.reqyestDataTypeRadio === 1
+        ? this.replaceData(self) //替换请求参数
+        : this.reqyestDataTypeRadio === 3
+        ? this.replaceDataf(self)
+        : null;
       this.datas.postMethods = self.post_methods;
+      
     },
     //替换请求头部数据
     replaceHeader(self) {
@@ -1085,8 +1232,8 @@ export default {
     },
     //替换请求数据
     replaceData(self) {
-      if (Array.isArray(self.res_data)) {
-        self.res_data.length > 0
+      if (Array.isArray(self.post_data)) {
+        self.post_data.length > 0
           ? (this.requestsData.keys.splice(0, this.requestsData.keys.length),
             self.post_data.forEach((item, index) => {
               this.requestsData.keys.push({
@@ -1099,6 +1246,41 @@ export default {
             }))
           : null;
       }
+      // else{
+      //   this.requestsData.keys.push({
+      //           isRequestsData: true, //是否选中默认为true
+      //           dataKey: "",
+      //           dataValue: "",
+      //           dataDetail: "",
+      //           key: Date.now()
+      //         });
+      // }
+    },
+    //同步form-data数据
+    replaceDataf(self) {
+      if (Array.isArray(self.post_data)) {
+        self.post_data.length > 0
+          ? (this.requestsDataf.keys.splice(0, this.requestsDataf.keys.length),
+            self.post_data.forEach((item, index) => {
+              this.requestsDataf.keys.push({
+                isRequestsData: true, //是否选中默认为true
+                dataKey: item.cname,
+                dataValue: item.mockValue,
+                dataDetail: item.detail,
+                key: Date.now()
+              });
+            }))
+          : null;
+      }
+      // else{
+      //   this.requestsDataf.keys.push({
+      //           isRequestsData: true, //是否选中默认为true
+      //           dataKey: "",
+      //           dataValue: "",
+      //           dataDetail: "",
+      //           key: Date.now()
+      //         });
+      // }
     },
     //默认选中前置处理-且改变现实类别
     changeRequstsBeforeOneColor() {
@@ -1365,7 +1547,6 @@ export default {
           right: 0px;
         }
       }
-     
     }
   }
   //   #2c3e50
@@ -1548,6 +1729,11 @@ export default {
       width: 25%;
       display: inline-block;
     }
+    .requestsHeaderTitlePush {
+      position: absolute;
+      right: 10px;
+      bottom: -4px;
+    }
     .headerInput {
       display: inline-block;
       width: 25%;
@@ -1601,5 +1787,8 @@ export default {
 
 .title-detail .el-select__caret {
   line-height: 30px;
+}
+.pushHeader .el-textarea__inner {
+  min-height: 300px !important;
 }
 </style>

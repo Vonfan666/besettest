@@ -143,7 +143,7 @@ export default {
       // environmentList.G_data
 
       // [{token: "1423"}, {4423: "432"}]转化成key+value
-
+      
       addEnvironmentList: [],
       globarlsList: [],
       globarlId: null,

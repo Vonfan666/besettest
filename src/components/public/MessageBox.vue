@@ -24,6 +24,7 @@
       <slot name="Cenvironment">
         <!-- 变量 -->
       </slot>
+      <slot name="pushHeader"></slot>
     </div>
   </div>
 </template>
