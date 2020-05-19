@@ -41,7 +41,7 @@
         <div class="FilesContext" v-show="!statusIng.searchStatus">
           <div class="fileName" v-for="(item,index) in caseGroupList" :key="index">
             <div class="fileName-father" @click="isOpen($event,index)">
-              <span :class="fileNameIcon[index]">{{item.name}}</span>
+              <span :class="fileNameIcon[index]" class="oneFiles">{{item.name}}</span>
               <div class="addTextFather">
                 <!-- <div class="addtext-code">
                     <span class="el-icon-plus it-icon-addtext"></span>
@@ -68,7 +68,9 @@
               @click="changeColor($event)"
               v-show="fileNameChildStatus[index]"
             >
-              <span class="file">{{item1.name}}</span>
+              <div class="file-father">
+                <span class="file">{{item1.name}}</span>
+              </div>
 
               <div class="addTextChild">
                 <!-- <div class="addtext-code">
@@ -97,7 +99,24 @@
         <div class="right-title-detail">
           <div class="title-detail">
             <span class="tt">基本信息</span>
-            <span class="aa" @click="enviromentAction()">当前环境</span>
+
+            <div class="et">
+              <el-select v-model="model.chiocsEnvironment" filterable placeholder="请选择环境">
+                <el-option
+                  v-for="item in Environments"
+                  :key="item.name"
+                  :label="item.name"
+                  :value="item.id"
+                ></el-option>
+              </el-select>
+              <el-button
+                type="primary"
+                icon="el-icon-edit"
+                circle
+                size="mini"
+                @click="enviromentAction()"
+              ></el-button>
+            </div>
           </div>
           <enviroment-box
             v-if="statusIng.enviromentStatus"
@@ -105,6 +124,7 @@
             :globarl.sync="globarls"
             ref="environmentBox"
           ></enviroment-box>
+
           <div class="title-detail-context">
             <el-form :model="datas" :rules="rules" ref="refFrom" label-width="100px">
               <div class="interfaName-1">
@@ -562,9 +582,7 @@ export default {
       model: {
         chiocsEnvironment: "" //当前选中环境
       },
-      Environments: [
- 
-      ], //环境列表
+      Environments: [], //环境列表
       globarls: [],
       postMethods: [
         // {id: 1, name: "GET"},
@@ -597,8 +615,6 @@ export default {
       fileNameChildStatus: [], //添加false数量默认为文件夹个数
       filesName: [
         //后台返回的接口内容,选择之后会自动填充部分数据
-        { id: 1, name: "测试文档1" },
-        { id: 2, name: "测试文档2" }
       ],
       urlHttp: [
         { id: 1, name: "HTTP" },
@@ -1023,9 +1039,7 @@ export default {
       console.log("haha");
     },
     enviromentAction() {
-      
-      this.EnvironmentsSelect();
-      
+      this.statusIng.enviromentStatus = !this.statusIng.enviromentStatus;
     },
 
     ContextIsNull(oldValue, newValue) {
@@ -1149,7 +1163,7 @@ export default {
           console.log(res.results);
           this.Environments = res.results.E_data;
           this.globarls = res.results.G_data;
-          this.statusIng.enviromentStatus = !this.statusIng.enviromentStatus;
+          // this.statusIng.enviromentStatus = !this.statusIng.enviromentStatus;
         }
       });
     }
@@ -1158,6 +1172,7 @@ export default {
   mounted() {
     this.changeRequstsBeforeOneColor();
     this.SelectFile();
+    this.EnvironmentsSelect();
   },
   // computed() {
   //   // this.filesNames();
@@ -1321,22 +1336,36 @@ export default {
       .fileName-father {
         padding: 7px 0 7px 0;
         cursor: pointer;
+        position: relative;
         .addTextFather {
           display: inline-block;
-          float: right;
+          position: absolute;
+          right: 0px;
+        }
+        .oneFiles {
+          margin-right: 15px;
         }
       }
       .fileNameChild {
         padding: 7px 0 7px 0;
+        position: relative;
         cursor: pointer;
+        .file-father {
+          display: inline-block;
+          // position: absolute;
+          margin-right: 15px;
+        }
         .file {
-          margin-left: 30px;
+          margin-left: 25px;
         }
         .addTextChild {
+          position: absolute;
           display: inline-block;
-          float: right;
+          // float: right;
+          right: 0px;
         }
       }
+     
     }
   }
   //   #2c3e50
@@ -1538,6 +1567,10 @@ export default {
     margin: 50px 20px;
   }
 }
+.title-detail .et {
+  display: inline-block;
+  float: right;
+}
 </style>
 
 <style>
@@ -1564,5 +1597,9 @@ export default {
 }
 .manageCase-right .el-button {
   padding: 8px 10px;
+}
+
+.title-detail .el-select__caret {
+  line-height: 30px;
 }
 </style>

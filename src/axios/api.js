@@ -72,7 +72,7 @@ export const EditFilesName=(params)=>{
 
 //查询文件夹以及文件夹下所有内容
 export const SelectFile=(params)=>{
-    return getRequest("/users/select_file/",params)
+    return getRequest("/users/select_file/mock/",params)
 }
 
 

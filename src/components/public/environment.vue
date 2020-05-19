@@ -98,7 +98,7 @@
         </div>
       </div>
 
-      <div class="environmentPage" v-if="statusIng.homePage">
+      <!-- <div class="environmentPage" v-if="statusIng.homePage">
         <el-pagination
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
@@ -109,7 +109,7 @@
           layout="total, sizes, prev, pager, next, jumper"
           :total="allTotal"
         ></el-pagination>
-      </div>
+      </div> -->
       <div class="environmentFoot" v-if="statusIng.homePage">
         <el-button type="primary" size="small" @click="close()">关闭</el-button>
         <el-button type="primary" size="small" @click="globarlButton()">全局变量</el-button>
@@ -130,8 +130,8 @@
 </template>
 
 <script>
-import { EnvironmentsAdd, EnvironmentsSelect } from "../../axios/api";
-
+import { EnvironmentsAdd, EnvironmentsSelect,EnvironmentsDelete } from "../../axios/api";
+import { Message } from "element-ui";
 export default {
   components: {
     box: () => import("./MessageBox.vue")
@@ -143,9 +143,10 @@ export default {
       // environmentList.G_data
 
       // [{token: "1423"}, {4423: "432"}]转化成key+value
-      
+
       addEnvironmentList: [],
       globarlsList: [],
+      globarlId: null,
       froms: {
         environmenName: ""
       },
@@ -160,7 +161,7 @@ export default {
       environmentStyle: "height:700px;width:1000px",
       currentPage: 1, //当前是第几页
       pagesize: 10, //每页展示多少个
-      currentEnvironmentIndex:null,
+      currentEnvironmentIndex: null,
       inputStyle: "border: none;",
       rules: {
         environmenName: [
@@ -174,19 +175,19 @@ export default {
   },
   methods: {
     //________________________________________________________________________
-    // EnvironmentsSelect(){
-    //   EnvironmentsSelect().then(res=>{
-    //     if(res.status===200){
-    //       console.log(res.results)
-    //       return  res.results
-    //     }
-    //   })
-    // },
+
+    globarlsAdd(data) {
+      EnvironmentsAdd(data).then(res => {
+        if (res.status === 200) {
+          Message.success("保存成功");
+          this.globarlBackHome();
+        }
+      });
+    },
 
     // ___________________________________________________________________
     //如果用户操作最后一个输入框之后，就给他自动添加一个
     changeInputPush(index) {
-      console.log(index);
       if (index + 1 === parseInt(this.globarlsList.length)) {
         this.globarlsList.push({
           key: "",
@@ -195,7 +196,7 @@ export default {
       }
       //添加成功之后移除最后一个的删除按钮
     },
-    EnchangeInputPush(index){
+    EnchangeInputPush(index) {
       if (index + 1 === parseInt(this.addEnvironmentList.length)) {
         this.addEnvironmentList.push({
           key: "",
@@ -205,10 +206,15 @@ export default {
     },
     //如果最后一个不为空则自动添加一个进去--让输入框自动添加一个
     globarlsListFromPush() {
-      console.log(this.globarlsList);
-      var obj = this.globarlsList[this.globarlsList.length - 1];
-      console.log(obj);
-      if (obj.key != "" || obj.value != "") {
+      if (this.globarlsList.length > 0) {
+        var obj = this.globarlsList[this.globarlsList.length - 1];
+        if (obj.key != "" || obj.value != "") {
+          this.globarlsList.push({
+            key: "",
+            value: ""
+          });
+        }
+      } else {
         this.globarlsList.push({
           key: "",
           value: ""
@@ -216,9 +222,15 @@ export default {
       }
     },
     environmenListFromPush() {
-      var obj = this.addEnvironmentList[this.addEnvironmentList.length - 1];
-      console.log(obj);
-      if (obj.key != "" || obj.value != "") {
+      if (this.addEnvironmentList.length > 0) {
+        var obj = this.addEnvironmentList[this.addEnvironmentList.length - 1];
+        if (obj.key != "" || obj.value != "") {
+          this.addEnvironmentList.push({
+            key: "",
+            value: ""
+          });
+        }
+      } else {
         this.addEnvironmentList.push({
           key: "",
           value: ""
@@ -228,24 +240,20 @@ export default {
 
     //点击编辑进入新增环境变量
     Edit(index, row) {
+      console.log(row.id)
       //点击编辑是 创建一个 name用于绑定--在返回时时需要清空
-      this.froms.environmenName = row.name;  
-      this.currentEnvironmentIndex=index; //获取当前编辑的索引
+      this.froms.environmenName = row.name;
+      this.currentEnvironmentIndex = index; //获取当前编辑的索引
+      // console.log(this.currentEnvironmentIndex);
       var EnvCode = [];
-      console.log("bianji", index, row);
-      console.log(this.environmentList, "this.environmentList");
       this.environmentButton();
       this.addEnvironmentList.splice(0, this.addEnvironmentList.length);
       Array.isArray(row.value)
-        ? ((EnvCode = row.value),
-          console.log(this.addEnvironmentList),
-          this.updateEnvironment(EnvCode))
+        ? ((EnvCode = row.value), this.updateEnvironment(EnvCode))
         : null;
     },
     //环境变量数据转换
     updateEnvironment(list) {
-      console.log(list, "list");
-
       if (list.length > 0) {
         var obj = list.forEach((item, index) => {
           var key = Object.keys(item)[0];
@@ -258,13 +266,18 @@ export default {
     },
     //环境变量数据还原
     callbackEnvironment() {
-      var submitEnvironmentList = [];
-      this.addEnvironmentList.forEach((item, index) => {
-        var key = item.key;
-        var value = item.value;
-        submitEnvironmentList.push({ key: value });
-      });
-      return submitEnvironmentList;
+      if (this.addEnvironmentList.length > 0) {
+        var submitEnvironmentList = [];
+        this.addEnvironmentList.forEach((item, index) => {
+          var l = {};
+          var keyCode = item.key;
+          var valueCode = item.value;
+          index !== this.addEnvironmentList.length - 1
+            ? ((l[keyCode] = valueCode), submitEnvironmentList.push(l))
+            : null;
+        });
+        return submitEnvironmentList;
+      }
     },
     //全局变量数据转换
     updateGlobarl(globarls) {
@@ -280,9 +293,12 @@ export default {
     callbackGlobarls() {
       var submitGlobarlList = [];
       this.globarlsList.forEach((item, index) => {
+        var l = {};
         var key = item.key;
         var value = item.value;
-        submitGlobarlList.push({ key: value });
+        index !== this.globarlsList.length - 1
+          ? ((l[key] = value), submitGlobarlList.push(l))
+          : null;
       });
       return submitGlobarlList;
     },
@@ -297,7 +313,15 @@ export default {
     //删除环境变量
     Delete(index, item) {
       console.log(index, item);
-      this.environmentList.splice(index, 1);
+      var id=item.id
+      console.log(id)
+      EnvironmentsDelete({
+        id:id,
+      }).then(res=>{
+        if(res.status===200){
+          this.environmentList.splice(index, 1);
+        }
+      })
       //删除之后跟新当前值
       this.allTotal = this.environmentList.length;
     },
@@ -307,13 +331,17 @@ export default {
       this.statusIng.homePage = false; //隐藏第一页
       this.statusIng.globarlPage = true; //打开全局变量页面
       this.environmentTitle = "全局变量"; //title改成全局变量
-      this.updateGlobarl(this.globarl);
+      this.globarlId = this.globarl[0].id;
+      this.updateGlobarl(this.globarl); //全局变量数据转换
     },
+    //环境变量按钮
     environmentButton() {
       this.statusIng.homePage = false; //隐藏第一页
       this.statusIng.enviromentStatus = true; //打开全局变量页面
       this.environmentTitle = "环境变量"; //title改成全局变量
+      this.environmenListFromPush();
     },
+    //关闭当前组件
     close() {
       this.$parent.statusIng.enviromentStatus = !this.$parent.statusIng
         .enviromentStatus;
@@ -321,42 +349,85 @@ export default {
 
     //全局变量保存
     glovarlSave() {
-      console.log(this.globarlsList);
+      var obj = this.callbackGlobarls();
+      this.globarl[0].value = obj;
+      var data = {
+        id: this.globarlId,
+        is_eg: 1,
+        value: JSON.stringify(obj)
+      };
+      //保存环境变量
+      this.globarlsAdd(data);
     },
-
+    //环境变量保存
     environmentSave() {
-      console.log("环境变量保存");
-      var  obj=this.callbackEnvironment()
-      console.log(obj)
-      console.log(this.environmentList)
-      this.environmentList[this.currentEnvironmentIndex].value=obj
-      this.environmentList[this.currentEnvironmentIndex].name=this.froms.environmenName
-      console.log(this.environmentList)
+      var obj = this.callbackEnvironment();
+      //点击编辑保存
+      console.log(this.currentEnvironmentIndex)
+      if (this.currentEnvironmentIndex!=null) {
+        this.environmentList[this.currentEnvironmentIndex].value = obj;
+        var id = this.environmentList[this.currentEnvironmentIndex].id;
+        this.environmentList[
+          this.currentEnvironmentIndex
+        ].name = this.froms.environmenName;
+        var data = {
+          id: id,
+          is_eg: 0,
+          name: this.froms.environmenName,
+          value: JSON.stringify(obj)
+        };
+        EnvironmentsAdd(data).then(res => {
+          if (res.status === 200) {
+            Message.success("保存成功");
+            this.environmentBackHome();
+            this.environmentList[this.currentEnvironmentIndex] = res.results;
+          }
+        });
+      } else {  //新增环境
+        var data = {
+          is_eg: 0,
+          name: this.froms.environmenName,
+          value: JSON.stringify(obj)
+        };
+        EnvironmentsAdd(data).then(res => {
+          if (res.status === 200) {
+            Message.success("保存成功");
+            this.environmentBackHome();
+            this.environmentList.unshift(res.results);
+          }
+        });
+      }
+      this.allTotal = this.environmentList.length;
+      // this.EnvironmentsAdd(data);
     },
     //全局变量移除某个
     globarlRemove(a) {
       this.globarlsList.splice(a, 1);
     },
-    environmentRemove(index,obj){
-      obj.splice(index,1)
-      console.log(this.addEnvironmentList)
+    //删除环境变量key-value
+    environmentRemove(index, obj) {
+      obj.splice(index, 1);
     },
+    //返回第一页
     globarlBackHome() {
       this.statusIng.homePage = true; //隐藏第一页
       this.statusIng.globarlPage = false; //打开全局变量页面
       this.environmentTitle = "环境列表"; //title改成全局变量
+      this.globarlId = null;
     },
+    //返回第一页
     environmentBackHome() {
       this.statusIng.homePage = true; //隐藏第一页
       this.statusIng.enviromentStatus = false; //打开全局变量页面
       this.environmentTitle = "环境列表"; //title改成全局变量
       this.froms.environmenName = "";
-      this.currentEnvironmentIndex=""
+      this.currentEnvironmentIndex = null;
+      this.addEnvironmentList = [];
     }
   },
   updated() {},
   mounted() {
-    console.log("传过来了", this.environmentList);
+    
     this.allTotal = parseInt(this.environmentList.length);
   }
   // watch:{
@@ -420,5 +491,7 @@ export default {
   border: none;
   /* background-color:whitesmoke; */
 }
+
+
 </style>
 
