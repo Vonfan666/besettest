@@ -86,7 +86,7 @@
         </span>
         <span class="apbt"  @click="pushData()">
           <el-button type="primary" size="small">
-            <span class="el-icon-sort"></span> 导入json数据
+            <span class="el-icon-sort"></span> 导入数据
           </el-button>
         </span>
       </div>
@@ -161,7 +161,14 @@ export default {
   methods: {
     pushData() {
       this.$parent.postType = this.indextp;
-
+      if(this.indextp==="data-com"){
+        console.log(1121212)
+        this.$parent.reversePushDatas()
+      }
+      if(this.indextp==="header-com"){
+        this.$parent.reversePushHeader()
+      }
+      
       return this.$emit("update:msbox", !this.msbox);
     },
     // draggable 属性规定元素是否可拖动

@@ -88,7 +88,7 @@
         </span>
         <span class="apbt">
           <el-button type="primary" size="small" @click="pushData($event)">
-            <span class="el-icon-sort"></span> 导入json数据
+            <span class="el-icon-sort"></span> 导入数据
           </el-button>
         </span>
       </div>

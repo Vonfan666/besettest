@@ -65,7 +65,7 @@
               v-for="(item1,index1) in item.Clist"
               :name="item1.id"
               :key="index1"
-              @click="changeColor($event)"
+              @click="changeColor($event),inCaseList()"
               v-show="fileNameChildStatus[index]"
             >
               <div class="file-father">
@@ -94,7 +94,14 @@
         </div>
       </div>
     </div>
-    <div class="manageCase-right">
+    <div class="caseLsit manageCase-right"  v-show="!statusIng.CaselistOrCaseDetailTstatus">
+      <div class="right-title">
+      <div class="title-detail">
+            <span class="tt">用例列表</span>
+      </div>
+      </div>
+    </div>
+    <div class="manageCase-right" v-show="statusIng.CaselistOrCaseDetailTstatus">
       <div class="right-title">
         <div class="right-title-detail">
           <div class="title-detail">
@@ -674,7 +681,8 @@ export default {
         caseAddFilesBoxStatus: false,
         caseAddInterfaceBoxStatus: false,
         enviromentStatus: false,
-        pushHeaderStatus: true
+        pushHeaderStatus: true,
+        CaselistOrCaseDetailTstatus:true
       },
       inputStatus: 1, //input输入替换成div输入-显示引用的环境变量的颜色
       searchName: "", //接口搜索名称
@@ -835,7 +843,7 @@ export default {
   methods: {
     ClearBr(key) {
       // key = key.replace(/<\/?.+?>/g, "");
-      key = key.replace(/[\r\n]/g, "||");
+      var key = key.replace(/[\r\n]/g, "||");
 
       return key;
     },
@@ -860,17 +868,22 @@ export default {
     },
     //将对象转化为 换行的格式
     reversePushHeader() {
+      
       console.log("2",this.requestsHeader.keys)
-      if (this.requestsHeader.keys.length !== 1) {
+      if (this.requestsHeader.keys.length >0) {
         //导入前先清空keys列表
         this.pushHeaderText=""
         var lists = [];
         this.requestsHeader.keys.forEach((item, index) => {
           if (index !== this.requestsHeader - 1) {
+            if( item.headerValue===undefined){
+              item.headerValue=""
+            }
             var str = item.headerKey.concat(":", item.headerValue);
             lists.push(str);
           }
         });
+
         this.pushHeaderText = lists.join("\n");
       }
     },
@@ -971,11 +984,11 @@ export default {
       if(a===2 && this.reqyestDataTypeRadio===3){
         var ele =this.requestsDataf
       }
-      console.log(ele);
       var index = ele.keys.indexOf(item);
       if (index !== 0) {
         ele.keys.splice(index, 1);
       }
+      console.log(this.requestsHeader)
     },
     //编辑顺序时判断是否重复
     changeIndex(index, a) {
@@ -1165,6 +1178,10 @@ export default {
         ? (this.caseGroupList.splice(command[2], 1),
           Message.success("删除成功"))
         : null;
+    },
+    //进入列表
+    inCaseList(){
+
     },
     //顶部选择接口文档
 
