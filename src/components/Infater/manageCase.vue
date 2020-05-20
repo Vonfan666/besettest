@@ -94,11 +94,42 @@
         </div>
       </div>
     </div>
-    <div class="caseLsit manageCase-right"  v-show="!statusIng.CaselistOrCaseDetailTstatus">
+    <div class="manageCase-right" v-if="!statusIng.CaselistOrCaseDetailTstatus">
       <div class="right-title">
-      <div class="title-detail">
-            <span class="tt">用例列表</span>
-      </div>
+        <div class="title-detail">
+          <span class="tt">用例列表</span>
+        </div>
+        <div class="caseList">
+          <el-table :data="caseList" border style="width: 100%" @selection-change="caseSelection">
+            <el-table-column fixed prop="date" type="selection" width="50"></el-table-column>
+            <el-table-column prop="order" label="执行顺序" width="80" >
+                <template slot-scope="scope" >
+                  <input v-model="scope.row.order" class="caseOrder">
+              </template>
+            </el-table-column>
+            <el-table-column prop="name" label="名称"></el-table-column>
+            <el-table-column prop="isInterface.name" label="所属接口" width="250"></el-table-column>
+            <el-table-column prop="status" label="状态" width="80"></el-table-column>
+            <el-table-column prop="createrUser" label="创建人" width="80"></el-table-column>
+            <el-table-column prop="createrTime" label="创建时间" width="150"></el-table-column>
+            <el-table-column fixed="right" label="操作" width="200">
+              <template slot-scope="scope" >
+                <!-- <el-button @click="handleClick(scope.row)" type="text" size="small">查看</el-button> -->
+                <el-button type="text" size="small">删除</el-button>
+                <el-button type="text" size="small">编辑</el-button>
+                <el-button type="text" size="small">单点执行</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+        <div class="caseFoot">
+            <div class="caseFoot-1">
+                <el-button type="primary"  @click="caseListBack()">返回</el-button>
+                <el-button type="primary" size="primary">保存</el-button>
+                <el-button type="primary" size="primary">调试</el-button>
+                <el-button type="primary" size="primary">查看结果</el-button>
+            </div>
+    </div>
       </div>
     </div>
     <div class="manageCase-right" v-show="statusIng.CaselistOrCaseDetailTstatus">
@@ -392,8 +423,8 @@
                 <div class="requestsFrom" v-show="statusIng.requestsStatus[2]">
                   <div style="margin-top: 20px;text-align:left">
                     <el-radio-group v-model="reqyestDataTypeRadio">
-                      <el-radio :label=1>x-www-form-urlencoded</el-radio>
-                      <el-radio :label=3>form-data</el-radio>
+                      <el-radio :label="1">x-www-form-urlencoded</el-radio>
+                      <el-radio :label="3">form-data</el-radio>
                       <!-- <el-radio :label="5">raw</el-radio> -->
                     </el-radio-group>
                   </div>
@@ -553,6 +584,7 @@
         </div>
       </div>
     </div>
+    
     <caseAddFiles-box
       v-slot:caseAddFiles
       :styleCode="caseAddFilesBoxStyle"
@@ -682,7 +714,7 @@ export default {
         caseAddInterfaceBoxStatus: false,
         enviromentStatus: false,
         pushHeaderStatus: true,
-        CaselistOrCaseDetailTstatus:true
+        CaselistOrCaseDetailTstatus: true
       },
       inputStatus: 1, //input输入替换成div输入-显示引用的环境变量的颜色
       searchName: "", //接口搜索名称
@@ -837,7 +869,180 @@ export default {
         addInterfaceName: [{ required: true, message: "必填" }],
         postMethods: [{ required: true, message: "必填" }]
         // beforeName: [{ required: true, message: "请输入名称" }]
-      }
+      },
+      caseList: [
+        
+        {
+          id: 1,
+          order: 1,
+          isTrue: 1,
+          name: "第一个测试接口",
+          isInterface: {
+            id: 1,
+            name: "第一个接口"
+          },
+          status: "已完成",
+          createrUser: "冯凡",
+          createrTime: "2020:05:20 22:28"
+        },
+        {
+          id: 1,
+          order: 1,
+          isTrue: 1,
+          name: "第一个测试接口",
+          isInterface: {
+            id: 1,
+            name: "第一个接口"
+          },
+          status: "已完成",
+          createrUser: "冯凡啊啊",
+          createrTime: "2020:05:20 22:28"
+        },
+        {
+          id: 1,
+          order: 1,
+          isTrue: 1,
+          name: "第一个测试接口",
+          isInterface: {
+            id: 1,
+            name: "第一个接口"
+          },
+          status: "已完成",
+          createrUser: "冯凡",
+          createrTime: "2020:05:20 22:28"
+        },
+        {
+          id: 1,
+          order: 1,
+          isTrue: 1,
+          name: "第一个测试接口",
+          isInterface: {
+            id: 1,
+            name: "第一个接口"
+          },
+          status: "已完成",
+          createrUser: "冯凡",
+          createrTime: "2020:05:20 22:28"
+        },
+        {
+          id: 1,
+          order: 1,
+          isTrue: 1,
+          name: "第一个测试接口",
+          isInterface: {
+            id: 1,
+            name: "第一个接口"
+          },
+          status: "已完成",
+          createrUser: "冯凡",
+          createrTime: "2020:05:20 22:28"
+        },
+        {
+          id: 1,
+          order: 1,
+          isTrue: 1,
+          name: "第一个测试接口",
+          isInterface: {
+            id: 1,
+            name: "第一个接口"
+          },
+          status: "已完成",
+          createrUser: "冯凡",
+          createrTime: "2020:05:20 22:28"
+        },
+        {
+          id: 1,
+          order: 1,
+          isTrue: 1,
+          name: "第一个测试接口",
+          isInterface: {
+            id: 1,
+            name: "第一个接口"
+          },
+          status: "已完成",
+          createrUser: "冯凡",
+          createrTime: "2020:05:20 22:28"
+        },
+        {
+          id: 1,
+          order: 1,
+          isTrue: 1,
+          name: "第一个测试接口",
+          isInterface: {
+            id: 1,
+            name: "第一个接口"
+          },
+          status: "已完成",
+          createrUser: "冯凡",
+          createrTime: "2020:05:20 22:28"
+        },
+        {
+          id: 1,
+          order: 1,
+          isTrue: 1,
+          name: "第一个测试接口",
+          isInterface: {
+            id: 1,
+            name: "第一个接口"
+          },
+          status: "已完成",
+          createrUser: "冯凡",
+          createrTime: "2020:05:20 22:28"
+        },
+        {
+          id: 1,
+          order: 1,
+          isTrue: 1,
+          name: "第一个测试接口",
+          isInterface: {
+            id: 1,
+            name: "第一个接口"
+          },
+          status: "已完成",
+          createrUser: "冯凡",
+          createrTime: "2020:05:20 22:28"
+        },
+        {
+          id: 1,
+          order: 1,
+          isTrue: 1,
+          name: "第一个测试接口",
+          isInterface: {
+            id: 1,
+            name: "第一个接口"
+          },
+          status: "已完成",
+          createrUser: "冯凡",
+          createrTime: "2020:05:20 22:28"
+        },
+        {
+          id: 1,
+          order: 1,
+          isTrue: 1,
+          name: "第一个测试接口",
+          isInterface: {
+            id: 1,
+            name: "第一个接口"
+          },
+          status: "已完成",
+          createrUser: "冯凡",
+          createrTime: "2020:05:20 22:28"
+        },
+        {
+          id: 1,
+          order: 1,
+          isTrue: 1,
+          name: "第一个测试接口",
+          isInterface: {
+            id: 1,
+            name: "第一个接口"
+          },
+          status: "已完成",
+          createrUser: "冯凡",
+          createrTime: "2020:05:20 22:28"
+        }
+      ],
+      multipleSelection: [] //选中执行的用例id
     };
   },
   methods: {
@@ -868,16 +1073,15 @@ export default {
     },
     //将对象转化为 换行的格式
     reversePushHeader() {
-      
-      console.log("2",this.requestsHeader.keys)
-      if (this.requestsHeader.keys.length >0) {
+      console.log("2", this.requestsHeader.keys);
+      if (this.requestsHeader.keys.length > 0) {
         //导入前先清空keys列表
-        this.pushHeaderText=""
+        this.pushHeaderText = "";
         var lists = [];
         this.requestsHeader.keys.forEach((item, index) => {
           if (index !== this.requestsHeader - 1) {
-            if( item.headerValue===undefined){
-              item.headerValue=""
+            if (item.headerValue === undefined) {
+              item.headerValue = "";
             }
             var str = item.headerKey.concat(":", item.headerValue);
             lists.push(str);
@@ -892,12 +1096,13 @@ export default {
       var ele = self.currentTarget;
       console.log(ele.classList);
       var eles = document.querySelectorAll(".fileName .activeColor");
-      ele.classList.length == 1
+
+      ele.classList.length === 1
         ? (ele.classList.add("activeColor"),
           eles.forEach((item, index) => {
             item.classList.remove("activeColor");
-          }))
-        : ele.classList.remove("activeColor");
+          })):null
+        // : ele.classList.remove("activeColor");
     },
     //点击分组文件-判断接口文件箭头方向
     isOpen(self, index) {
@@ -979,16 +1184,15 @@ export default {
 
     //删除前置处理项
     removeListToDict(item, a) {
-      
       var ele = this.isBeforeEle(a);
-      if(a===2 && this.reqyestDataTypeRadio===3){
-        var ele =this.requestsDataf
+      if (a === 2 && this.reqyestDataTypeRadio === 3) {
+        var ele = this.requestsDataf;
       }
       var index = ele.keys.indexOf(item);
       if (index !== 0) {
         ele.keys.splice(index, 1);
       }
-      console.log(this.requestsHeader)
+      console.log(this.requestsHeader);
     },
     //编辑顺序时判断是否重复
     changeIndex(index, a) {
@@ -1179,10 +1383,7 @@ export default {
           Message.success("删除成功"))
         : null;
     },
-    //进入列表
-    inCaseList(){
 
-    },
     //顶部选择接口文档
 
     requestsTitile1() {},
@@ -1211,12 +1412,13 @@ export default {
     addContext(self) {
       this.datas.urlAttr = self.post_attr; //替换请求地址
       this.datas.caseDetail = self.interface_detail; //替换用例描述
-      var type=self.post_type
-      console.log(type,typeof type)
-      type!==1 && type!==3
-      ? this.reqyestDataTypeRadio = 1 :this.reqyestDataTypeRadio = type;
-      
-      console.log(this.reqyestDataTypeRadio)
+      var type = self.post_type;
+      console.log(type, typeof type);
+      type !== 1 && type !== 3
+        ? (this.reqyestDataTypeRadio = 1)
+        : (this.reqyestDataTypeRadio = type);
+
+      console.log(this.reqyestDataTypeRadio);
       this.replaceHeader(self); //替换请求头部数据
       this.reqyestDataTypeRadio === 1
         ? this.replaceData(self) //替换请求参数
@@ -1224,7 +1426,6 @@ export default {
         ? this.replaceDataf(self)
         : null;
       this.datas.postMethods = self.post_methods;
-      
     },
     //替换请求头部数据
     replaceHeader(self) {
@@ -1320,6 +1521,28 @@ export default {
     },
     //选择文档之后同步相应数据
 
+    //用例列表
+    //__________________________________________________________________________________________________
+
+    handleCheckedCitiesChange(value) {
+      let checkedCount = value.length;
+      this.checkAll = checkedCount === this.cities.length;
+      this.isIndeterminate =
+        checkedCount > 0 && checkedCount < this.cities.length;
+    },
+    //进入列表
+    inCaseList() {
+      this.statusIng.CaselistOrCaseDetailTstatus = false
+    },
+    caseListBack(){
+      this.statusIng
+        .CaselistOrCaseDetailTstatus=true
+    },
+    caseSelection(val) {
+      //选中的item val是一个对象列表--
+      this.multipleSelection = val;
+      console.log(this.multipleSelection);
+    },
     //以下方法为接口请求
     // ________________________________________________________________
     //查询该项目下的接口文件以及对象的接口文档
@@ -1774,6 +1997,28 @@ export default {
   display: inline-block;
   float: right;
 }
+
+// __________________________________________________
+// caseList
+.caseList{
+  margin-top: 20px;
+  overflow-x:hidden ;
+  max-height: 730px;
+  min-height: 730px;
+  position: relative;
+}
+.caseOrder{
+  width: 58px;
+  border: none;
+  height: 20px;
+  
+}
+.caseFoot{
+  // margin-top: 50px;
+  text-align: center;
+  margin-top: 35px;
+}
+
 </style>
 
 <style>
@@ -1807,5 +2052,10 @@ export default {
 }
 .pushHeader .el-textarea__inner {
   min-height: 300px !important;
+}
+/* // __________________________________________________
+// caseList */
+.caseList .cell button {
+  padding: 0;
 }
 </style>
