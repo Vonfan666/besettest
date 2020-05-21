@@ -2,50 +2,47 @@
   <div class="messageBox" @click="clickAll($event)">
     <div class="ms-text"></div>
 
-    <div class="mb-text"  :style="styleCode" >
-      <slot name="addFiels">
-      </slot>
-      <slot name="postJsonData">
-      </slot>
+    <div class="mb-text" :style="styleCode">
+      <slot name="addFiels"></slot>
+      <slot name="postJsonData"></slot>
       <slot name="environment">
         <!-- 变量 -->
       </slot>
-      
-      <slot name="project">
-        
-      </slot>
+
+      <slot name="project"></slot>
       <slot name="mockData">
         <!-- mock数据页面 -->
       </slot>
-      <slot name="caseAddFiles">
-      </slot>
-      <slot name="caseAddInterface">
-      </slot>
+      <slot name="caseAddFiles"></slot>
+      <slot name="caseAddInterface"></slot>
       <slot name="Cenvironment">
         <!-- 变量 -->
       </slot>
+
       <slot name="pushHeader"></slot>
+
+      <slot name="isUnityBox">
+        <!-- 同步数据弹窗 -->
+      </slot>
     </div>
   </div>
 </template>
 
 <script>
 export default {
-  props:["styleCode","statusCode"],
+  props: ["styleCode", "statusCode"],
   data() {
     return {
       test: "ceshi"
-      
     };
   },
-  methods:{
-    clickAll(a){
-      var ele=document.querySelector(".mb-text")
-      if(ele){
-
-        if(!ele.contains(a.target)){
+  methods: {
+    clickAll(a) {
+      var ele = document.querySelector(".mb-text");
+      if (ele) {
+        if (!ele.contains(a.target)) {
           // this.statusCode=!this.statusCode
-          this.$emit("update:statusCode",!this.statusCode)
+          this.$emit("update:statusCode", !this.statusCode);
         }
       }
     }
@@ -53,7 +50,6 @@ export default {
   // created(){
   //   console.log(this.styleCode,"11111")
   // }
-
 };
 </script>
 
@@ -84,7 +80,7 @@ export default {
 }
 </style>
 <style>
-.messageBox .el-form-item__label{
- color: black;
+.messageBox .el-form-item__label {
+  color: black;
 }
 </style>

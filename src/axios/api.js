@@ -133,3 +133,9 @@ export const EnvironmentsDelete=(params)=>{
     return postRequest("/users/environment_delete/",params)
 }
 
+//修改用例管理文件同步状态
+export const ProjectUnityStatus=(params)=>{
+    return postRequest("/users/unity_project/",params)
+}
+
+

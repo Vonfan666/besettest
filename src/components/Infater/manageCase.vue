@@ -640,6 +640,23 @@
         </div>
       </div>
     </caseAddFiles-box>
+
+    <unity-box v-slot:isUnityBox v-if="statusIng.isUnifyStatus" :styleCode="isUnifyStyle"> 
+
+      <div style="margin-top:50px" >
+        <ul  style="text-align:left;">
+          <li style="margin:10px 0">选择同步,用例文件目录则会同步接口文档数据,且后续无法继续同步</li>
+          <li style="margin:10px 0">选择取消,则永不同步数据,下次不会继续提示同步弹窗</li>
+          <li style="margin:10px 0">下次再说,下次进入则会继续弹出该同步窗口</li>
+        </ul>
+        <div style="margin-top:50px">
+          <el-button type="primary" size="small" @click="isUnity(1)">取消</el-button>
+          <el-button type="primary" size="small" @click="isUnity(2)">下次再说</el-button>
+          <el-button type="primary" size="small" @click="isUnity(3)">同步</el-button>
+        </div >
+      </div>
+
+    </unity-box>
     <!-- <pushHeader-box v-slot:pushHeader :styleCode="pushHeaderStyle" v-if="statusIng.pushHeaderStatus">
       <div class="pushHeader" style="margin:10px">
         <el-input type="pushHeaderText" placeholder="请输入内容" v-model="pushHeaderText"></el-input>
@@ -684,7 +701,9 @@ import {
   SelectFile,
   InterfaceDetailGet,
   postMethods,
-  EnvironmentsSelect
+  EnvironmentsSelect,
+  projectList,
+  ProjectUnityStatus
 } from "../../axios/api.js";
 import storage from "../../libs/storage";
 
@@ -692,10 +711,12 @@ export default {
   components: {
     "pushHeader-box": () => import("../public/MessageBox.vue"),
     "caseAddFiles-box": () => import("../public/MessageBox.vue"),
-    "enviroment-box": () => import("../public/environment.vue")
+    "enviroment-box": () => import("../public/environment.vue"),
+    "unity-box": () => import("../public/MessageBox.vue"),
   },
   data() {
     return {
+      isUnifyStyle:"width:400px;height:300px",
       pushHeaderText: "",
       pushHeaderStyle: "height:500px;width:500px",
       model: {
@@ -723,7 +744,8 @@ export default {
         caseAddInterfaceBoxStatus: false,
         enviromentStatus: false,
         pushHeaderStatus: true,
-        CaselistOrCaseDetailTstatus: true
+        CaselistOrCaseDetailTstatus: true,
+        isUnifyStatus:false,
       },
       inputStatus: 1, //input输入替换成div输入-显示引用的环境变量的颜色
       searchName: "", //接口搜索名称
@@ -1558,7 +1580,6 @@ export default {
     // ________________________________________________________________
     //查询该项目下的接口文件以及对象的接口文档
     SelectFile() {
-      //如果用例分组返回为空则默认请求当前接口文档分组
       SelectFile({
         projectId: storage.get("projectId")
       }).then(res => {
@@ -1599,12 +1620,42 @@ export default {
           // this.statusIng.enviromentStatus = !this.statusIng.enviromentStatus;
         }
       });
-    }
+    },
+
+    //判断用户是否同步过数据
+    projectList(){
+      projectList({
+        id:storage.get("projectId")
+      }).then(res=>{
+        res.results.status===0
+        ?
+        this.statusIng.isUnifyStatus=true
+        :null
+      })
+    },
+    //操作用例文件是否同步
+    isUnity(key){
+      ProjectUnityStatus({
+        id:storage.get("projectId"),
+        key:key,
+        userId:storage.get("userId")
+      }).then(res=>{
+        this.statusIng.isUnifyStatus=false
+        res.status===200
+        ?
+        (Message.success(res.msg), 
+        key===3?this.SelectFile():null
+        
+        )
+        :Message.error(res.msg)
+      })
+    },
   },
   Update() {},
   mounted() {
     this.changeRequstsBeforeOneColor();
-    this.SelectFile();
+    // this.SelectFile();
+    this.projectList()
     this.EnvironmentsSelect();
   },
   // computed() {
@@ -1616,7 +1667,7 @@ export default {
       handler: function(newValue, oldValue) {
         console.log(newValue, oldValue);
         if (newValue !== oldValue) {
-          this.SelectFile();
+          this.projectList()
         }
       },
       deep: true
