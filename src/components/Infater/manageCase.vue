@@ -103,9 +103,9 @@
           <el-table :data="caseList" border style="width: 100%" @selection-change="caseSelection">
             <el-table-column fixed prop="date" type="selection" width="50"></el-table-column>
             <el-table-column prop="order" label="执行顺序" width="80" >
-                <template slot-scope="scope" >
+                <!-- <template slot-scope="scope" >
                   <input v-model="scope.row.order" class="caseOrder">
-              </template>
+              </template> -->
             </el-table-column>
             <el-table-column prop="name" label="名称"></el-table-column>
             <el-table-column prop="isInterface.name" label="所属接口" width="250"></el-table-column>
@@ -165,6 +165,15 @@
 
           <div class="title-detail-context">
             <el-form :model="datas" :rules="rules" ref="refFrom" label-width="100px">
+                <div class="interfaName-1">
+                  <el-form-item label="执行顺序" prop="order">
+                    <el-input
+                      placeholder="请输入执行顺序"
+                      v-model="datas.order"
+                      clearable
+                    ></el-input>
+                    </el-form-item>
+                  </div>
               <div class="interfaName-1">
                 <el-form-item label="选择接口" prop>
                   <el-select
@@ -759,7 +768,8 @@ export default {
         urlPort: "", //端口
         urlPostType: 1, //请求类型
         caseDetail: "", //用例描述
-        postMethods: ""
+        postMethods: "",
+        order:""
       },
       reqyestDataTypeRadio: 1, //提交的参数类型
       //前置处理器
@@ -867,7 +877,8 @@ export default {
         beforePlan: [{ required: true, message: "必填" }],
         addGroupName: [{ required: true, message: "必填" }],
         addInterfaceName: [{ required: true, message: "必填" }],
-        postMethods: [{ required: true, message: "必填" }]
+        postMethods: [{ required: true, message: "必填" }],
+        order:[{ required: true, message: "必填" }],
         // beforeName: [{ required: true, message: "请输入名称" }]
       },
       caseList: [
