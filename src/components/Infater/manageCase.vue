@@ -1625,11 +1625,13 @@ export default {
     //判断用户是否同步过数据
     projectList(){
       projectList({
-        id:storage.get("projectId")
+        id:storage.get("projectId"),
+        userId:storage.get("userId")
       }).then(res=>{
-        res.results.status===0
+        res.status===200 && res.code===1
         ?
         this.statusIng.isUnifyStatus=true
+
         :null
       })
     },
@@ -1640,15 +1642,19 @@ export default {
         key:key,
         userId:storage.get("userId")
       }).then(res=>{
-        this.statusIng.isUnifyStatus=false
+        
         res.status===200
         ?
-        (Message.success(res.msg), 
+        (this.statusIng.isUnifyStatus=false,Message.success(res.msg), 
         key===3?this.SelectFile():null
         
         )
         :Message.error(res.msg)
       })
+    },
+    //查询case分组以及用例
+    selectingCase(){
+
     },
   },
   Update() {},
