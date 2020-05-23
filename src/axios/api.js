@@ -138,4 +138,43 @@ export const ProjectUnityStatus=(params)=>{
     return postRequest("/users/unity_project/",params)
 }
 
+//获取用例文件夹内容以及用例接口内容
 
+
+export const CaseGroup=(params)=>{
+    return getRequest("/users/select_caseGroup/",params)
+}
+
+
+//添加用例文件夹
+export const AddGroup=(params)=>{
+    return postRequest("/users/caseGroup_add/",params)
+}
+
+//修改用例文件夹名称
+export const EditGroup=(params)=>{
+    return postRequest("/users/caseGroup_edit/",params)
+}
+
+
+//删除用例文件夹
+export const RemoveGroup=(params)=>{
+    return postRequest("/users/caseGroup_remove/",params)
+    
+}
+
+//新增用例接口文件
+export const AddCase=(params)=>{
+    return postRequest("/users/caseInterface_add/",params)
+    
+}
+
+//编辑接口用例文件
+export const EditCase=(params)=>{
+    return postRequest("/users/caseInterface_edit/",params)   
+}
+
+//删除接口用例文件
+export const RemoveCase=(params)=>{
+    return postRequest("/users/caseInterface_remove/",params)   
+}

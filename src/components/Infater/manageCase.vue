@@ -27,7 +27,7 @@
             <p
               v-for="(item,index) in searchList"
               :key="index"
-              @click="searchResult(item.fid,item.id)"
+              @click="searchResult(item.CaseGroupFilesId,item.id)"
             >{{item.name}}</p>
           </div>
         </div>
@@ -62,7 +62,7 @@
             </div>
             <div
               class="fileNameChild"
-              v-for="(item1,index1) in item.Clist"
+              v-for="(item1,index1) in item.idCaseGroupFiles"
               :name="item1.id"
               :key="index1"
               @click="changeColor($event),inCaseList()"
@@ -102,10 +102,10 @@
         <div class="caseList">
           <el-table :data="caseList" border style="width: 100%" @selection-change="caseSelection">
             <el-table-column fixed prop="date" type="selection" width="50"></el-table-column>
-            <el-table-column prop="order" label="执行顺序" width="80" >
-                <!-- <template slot-scope="scope" >
+            <el-table-column prop="order" label="执行顺序" width="80">
+              <!-- <template slot-scope="scope" >
                   <input v-model="scope.row.order" class="caseOrder">
-              </template> -->
+              </template>-->
             </el-table-column>
             <el-table-column prop="name" label="名称"></el-table-column>
             <el-table-column prop="isInterface.name" label="所属接口" width="250"></el-table-column>
@@ -113,7 +113,7 @@
             <el-table-column prop="createrUser" label="创建人" width="80"></el-table-column>
             <el-table-column prop="createrTime" label="创建时间" width="150"></el-table-column>
             <el-table-column fixed="right" label="操作" width="200">
-              <template slot-scope="scope" >
+              <template slot-scope="scope">
                 <!-- <el-button @click="handleClick(scope.row)" type="text" size="small">查看</el-button> -->
                 <el-button type="text" size="small">删除</el-button>
                 <el-button type="text" size="small">编辑</el-button>
@@ -123,13 +123,13 @@
           </el-table>
         </div>
         <div class="caseFoot">
-            <div class="caseFoot-1">
-                <el-button type="primary"  @click="caseListBack()">返回</el-button>
-                <el-button type="primary" size="primary">保存</el-button>
-                <el-button type="primary" size="primary">调试</el-button>
-                <el-button type="primary" size="primary">查看结果</el-button>
-            </div>
-    </div>
+          <div class="caseFoot-1">
+            <el-button type="primary" @click="caseListBack()">返回</el-button>
+            <el-button type="primary" size="primary">保存</el-button>
+            <el-button type="primary" size="primary">调试</el-button>
+            <el-button type="primary" size="primary">查看结果</el-button>
+          </div>
+        </div>
       </div>
     </div>
     <div class="manageCase-right" v-show="statusIng.CaselistOrCaseDetailTstatus">
@@ -165,15 +165,11 @@
 
           <div class="title-detail-context">
             <el-form :model="datas" :rules="rules" ref="refFrom" label-width="100px">
-                <div class="interfaName-1">
-                  <el-form-item label="执行顺序" prop="order">
-                    <el-input
-                      placeholder="请输入执行顺序"
-                      v-model="datas.order"
-                      clearable
-                    ></el-input>
-                    </el-form-item>
-                  </div>
+              <div class="interfaName-1">
+                <el-form-item label="执行顺序" prop="order">
+                  <el-input placeholder="请输入执行顺序" v-model="datas.order" clearable></el-input>
+                </el-form-item>
+              </div>
               <div class="interfaName-1">
                 <el-form-item label="选择接口" prop>
                   <el-select
@@ -593,7 +589,7 @@
         </div>
       </div>
     </div>
-    
+
     <caseAddFiles-box
       v-slot:caseAddFiles
       :styleCode="caseAddFilesBoxStyle"
@@ -603,7 +599,7 @@
         <h3>新建用例分组</h3>
 
         <div class="caseBoxInput">
-          <el-form :model="caseGroupDatats" :rules="rules" ref="refFrom" label-width="80px">
+          <el-form :model="caseGroupDatats" :rules="rules" ref="AddGroup" label-width="80px">
             <el-form-item label="分组名称" prop="addGroupName">
               <el-input v-model="caseGroupDatats.addGroupName"></el-input>
             </el-form-item>
@@ -641,10 +637,9 @@
       </div>
     </caseAddFiles-box>
 
-    <unity-box v-slot:isUnityBox v-if="statusIng.isUnifyStatus" :styleCode="isUnifyStyle"> 
-
-      <div style="margin-top:50px" >
-        <ul  style="text-align:left;">
+    <unity-box v-slot:isUnityBox v-if="statusIng.isUnifyStatus" :styleCode="isUnifyStyle">
+      <div style="margin-top:50px">
+        <ul style="text-align:left;">
           <li style="margin:10px 0">选择同步,用例文件目录则会同步接口文档数据,且后续无法继续同步</li>
           <li style="margin:10px 0">选择取消,则永不同步数据,下次不会继续提示同步弹窗</li>
           <li style="margin:10px 0">下次再说,下次进入则会继续弹出该同步窗口</li>
@@ -653,9 +648,8 @@
           <el-button type="primary" size="small" @click="isUnity(1)">取消</el-button>
           <el-button type="primary" size="small" @click="isUnity(2)">下次再说</el-button>
           <el-button type="primary" size="small" @click="isUnity(3)">同步</el-button>
-        </div >
+        </div>
       </div>
-
     </unity-box>
     <!-- <pushHeader-box v-slot:pushHeader :styleCode="pushHeaderStyle" v-if="statusIng.pushHeaderStatus">
       <div class="pushHeader" style="margin:10px">
@@ -703,7 +697,14 @@ import {
   postMethods,
   EnvironmentsSelect,
   projectList,
-  ProjectUnityStatus
+  ProjectUnityStatus,
+  CaseGroup,
+  AddGroup,
+  EditGroup,
+  RemoveGroup,
+  AddCase,
+  EditCase,
+  RemoveCase
 } from "../../axios/api.js";
 import storage from "../../libs/storage";
 
@@ -712,11 +713,11 @@ export default {
     "pushHeader-box": () => import("../public/MessageBox.vue"),
     "caseAddFiles-box": () => import("../public/MessageBox.vue"),
     "enviroment-box": () => import("../public/environment.vue"),
-    "unity-box": () => import("../public/MessageBox.vue"),
+    "unity-box": () => import("../public/MessageBox.vue")
   },
   data() {
     return {
-      isUnifyStyle:"width:400px;height:300px",
+      isUnifyStyle: "width:400px;height:300px",
       pushHeaderText: "",
       pushHeaderStyle: "height:500px;width:500px",
       model: {
@@ -745,7 +746,7 @@ export default {
         enviromentStatus: false,
         pushHeaderStatus: true,
         CaselistOrCaseDetailTstatus: true,
-        isUnifyStatus:false,
+        isUnifyStatus: false
       },
       inputStatus: 1, //input输入替换成div输入-显示引用的环境变量的颜色
       searchName: "", //接口搜索名称
@@ -791,7 +792,7 @@ export default {
         urlPostType: 1, //请求类型
         caseDetail: "", //用例描述
         postMethods: "",
-        order:""
+        order: ""
       },
       reqyestDataTypeRadio: 1, //提交的参数类型
       //前置处理器
@@ -900,11 +901,10 @@ export default {
         addGroupName: [{ required: true, message: "必填" }],
         addInterfaceName: [{ required: true, message: "必填" }],
         postMethods: [{ required: true, message: "必填" }],
-        order:[{ required: true, message: "必填" }],
+        order: [{ required: true, message: "必填" }]
         // beforeName: [{ required: true, message: "请输入名称" }]
       },
       caseList: [
-        
         {
           id: 1,
           order: 1,
@@ -1134,8 +1134,9 @@ export default {
         ? (ele.classList.add("activeColor"),
           eles.forEach((item, index) => {
             item.classList.remove("activeColor");
-          })):null
-        // : ele.classList.remove("activeColor");
+          }))
+        : null;
+      // : ele.classList.remove("activeColor");
     },
     //点击分组文件-判断接口文件箭头方向
     isOpen(self, index) {
@@ -1276,7 +1277,7 @@ export default {
     searchNameMethod() {
       console.log("揍你", this.searchName, typeof this.searchName);
       var searList = this.caseGroupList.map(row =>
-        row.Clist.filter(rows => rows.name.includes(this.searchName))
+        row.idCaseGroupFiles.filter(rows => rows.name.includes(this.searchName))
       );
       console.log("searList", searList);
       var endSearList = searList.filter(
@@ -1301,7 +1302,7 @@ export default {
         if (item.id === fid) {
           this.fileNameIcon.splice(index, 1, "el-icon-caret-bottom");
           this.fileNameChildStatus.splice(index, 1, true);
-          item.Clist.forEach((item1, index1) => {
+          item.idCaseGroupFiles.forEach((item1, index1) => {
             console.log(item1.id, cid);
             if (item1.id === cid) {
               var eles = document.querySelectorAll(".fileName .activeColor");
@@ -1321,18 +1322,28 @@ export default {
     },
     //新建文件确认提交
     caseAddGroupSubmit() {
-      //先请求添加分组接口--成功之后
-      this.caseGroupList.push({
-        id: "",
-        name: this.caseGroupDatats.addGroupName,
-        projectId_id: "",
-        Clist: []
+      //先请求添加分组接口
+      this.$refs.AddGroup.validate(valid => {
+        if (valid) {
+          AddGroup({
+            projectId: storage.get("projectId"),
+            userId: storage.get("userId"),
+            name: this.caseGroupDatats.addGroupName
+          }).then(res => {
+            res.status === 200
+              ? (this.caseGroupList.push(res.results),
+                //默认添加的该文件不展开
+                this.fileNameChildStatus.push(false),
+                //默认新增分组箭头向右
+                this.fileNameIcon.push("el-icon-caret-right"),
+                (this.statusIng.caseAddFilesBoxStatus = false),
+                (this.searchName = ""))
+              : null;
+          });
+        } else {
+          return false;
+        }
       });
-      //默认添加的该文件不展开
-      this.fileNameChildStatus.push(false);
-      //默认新增分组箭头向右
-      this.fileNameIcon.push("el-icon-caret-right");
-      this.statusIng.caseAddFilesBoxStatus = false;
     },
     //新建用例接口,操作按钮
     caseAddInterfaceSubmit() {
@@ -1344,45 +1355,77 @@ export default {
         var findex = this.commandCode[2];
         if (status === "a") {
           //如果等于a则是用例分组新增
-          //请求新增接口成功之后再push到对应的列表
-          this.caseGroupList[findex].Clist.push({
-            fid: fid,
-            id: 1,
-            name: this.caseGroupDatats.addInterfaceName,
-            createUserName: "test"
+          this.$refs.refFrom.validate(valid => {
+            if (valid) {
+              AddCase({
+                CaseGroupFilesId: fid,
+                userId: storage.get("userId"),
+                name: this.caseGroupDatats.addInterfaceName
+              }).then(res => {
+                if (res.status === 200) {
+                  this.caseGroupList[findex].idCaseGroupFiles.push(res.results);
+                  this.statusIng.caseAddInterfaceBoxStatus = false;
+                  this.commandCode = null;
+                  this.caseGroupDatats.addInterfaceName = null;
+                }
+              });
+            }
           });
-          //关闭后请求
-          this.statusIng.caseAddInterfaceBoxStatus = false;
-          this.commandCode = null;
-          this.caseGroupDatats.addInterfaceName = null;
         }
         if (status === "b") {
           //如果等于a则是用例分组新增
           //请求新增接口成功之后再push到对应的列表
-          this.caseGroupList[
-            findex
-          ].name = this.caseGroupDatats.addInterfaceName;
-          //关闭后请求
-          this.statusIng.caseAddInterfaceBoxStatus = false;
-          this.commandCode = null;
-          this.caseGroupDatats.addInterfaceName = null;
+          this.$refs.refFrom.validate(valid => {
+            if (valid) {
+              EditGroup({
+                id: fid,
+                name: this.caseGroupDatats.addInterfaceName
+              }).then(res => {
+                res.status === 200
+                  ? ((this.caseGroupList[findex].name = res.results.name),
+                    //关闭后请求
+                    (this.statusIng.caseAddInterfaceBoxStatus = false),
+                    (this.commandCode = null),
+                    (this.caseGroupDatats.addInterfaceName = null),
+                    (this.caseGroupDatats.addInterfaceName = ""))
+                  : null;
+              });
+            }
+          });
+          // this.caseGroupList[
+          //   findex
+          // ].name = this.caseGroupDatats.addInterfaceName;
+          // //关闭后请求
+          // this.statusIng.caseAddInterfaceBoxStatus = false;
+          // this.commandCode = null;
+          // this.caseGroupDatats.addInterfaceName = null;
         }
       }
       if (type === "child") {
         console.log();
         var status = this.commandCode[0];
         var findex = this.commandCode[2];
+        var cid = this.commandCode[3];
         var cindex = this.commandCode[4];
         if (status === "b") {
-          this.caseGroupList[findex].Clist[
-            cindex
-          ].name = this.caseGroupDatats.addInterfaceName;
+          this.$refs.refFrom.validate(valid => {
+            if (valid) {
+              EditCase({
+                id: cid,
+                name: this.caseGroupDatats.addInterfaceName
+              }).then(res => {
+                res.status === 200
+                  ? ((this.caseGroupList[findex].idCaseGroupFiles[cindex].name =
+                      res.results.name),
+                    (this.statusIng.caseAddInterfaceBoxStatus = false),
+                    (this.commandCode = null),
+                    (this.caseGroupDatats.addInterfaceName = null),
+                    Message.success("接口文档名称修改成功"))
+                  : null;
+              });
+            }
+          });
         }
-        //关闭后请求
-        this.statusIng.caseAddInterfaceBoxStatus = false;
-        this.commandCode = null;
-        this.caseGroupDatats.addInterfaceName = null;
-        Message.success("接口文档名称修改成功");
       }
     },
     //操作接口文件
@@ -1394,8 +1437,14 @@ export default {
           (this.caseBoxLable = "接口名称"),
           (this.commandCode = command))
         : command[0] === "c"
-        ? (this.caseGroupList[command[2]].Clist.splice(command[4], 1),
-          Message.success("删除成"))
+        ? RemoveCase({
+            id: command[3]
+          }).then(res => {
+            res.status === 200
+              ? (this.caseGroupList[command[2]].idCaseGroupFiles.splice(command[4], 1),
+                Message.success("删除成"))
+              : null;
+          })
         : null;
     },
     //操作分组文件
@@ -1412,8 +1461,14 @@ export default {
           (this.caseBoxLable = "分组名称"),
           (this.commandCode = command))
         : command[0] === "c"
-        ? (this.caseGroupList.splice(command[2], 1),
-          Message.success("删除成功"))
+        ? RemoveGroup({
+            id: command[1]
+          }).then(res => {
+            res.status === 200
+              ? (this.caseGroupList.splice(command[2], 1),
+                Message.success("删除成功"))
+              : null;
+          })
         : null;
     },
 
@@ -1549,7 +1604,7 @@ export default {
     filesNames() {
       console.log("111", this.caseGroupList);
       this.caseGroupList.forEach((item, index) => {
-        this.filesName = this.filesName.concat(item.Clist);
+        this.filesName = this.filesName.concat(item.idCaseGroupFiles);
       });
     },
     //选择文档之后同步相应数据
@@ -1565,11 +1620,10 @@ export default {
     },
     //进入列表
     inCaseList() {
-      this.statusIng.CaselistOrCaseDetailTstatus = false
+      this.statusIng.CaselistOrCaseDetailTstatus = false;
     },
-    caseListBack(){
-      this.statusIng
-        .CaselistOrCaseDetailTstatus=true
+    caseListBack() {
+      this.statusIng.CaselistOrCaseDetailTstatus = true;
     },
     caseSelection(val) {
       //选中的item val是一个对象列表--
@@ -1592,6 +1646,7 @@ export default {
       });
     },
     postMethodss() {
+      //获取请求方法---获取用力的请求方法
       postMethods().then(res => {
         if (res.status === 200) {
           this.postMethods = res.res_post_methods;
@@ -1623,45 +1678,50 @@ export default {
     },
 
     //判断用户是否同步过数据
-    projectList(){
+    projectList() {
+      this.caseGroupList = [];
       projectList({
-        id:storage.get("projectId"),
-        userId:storage.get("userId")
-      }).then(res=>{
-        res.status===200 && res.code===1
-        ?
-        this.statusIng.isUnifyStatus=true
-
-        :null
-      })
+        id: storage.get("projectId"),
+        userId: storage.get("userId")
+      }).then(res => {
+        res.status === 200 && res.code === 1
+          ? (this.statusIng.isUnifyStatus = true)
+          : this.selectionCase();
+      });
     },
     //操作用例文件是否同步
-    isUnity(key){
+    isUnity(key) {
       ProjectUnityStatus({
-        id:storage.get("projectId"),
-        key:key,
-        userId:storage.get("userId")
-      }).then(res=>{
-        
-        res.status===200
-        ?
-        (this.statusIng.isUnifyStatus=false,Message.success(res.msg), 
-        key===3?this.SelectFile():null
-        
-        )
-        :Message.error(res.msg)
-      })
+        id: storage.get("projectId"),
+        key: key,
+        userId: storage.get("userId")
+      }).then(res => {
+        res.status === 200
+          ? ((this.statusIng.isUnifyStatus = false),
+            Message.success(res.msg),
+            key === 3 ? this.selectionCase() : null)
+          : Message.error(res.msg);
+      });
     },
     //查询case分组以及用例
-    selectingCase(){
-
-    },
+    selectionCase() {
+      CaseGroup({
+        id: storage.get("projectId")
+      }).then(res => {
+        res.status === 200
+          ? ((this.caseGroupList = res.results),
+            this.filesLen(),
+            this.filesNames(),
+            this.postMethodss())
+          : null;
+      });
+    }
   },
   Update() {},
   mounted() {
     this.changeRequstsBeforeOneColor();
     // this.SelectFile();
-    this.projectList()
+    this.projectList();
     this.EnvironmentsSelect();
   },
   // computed() {
@@ -1671,9 +1731,9 @@ export default {
   watch: {
     $route: {
       handler: function(newValue, oldValue) {
-        console.log(newValue, oldValue);
+        console.log("路由变化", newValue, oldValue);
         if (newValue !== oldValue) {
-          this.projectList()
+          this.projectList();
         }
       },
       deep: true
@@ -2068,25 +2128,23 @@ export default {
 
 // __________________________________________________
 // caseList
-.caseList{
+.caseList {
   margin-top: 20px;
-  overflow-x:hidden ;
+  overflow-x: hidden;
   max-height: 730px;
   min-height: 730px;
   position: relative;
 }
-.caseOrder{
+.caseOrder {
   width: 58px;
   border: none;
   height: 20px;
-  
 }
-.caseFoot{
+.caseFoot {
   // margin-top: 50px;
   text-align: center;
   margin-top: 35px;
 }
-
 </style>
 
 <style>
