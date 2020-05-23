@@ -171,11 +171,11 @@
                 </el-form-item>
               </div>
               <div class="interfaName-1">
-                <el-form-item label="选择接口" prop>
+                <el-form-item label="数据同步" prop>
                   <el-select
                     v-model="datas.isInterfaceId"
                     filterable
-                    placeholder="请选择接口文档"
+                    placeholder="请选择接口同步数据"
                     @change="chiocesInterface()"
                   >
                     <el-option
@@ -189,9 +189,9 @@
               </div>
               <div class="interfaName-1">
                 <el-form-item label="选择分组" prop="caseGroupId">
-                  <el-select v-model="datas.caseGroupId" filterable placeholder="请选择用例分组">
+                  <el-select v-model="datas.caseGroupId" filterable placeholder="请选择所属接口">
                     <el-option
-                      v-for="(item,index) in caseGroupList"
+                      v-for="(item,index) in caseGroupListInterface"
                       :key="index"
                       :label="item.name"
                       :value="item.id"
@@ -754,6 +754,7 @@ export default {
       manageCaseLefStatus: true, //左侧是否展示
       //分组列表,其包含子级用例,当该项目用例分组为空时，则默认展示所有接口分组name
       caseGroupList: [],
+      caseGroupListInterface: [],
       //文件名称箭头方向 el-icon-caret-bottom向下，默认向右
       fileNameIcon: [],
       fileNameChildStatus: [], //添加false数量默认为文件夹个数
@@ -1363,17 +1364,19 @@ export default {
                 name: this.caseGroupDatats.addInterfaceName
               }).then(res => {
                 if (res.status === 200) {
+                  
                   this.caseGroupList[findex].idCaseGroupFiles.push(res.results);
                   this.statusIng.caseAddInterfaceBoxStatus = false;
                   this.commandCode = null;
                   this.caseGroupDatats.addInterfaceName = null;
+                  this.groupFileWithInterface();
                 }
               });
             }
           });
         }
         if (status === "b") {
-          //如果等于a则是用例分组新增
+          //如果等于b则是编辑分组文件名称
           //请求新增接口成功之后再push到对应的列表
           this.$refs.refFrom.validate(valid => {
             if (valid) {
@@ -1420,6 +1423,7 @@ export default {
                     (this.statusIng.caseAddInterfaceBoxStatus = false),
                     (this.commandCode = null),
                     (this.caseGroupDatats.addInterfaceName = null),
+                    this.groupFileWithInterface(),
                     Message.success("接口文档名称修改成功"))
                   : null;
               });
@@ -1441,7 +1445,11 @@ export default {
             id: command[3]
           }).then(res => {
             res.status === 200
-              ? (this.caseGroupList[command[2]].idCaseGroupFiles.splice(command[4], 1),
+              ? (this.caseGroupList[command[2]].idCaseGroupFiles.splice(
+                  command[4],
+                  1
+                ),
+                this.groupFileWithInterface(),
                 Message.success("删除成"))
               : null;
           })
@@ -1466,6 +1474,7 @@ export default {
           }).then(res => {
             res.status === 200
               ? (this.caseGroupList.splice(command[2], 1),
+                this.groupFileWithInterface(),
                 Message.success("删除成功"))
               : null;
           })
@@ -1600,11 +1609,11 @@ export default {
       Ele.style.cssText =
         "background-color:rgb(98, 161, 239);color:rgb(248, 248, 251);border-radius: 5px";
     },
-    //遍历左侧接口文件下的 接口文档并选择
-    filesNames() {
+    //遍历后台返回的接口文档--并加到filesName去
+    filesNames(self) {
       console.log("111", this.caseGroupList);
-      this.caseGroupList.forEach((item, index) => {
-        this.filesName = this.filesName.concat(item.idCaseGroupFiles);
+      self.forEach((item, index) => {
+        this.filesName = this.filesName.concat(item.Clist);
       });
     },
     //选择文档之后同步相应数据
@@ -1637,12 +1646,7 @@ export default {
       SelectFile({
         projectId: storage.get("projectId")
       }).then(res => {
-        res.status === 200
-          ? ((this.caseGroupList = res.results),
-            this.filesLen(),
-            this.filesNames(),
-            this.postMethodss())
-          : null;
+        res.status === 200 ? this.filesNames(res.results) : null;
       });
     },
     postMethodss() {
@@ -1703,15 +1707,24 @@ export default {
           : Message.error(res.msg);
       });
     },
-    //查询case分组以及用例
+    //查询case分组以及用例文件
+    groupFileWithInterface() {
+      this.caseGroupListInterface=[]
+      this.caseGroupList.map(row => {
+        this.caseGroupListInterface = this.caseGroupListInterface.concat(
+          row.idCaseGroupFiles
+        );
+      });
+    },
+
     selectionCase() {
       CaseGroup({
         id: storage.get("projectId")
       }).then(res => {
         res.status === 200
           ? ((this.caseGroupList = res.results),
+            this.groupFileWithInterface(),
             this.filesLen(),
-            this.filesNames(),
             this.postMethodss())
           : null;
       });
@@ -1720,7 +1733,7 @@ export default {
   Update() {},
   mounted() {
     this.changeRequstsBeforeOneColor();
-    // this.SelectFile();
+    this.SelectFile();
     this.projectList();
     this.EnvironmentsSelect();
   },
@@ -1948,7 +1961,7 @@ export default {
       width: 100%;
       margin: 10px 0;
       text-align: left;
-      height: 280px;
+      height: 100%;
       background-color: whitesmoke;
       // background-color: silver;
       // display: flex;
@@ -1971,7 +1984,8 @@ export default {
       }
       .interfaName-3 {
         width: 600px;
-        height: 40px;
+        // height: 40px;
+        padding-bottom: 10px;
       }
     }
   }
