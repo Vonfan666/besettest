@@ -538,7 +538,7 @@ export default {
         projectId: storage.get("projectId")
       }).then(res => {
         if (res.status == 200) {
-          console.log("res_results111", res.results);
+          // console.log("res_results111", res.results);
           this.list = res.results;
           Bus.$emit("listValue", this.list);
           // this.$set(

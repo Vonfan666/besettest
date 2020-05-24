@@ -5,15 +5,16 @@
       <div class="Environment">
         <el-form class="top-el-form" :model="model">
           <el-form-item label label-width="63px" label-height="20px" class="top-eft">
-            <el-select v-model="model.chiocsEnvironment" placeholder="请选择测试环境">
+            <el-select v-model="model.chiocsEnvironment" placeholder="请选择接口分组">
               <el-option
-                v-for="(item,index) in Environments"
+                v-for="(item,index) in interfaceListFiles"
                 :key="index"
                 :label="item.name"
                 :value="item.id"
+                @click="chiocesInterface()"
               ></el-option>
             </el-select>
-            <span class="el-icon-plus EnvironmentIcon" @click="EnvironmentIcon()"></span>
+            <span class="EnvironmentIcon">选择分组</span>
           </el-form-item>
         </el-form>
       </div>
@@ -180,211 +181,6 @@
         </keep-alive>
       </div>
       <div>
-        <!--    
-          <select aria-setsize="40" v-model="selected" before="shez">
-              <option disabled value="">请选择需要保存的变量</option>
-              <option v-for="(item,index) in  postheaders" :key=index >{{item.cname}} </option>
-    
-        </select>-->
-        <!-- <el-form>
-          <el-form-item label="请求方法" label-width="63px" class="top-eft">
-            <el-select v-model="selected">
-              <el-option disabled value>请选择需要保存的变量</el-option>
-              <el-option
-                v-for="(item,index) in  postheaders"
-                :key="index"
-                :label="item.cname"
-                :value="item.id"
-              ></el-option>
-            </el-select>
-          </el-form-item>
-        </el-form>-->
-        <el-row class="demo-autocomplete">
-          <div class="pd-title">
-            <!-- <span class="colorCode3">新增环境变量</span> -->
-
-            <el-button type="primary" size="small" @click="clickEnvironment()" class="addCode">
-              <span>添加变量</span>
-            </el-button>
-
-            <environment-box
-              v-slot:environment
-              :styleCode="environmentStyle"
-              v-if="EnvironmentStatus"
-            >
-              <div class="environments" v-if="environments">
-                <div class="environmentsHeader" style="text-align:center">
-                  <h2>添加环境</h2>
-                </div>
-                <div class="environmentsbody" :style="environmentbodyStyle">
-                  <div class="environmentsName" v-for="(item,index) in Environments" :key="index">
-                    <div
-                      @click="EnvironmentsMethod(item,index);EnvironmentsIndex=index;environmentbodyStyle='height: 484px'"
-                    >
-                      <span class="name">{{item.name}}</span>
-                    </div>
-
-                    <div class="EnvironmentsFloat" @click="environmentsDelete(item,index)">
-                      <!-- <span class="environmentsType" v-if="item.type==0 ">环境变量</span>
-                      <span class="environmentsType" v-else>全局变量</span>-->
-                      <span class="environmentsDelete el-icon-close"></span>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="environmentsFoot">
-                  <el-button
-                    type="primary"
-                    class="environmentsBottom"
-                    size="small"
-                    @click="environments=false;environmentbodyStyle='height: 484px;'
-                    EnvironmentStatused=true;
-                    EnvironmentStatus=true;
-                    environmentType=0;
-                    addStatus=1
-                    "
-                  >添加</el-button>
-                  <el-button
-                    type="primary"
-                    class="environmentsBottom"
-                    size="small"
-                    @click="environments=false;environmentbodyStyle='height: 546px;'
-                    EnvironmentStatused=true;
-                    EnvironmentStatus=true;
-                    environmentType=1;
-                    selectGlobal()
-                    "
-                  >全局变量</el-button>
-                  <el-button
-                    type="primary"
-                    class="environmentsBottom"
-                    size="small"
-                    @click="EnvironmentStatus=false;environmentbodyStyle='height: 550px';
-                    environments=false;
-                    
-                    
-                    ;
-                    "
-                  >关闭</el-button>
-                </div>
-              </div>
-
-              <div class="enviromentClass" v-if="EnvironmentStatused">
-                <div class="environmenttitle" style="text-align:center">
-                  <h2 style="margin: 19px 30px;" v-if="environmentType==0">环境变量</h2>
-                  <h2 style="margin: 19px 30px;" v-if="environmentType==1">全局变量</h2>
-                </div>
-                <div class="addEnvironmentName" v-if="environmentType==0">
-                  <div>Environment Name</div>
-                  <div>
-                    <input class="addEnvironmentInput" v-model="Environmentname" />
-                  </div>
-                </div>
-                <div class="environmentbody" :style="environmentbodyStyle">
-                  <el-table :data="EnvironmentList" border style="width: 100%; margin-top: 20px">
-                    <el-table-column label width="59">
-                      <template slot-scope="scope">
-                        <span
-                          class="environmentDelete el-icon-close"
-                          @click="environmentDelete(scope.$index)"
-                        ></span>
-                      </template>
-                    </el-table-column>
-                    <el-table-column label="key" prop="key">
-                      <template slot-scope="scope">
-                        <input class="input" v-model="EnvironmentList[scope.$index].key" />
-                      </template>
-                    </el-table-column>
-                    <el-table-column label="value" prop="value">
-                      <template slot-scope="scope">
-                        <input v-model="EnvironmentList[scope.$index].value" />
-                      </template>
-                    </el-table-column>
-                  </el-table>
-                </div>
-                <div class="environmentFoot">
-                  <el-button
-                    v-if="environmentType==0"
-                    type="primary"
-                    class="environmentBottom"
-                    size="small"
-                    @click="EnvironmentUpdate()"
-                  >保存</el-button>
-                  <el-button
-                    v-if="environmentType==1"
-                    type="primary"
-                    class="environmentBottom"
-                    size="small"
-                    @click="globalsUpdate();environmentbodyStyle='height: 550px;'"
-                  >保存</el-button>
-                  <el-button
-                    type="primary"
-                    class="environmentBottom"
-                    size="small"
-                    @click="EnvironmentInsert()"
-                  >新增</el-button>
-                  <el-button
-                    type="primary"
-                    class="environmentBottom"
-                    size="small"
-                    @click="EnvironmentStatus=true;environmentbodyStyle='height: 550px';
-                    EnvironmentStatused=false;
-                    environments=true;
-                    currentEnvironmentId=null;
-                    currentEnvironmentIndex=null;
-                    EnvironmentList=[];
-                    EnvironmentClear()"
-                  >返回</el-button>
-                  <el-button
-                    type="primary"
-                    class="environmentBottom"
-                    size="small"
-                    @click="environments=false;environmentbodyStyle='height: 550px';
-                    EnvironmentStatused=false;
-                    EnvironmentStatus=false;
-                    currentEnvironmentId=null;
-                    currentEnvironmentIndex=null;
-                    EnvironmentList=[];
-                    EnvironmentClear()"
-                  >关闭</el-button>
-                </div>
-              </div>
-            </environment-box>
-          </div>
-          <!-- <el-col :span="12"> -->
-          <!-- <div class="sub-title" v-for="(item,index) in selected" :key="index">
-              <div class="left">
-                <span>key</span>
-                <el-autocomplete
-                  class="inline-input"
-                  v-model="selected[index]['keys']"
-                  :fetch-suggestions="querySearch"
-                  placeholder="请输入变量名"
-                  :trigger-on-focus="false"
-                  @select="handleSelect(item.keys,index)"
-                ></el-autocomplete>
-              </div>
-              <div class="right">
-                <el-form :model="Environment">
-                  <el-form-item label="value" label-width="70px">
-                    <el-input v-model="Environment.value[index]" clearable placeholder="自动返回变量的值"></el-input>
-                  </el-form-item>
-                  <div class="icon">
-                    <span
-                      class="el-icon-remove-outline"
-                      @click="removeEnvironment(index)"
-                      :disabled="disabled"
-          ></span>-->
-
-          <!-- el-icon-remove-outline
-                    <span class="el-icon-circle-plus-outline" @click="addEnvironment(index)"></span>
-                  </div>
-                </el-form>
-              </div>
-          </div>-->
-          <br />
-          <!-- </el-col> -->
-        </el-row>
         <!-- {{selected}} -->
       </div>
       <div class="pd-title">
@@ -427,9 +223,37 @@
         </div>
       </div>
     </message-box>
+    <ischildId-box v-slot:ischildId :styleCode="styleCode" v-if="ischildIdStatus">
+      <div class="ischild">
+        <div style="text-align:center">
+          <h3>添加接口</h3>
+        </div>
+        <div style="margin:50px 20px;">
+          <el-form :model="model" :rules="rules" ref="ischildRef">
+            <el-form-item label="选择分组" prop="ischildGroupId" label-width="70px">
+              <el-select v-model="model.ischildGroupId">
+                <el-option
+                  v-for="(item,index) in groupList"
+                  :key="index"
+                  :label="item.name"
+                  :value="item.id"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="接口名称" prop="ischildName" label-width="70px">
+              <el-input v-model="model.ischildName" clearable placeholder="请输入用例名称"></el-input>
+            </el-form-item>
+          </el-form>
+        </div>
+        <div style="text-align:center;margin-top:80px">
+          <el-button type="primary" size="small" @click="ischildIdStatus=false">取消</el-button>
+          <el-button type="primary" size="small" @click="ischildIdSubmit()">确认</el-button>
+        </div>
+      </div>
+    </ischildId-box>
 
     <div class="tt">
-      <el-button type="primary" size="small" @click="Submit()">确认</el-button>
+      <el-button type="primary" size="small" @click="ischildId()">确认</el-button>
     </div>
   </div>
 </template>
@@ -443,9 +267,7 @@ import {
   EditInterfaceDetail,
   MockPost,
   MockResData,
-  EnvironmentsAdd,
-  EnvironmentsSelect,
-  EnvironmentsDelete
+  addFiles
 } from "../../axios/api.js";
 import { Message } from "element-ui";
 import storage from "../../libs/storage";
@@ -456,41 +278,21 @@ export default {
     "header-com2": () => import("./IrPost/postHeader.vue"),
     "data-com2": () => import("./IrPost/PostData"),
     "message-box": () => import("../public/MessageBox.vue"),
-    "environment-box": () => import("../public/MessageBox.vue"),
+    "ischildId-box": () => import("../public/MessageBox.vue"),
     "mock-box": () => import("../public/MessageBox.vue")
   },
   data() {
     return {
-      environmentbodyStyle: "height:550px;",
+      groupList: [],
+      ischildIdStatus: false,
       mockDatas: {
         mockData: null
       },
       mockRadio: "1",
       mockStatus: false,
-      // postIndent:[],
       l: [], //将后台返回数据转化为一级目录的数据
       disabled: false,
-      environmentType: 1, //0是环境变量  1是全局变量
-      Environment: {
-        value: []
-      },
-      addStatus: 0, //判断是新增还是更新 0为更新 1为新增  返回或者关闭改为null
-      environments: false,
-      Environmentname: "", //环境名
-      EnvironmentsIndex: null, //点击名称进入变量列表时的index
-      Environments: [
-        //环境变量列表
-      ],
-
-      currentEnvironmentId: null,
-      currentEnvironmentIndex: null,
-      globalVariables: [], //提交时把Environments里type=1的独立出来---返回时加入进去
-      // globalVariablesList:null,
-      EnvironmentList: [],
-      EnvironmentStatus: false,
-      EnvironmentStatused: false,
-      environmentStyle: "height:700px;width:700px",
-      // EnvironmentAdd: [0],
+      interfaceListFiles: [],
       valueStatus: [], //存储环境变量临时值  [{"value":value}]
       restaurants: [], //将对象所有key放到一个列表--先把后端返回的内容的key全部组成一个数组放到这里，
       selected: [{ keys: "", value: "" }],
@@ -570,7 +372,8 @@ export default {
         postAttr: "", //请求地址
         interDetail: "", //接口描述
         mockAttr: "", //mock地址
-        chiocsEnvironment: null
+        ischildName: "",
+        ischildGroupId: ""
       },
       rules: {
         infaterName: [
@@ -578,6 +381,12 @@ export default {
         ],
         postAttr: [
           { required: true, message: "请输入请求地址", trigger: "blur" }
+        ],
+        ischildName: [
+          { required: true, message: "请输入接口名称", trigger: "blur" }
+        ],
+        ischildGroupId: [
+          { required: true, message: "请输入接口名称", trigger: "blur" }
         ]
       },
       rulesMock: {
@@ -624,24 +433,19 @@ export default {
     };
   },
   methods: {
-    addEnvironment(index) {
-      this.selected.splice(index + 1, 0, { keys: "e", value: "t" });
+    //选择接口分组
+    chiocesInterface() {},
 
-      this.Environment.value.splice(index + 1, 0, "t");
-      this.restaurants.splice(index + 1, 0, "");
-      this.valueStatus.splice(index + 1, 0, "");
-      console.log(this.postheaders);
-    },
-    removeEnvironment(index) {
-      if (this.selected.length == 1) {
-        // document.querySelector(".el-icon-remove-outline").style.color="#606266"
-        this.disabled = "disabled";
-      } else {
-        this.selected.splice(index, 1);
-        this.Environment.value.splice(index, 1);
-        this.restaurants.splice(index, 1);
-        this.valueStatus.splice(index, 1);
-      }
+    //同步右上角选择分组
+    groupUnity() {
+      // interfaceListFiles
+      // this.interfaceListFiles=[]
+      // console.log("diudi",this.$parent.list)
+      var gourpList = [];
+      this.$parent.list.map(row => {
+        gourpList = gourpList.concat(row);
+      });
+      return gourpList;
     },
     querySearch(queryString, cb) {
       var restaurants = this.restaurants;
@@ -659,14 +463,14 @@ export default {
         );
       };
     },
-    handleSelect(item, index) {
-      var l = [];
-      this.restaurants.forEach((item1, index1) => {
-        l.push(item1.value);
-      });
-      this.selected[index].value = this.valueStatus[l.indexOf(item)];
-      this.Environment.value.splice(index, 1, this.selected[index].value);
-    },
+    // handleSelect(item, index) {
+    //   var l = [];
+    //   this.restaurants.forEach((item1, index1) => {
+    //     l.push(item1.value);
+    //   });
+    //   this.selected[index].value = this.valueStatus[l.indexOf(item)];
+    //   this.Environment.value.splice(index, 1, this.selected[index].value);
+    // },
     isValid(newObj, oldObj) {
       //导入数据格式校验
       if (newObj instanceof Array) {
@@ -689,31 +493,29 @@ export default {
     },
     //处理输入转化为字典
     replacePush() {
-      
-      console.log("开始导入", this.postJson);
+      // console.log("开始导入", this.postJson);
       var str = this.replaceKb(this.postJson);
       var lists = str.split("||");
       var dictCode = {};
       this.postJson = "";
-      console.log("打印lists", lists);
+      // console.log("打印lists", lists);
       lists.forEach((item, index) => {
         var dic = item.split(":");
         if (dic[1] === undefined) {
           dic[1] = "";
         }
-        console.log("打印dicy", dic);
+        // console.log("打印dicy", dic);
         dictCode[dic[0]] = dic[1];
       });
-      console.log(dictCode);
+      // console.log(dictCode);
       return dictCode;
-      
     },
     //数据还原成原来的 换行格式的 格式
     reversePushDatas() {
       this.postJson = "";
       if (this.postDatas.length > 0) {
         //导入前先清空存储列表
-        
+
         var lists = [];
         this.postDatas.forEach((item, index) => {
           if (index !== this.postDatas - 1) {
@@ -728,7 +530,7 @@ export default {
       this.postJson = "";
       if (this.postheaders.length > 0) {
         //导入前先清空存储列表
-        
+
         var lists = [];
         this.postheaders.forEach((item, index) => {
           if (index !== this.postheaders - 1) {
@@ -742,37 +544,37 @@ export default {
     postJsonSubmit() {
       //确认json数据提交--判断是导入到什么参数
       //  postType判断类型   postJson临时绑定上传的数据   postJHeader一级的请求头数据
-      console.log(this.postType);
+      // console.log(this.postType);
 
       try {
         switch (this.postType) {
           case "header-com":
             try {
-              console.log(1111);
               Object.prototype.toString.call(JSON.parse(this.postJson)) !==
-                "[object Object]"?this.postJHeader=this.replacePush():
-              this.postJHeader = JSON.parse(this.postJson);
+              "[object Object]"
+                ? (this.postJHeader = this.replacePush())
+                : (this.postJHeader = JSON.parse(this.postJson));
             } catch (e) {
-              console.log("走字符串验证");
-              this.postJHeader=this.replacePush();
+              // console.log("走字符串验证");
+              this.postJHeader = this.replacePush();
             }
-            
+
             this.isValid(this.postJHeader, this.postheaders);
             var dataCode = JSON.parse(JSON.stringify(this.postheaders));
             var a = this.addObjectSatrt(dataCode); //该请求是在提交数据的时候才做处理  a是标准的json数据--
-            console.log(a);
+            // console.log(a);
             break;
           case "data-com":
-            console.log(typeof this.postJson)
+            // console.log(typeof this.postJson)
             try {
-              console.log(1111);
+              // console.log(1111);
               Object.prototype.toString.call(JSON.parse(this.postJson)) !==
-                "[object Object]"?
-              this.postJData =this.replacePush()
-              : this.postJData = JSON.parse(this.postJson)//postJson导入的标准json数据
+              "[object Object]"
+                ? (this.postJData = this.replacePush())
+                : (this.postJData = JSON.parse(this.postJson)); //postJson导入的标准json数据
             } catch (e) {
-              console.log("走字符串验证");
-              this.postJData =this.replacePush();
+              // console.log("走字符串验证");
+              this.postJData = this.replacePush();
             }
 
             this.isValid(this.postJData, this.postDatas); //postJData新数据 this.postDatas老数据
@@ -792,7 +594,7 @@ export default {
             this.isValid(this.resJHeader, this.resHeaders); //this.postDatas老数据   postJData新数据
             var dataCode = JSON.parse(JSON.stringify(this.resHeaders));
             var a = this.addObjectSatrt(dataCode);
-            console.log(a);
+            // console.log(a);
             break;
           case "data-com2":
             this.resJData = JSON.parse(this.postJson);
@@ -892,7 +694,7 @@ export default {
             item.id > maxId ? (maxId = item.id) : null;
           })
         : null;
-      console.log(maxId);
+      // console.log(maxId);
       return maxId + 1;
     },
 
@@ -918,7 +720,7 @@ export default {
       // console.log("oldData",oldData)
       var falg = 0;
       var fatherList = Object.keys(newData);
-      console.log("fatherList", fatherList);
+      // console.log("fatherList", fatherList);
       fatherList.forEach((item, index) => {
         var id = this.chageId(oldData); //改过      11
         if (typeof newData[item] == "object") {
@@ -1029,178 +831,7 @@ export default {
           }
         });
       }
-      console.log(oldData);
-    },
-    EnvironmentsMethod(item, index) {
-      this.currentEnvironmentIndex = index;
-      this.currentEnvironmentId = item.id;
-      this.environments = false;
-      this.environmentbodyStyle = "height: 484px;";
-      this.EnvironmentStatused = true;
-      this.EnvironmentStatus = true;
-      this.environmentType = 0;
-      this.addStatus = 0;
-      console.log(item);
-      item.value.forEach((item1, index1) => {
-        var key = Object.keys(item1)[0];
-        var value = Object.values(item1)[0];
-        console.log(key, value);
-        this.EnvironmentList.push({ key: key, value: value });
-      });
-      this.Environmentname = item.name;
-      console.log(this.EnvironmentList);
-    },
-    EnvironmentInsert() {
-      //sasa
-      this.EnvironmentList.push({ key: "", value: "" });
-    },
-    EnvironmentUpdate() {
-      console.log(this.addStatus);
-      console.log("this.addStatus", this.addStatus);
-      console.log("this.EnvironmentList", this.EnvironmentList);
-
-      // 新增变量-更新到主Environments并提交到后端保存
-      if (this.Environmentname == "" || this.Environmentname == null) {
-        Message.error("环境名称为必填项");
-      }
-      console.log(111);
-      //状态等于0就是新增环境以及对应变量
-      var name = this.Environmentname;
-      //现在环境列表插入父级
-      var valueList = [];
-
-      this.EnvironmentList.forEach((item, idnex) => {
-        var dic = {};
-        console.log(item);
-        var key = item.key;
-        var value = item.value;
-        dic[key] = value;
-        valueList.push(dic);
-      });
-      console.log(valueList);
-      if (this.addStatus == 0) {
-        EnvironmentsAdd({
-          id: this.currentEnvironmentId,
-          name: this.Environmentname,
-          is_eg: 0,
-          value: JSON.stringify(valueList)
-        }).then(res => {
-          if (res.status == 200) {
-            Message.success("操作成功");
-            this.Environments.splice(
-              [this.currentEnvironmentIndex],
-              1,
-              res.results
-            );
-            this.currentEnvironmentId = null;
-            this.currentEnvironmentIndex = null;
-          }
-        });
-      } else {
-        EnvironmentsAdd({
-          // id:this.currentEnvironmentId,
-          name: this.Environmentname,
-          is_eg: 0, //环境 后台传0
-          value: JSON.stringify(valueList)
-        }).then(res => {
-          if (res.status == 200) {
-            Message.success("操作成功");
-            this.Environments.push(res.results);
-          }
-        });
-      }
-
-      this.Environmentname = ""; //名称置空
-      this.EnvironmentStatused = false; //隐藏变量页面
-      this.environments = true; //打开环境页面
-      this.EnvironmentList.splice(0, this.EnvironmentList.length); //置空EnvironmentList
-      this.addStatus = null; //重置添加类型
-      this.environmentbodyStyle = "height: 550px;";
-      console.log(this.EnvironmentList);
-      console.log(this.Environments);
-      // }
-    },
-    globalsUpdate() {
-      console.log("全局");
-      var valueList = [];
-      this.EnvironmentList.forEach((item, idnex) => {
-        var dic = {};
-        var key = item.key;
-        var value = item.value;
-        dic[key] = value;
-        valueList.push(dic);
-      });
-      console.log("this.globalVariables", this.globalVariables);
-      if (this.globalVariables.length > 0) {
-        var data = {
-          id: this.globalVariables[0].id,
-          is_eg: 1,
-          value: JSON.stringify(valueList)
-        };
-      } else {
-        var data = {
-          is_eg: 1,
-          value: JSON.stringify(valueList)
-        };
-      }
-      EnvironmentsAdd(data).then(res => {
-        if (res.status == 200) {
-          Message.success("操作成功");
-          this.globalVariables.splice(
-            0,
-            this.globalVariables.length,
-            res.results
-          );
-          console.log(this.globalVariables);
-          //     this.EnvironmentStatused = false; //隐藏变量页面
-          // this.environments = true; //打开环境页面
-          // this.EnvironmentList.splice(0, this.EnvironmentList.length); //置空EnvironmentList
-          // this.addStatus = null; //重置添加类型
-          // this.environmentbodyStyle='height: 550px;'
-        }
-      });
-    },
-    selectGlobal() {
-      console.log(111);
-      console.log(this.globalVariables);
-      if (this.globalVariables.length > 0) {
-        var globalVariablesList = this.globalVariables[0].value;
-        console.log(globalVariablesList);
-        globalVariablesList.forEach((item1, index1) => {
-          var key = Object.keys(item1)[0];
-          var value = Object.values(item1)[0];
-          this.EnvironmentList.push({ key: key, value: value });
-        });
-      }
-    },
-
-    EnvironmentClear() {
-      this.addStatus = null;
-      this.Environmentname = "";
-      this.EnvironmentList.splice(0, this.EnvironmentList.length);
-    },
-    environmentDelete(index) {
-      //删除变量
-      console.log(222);
-      console.log(this.EnvironmentList);
-
-      // var indexCode = this.EnvironmentsIndex;
-      // console.log(indexCode);
-      // console.log(index, this.Environments[this.EnvironmentsIndex]);
-      this.EnvironmentList.splice(index, 1);
-      // this.Environments[indexCode].children.splice(index, 1);
-      //删除环境中的key
-    },
-    environmentsDelete(item, index) {
-      //删除环境
-      EnvironmentsDelete({
-        id: item.id
-      }).then(res => {
-        if (res.status == 200) {
-          Message.success(res.msg);
-        }
-      });
-      this.Environments.splice(index, 1);
+      // console.log(oldData);
     },
 
     changeBottomColor(event, value) {
@@ -1247,7 +878,7 @@ export default {
       this.bindCom2 = value;
     },
     test() {
-      console.log(1);
+      // console.log(1);
     },
     open3(msg, status) {
       this.$message({
@@ -1255,15 +886,49 @@ export default {
         type: status
       });
     },
-    clickEnvironment() {
-      //点击查看环境变量
-      this.EnvironmentStatus = !this.EnvironmentStatus;
-      this.environments = !this.environments;
-      this.EnvironmentsSelect();
+    //该方法判断路由中是否存在childId-如果不存在则弹窗-添加一个接口文件名称以及childId
+    ischildId() {
+      var query = this.$route.query;
+      console.log("query",query)
+      console.log(Object.keys(query).indexOf("childId"));
+      if (Object.keys(query).indexOf("childId") < 0) {
+        console.log("啥情况")
+        this.groupList = this.$parent.list;
+        this.ischildIdStatus = true;
+      }else{
+        this.Submit()
+      }
+      
     },
+    ischildIdSubmit() {
+      this.$refs.ischildRef.validate(valid => {
+        if (valid) {
+          addFiles({
+            createUserId: storage.get("userId"),
+            fileId: this.model.ischildGroupId,
+            filesName: this.model.ischildName,
+            projectId: storage.get("projectId")
+          }).then(res=>{
+            if(res.status===200){
+              var querys=this.$route.query
+              let path = this.$router.history.current.path;
+              let newQuery = JSON.parse(JSON.stringify(querys));
+              newQuery["childId"]=res.results.id
+              console.log(newQuery)
+              this.$router.push({ path,query: newQuery })
+              this.model.infaterName=this.model.ischildName
+              this.Submit()
+              this.ischildIdStatus=false
+            }
+          })
+        }
+      });
+    },
+
     Submit() {
       console.log("请求接口", this.$refs.child.indent);
       console.log(this.$route.query.childId);
+
       var dataCode1 = JSON.parse(JSON.stringify(this.postheaders));
       var a1 = this.addObjectSatrt(dataCode1);
 
@@ -1291,10 +956,10 @@ export default {
         res_data: JSON.stringify(a4)
         // indent:JSON.stringify(this.$refs.child.indent)
       }).then(res => {
-        console.log(this.$parent.updateFiels.fielsName);
+        // console.log(this.$parent.updateFiels.fielsName);
         if (res.status === 200) {
           Message.success("更新成功");
-          console.log(res.results.res_data);
+          // console.log(res.results.res_data);
           this.postheaders = this.SplitData(res.results.post_header);
 
           this.postDatas = this.SplitData(res.results.post_data);
@@ -1347,7 +1012,7 @@ export default {
         data: JSON.stringify(data)
       }).then(res => {
         if (Object.keys(res).length >= 0) {
-          console.log(res.results);
+          // console.log(res.results);
           this.jsonDemo1 = JSON.stringify(res, null, 4);
           Message.success("接口请求成功");
         } else {
@@ -1356,7 +1021,7 @@ export default {
       });
     },
     mockDataSubmit() {
-      console.log(storage.get("projectId"));
+      // console.log(storage.get("projectId"));
       var obj = {
         id: this.$route.query.childId,
         mock_type: "1",
@@ -1404,19 +1069,6 @@ export default {
                 : Message.error(msg);
             });
       }
-    },
-    EnvironmentIcon() {
-      this.clickEnvironment();
-    },
-    EnvironmentsSelect() {
-      //请求测试环境
-      EnvironmentsSelect().then(res => {
-        if (res.status == 200) {
-          this.Environments = res.results.E_data;
-          this.globalVariables = res.results.G_data;
-          console.log(this.globalVariables);
-        }
-      });
     }
   },
 
@@ -1443,20 +1095,18 @@ export default {
     } else {
       this.jsonDemo1 = this.jsonDemo;
     }
-    console.log(this.$route.query, "---");
+    // console.log(this.$route.query, "---");
   },
+
   mounted() {
-    this.EnvironmentsSelect();
+    // this.groupUnity()  //在父组件获取列表信息时同步数据
     this.restaurants = [];
     this.valueStatus = [];
     this.requestsResDatas.forEach((item, index) => {
       this.restaurants.push({ value: item.cname });
       this.valueStatus.push(item.value);
     });
-    this.selected.forEach((item, index) => {
-      this.Environment.value.push("");
-    });
-    console.log(this.$route, "---");
+    // console.log(this.$route, "---");
 
     postMethods() //获取请求方法 请求类型 响应类型列表数据
       .then(res => {
@@ -1620,88 +1270,88 @@ export default {
 
 //   // height: 100%;
 // }
-.environments {
-  margin: 0 30px;
-}
-.environmentsHeader {
-  border-bottom: 1px solid #c9b2b2;
-}
-.environmentsbody {
-  // height: 550px;
-  border-bottom: 1px solid #c9b2b2;
-  overflow-y: auto;
-}
-.environmentsFoot {
-  margin: 30px 0;
-  .environmentsBottom {
-    margin-left: 10px;
-  }
-}
-.environmentsbody .environmentsName .name {
-  font-size: 15px;
-}
-.environmentsbody .environmentsName {
-  cursor: pointer;
-  border-bottom: 1px solid #c9b2b2;
-  padding: 15px 0;
-  position: relative;
-}
+// .environments {
+//   margin: 0 30px;
+// }
+// .environmentsHeader {
+//   border-bottom: 1px solid #c9b2b2;
+// }
+// .environmentsbody {
+//   // height: 550px;
+//   border-bottom: 1px solid #c9b2b2;
+//   overflow-y: auto;
+// }
+// .environmentsFoot {
+//   margin: 30px 0;
+//   .environmentsBottom {
+//     margin-left: 10px;
+//   }
+// }
+// .environmentsbody .environmentsName .name {
+//   font-size: 15px;
+// }
+// .environmentsbody .environmentsName {
+//   cursor: pointer;
+//   border-bottom: 1px solid #c9b2b2;
+//   padding: 15px 0;
+//   position: relative;
+// }
 
-.environmentsbody .environmentsName:hover > .name {
-  color: #409eff;
-}
-.EnvironmentsFloat {
-  display: inline-block;
-  right: 0px;
-  position: absolute;
-  top: 0px;
-}
+// .environmentsbody .environmentsName:hover > .name {
+//   color: #409eff;
+// }
+// .EnvironmentsFloat {
+//   display: inline-block;
+//   right: 0px;
+//   position: absolute;
+//   top: 0px;
+// }
 
 // .EnvironmentsFloat  {
 //   // padding: 0 20px 4px 20px;
 
 // }
-.EnvironmentsFloat :hover {
-  background: grey;
-}
-.environmentsType {
-  padding: 16px 0px !important;
-  margin-right: 0px !important;
-  color: rgb(196, 193, 193);
-}
-.environmentsDelete {
-  padding: 18.5px 15px !important;
-  margin-right: 0px !important;
-  margin-left: 10px !important;
-}
-.environmentsName:hover .name {
-  color: #1e87f0;
-}
+// .EnvironmentsFloat :hover {
+//   background: grey;
+// }
+// .environmentsType {
+//   padding: 16px 0px !important;
+//   margin-right: 0px !important;
+//   color: rgb(196, 193, 193);
+// }
+// .environmentsDelete {
+//   padding: 18.5px 15px !important;
+//   margin-right: 0px !important;
+//   margin-left: 10px !important;
+// }
+// .environmentsName:hover .name {
+//   color: #1e87f0;
+// }
 
-.enviromentClass {
-  margin: 0 30px;
-}
-.environmentbody {
-  margin: 10px 0;
-  height: 470px;
-  overflow-y: auto;
-  border-bottom: 1px solid #c9b2b2;
-  border-top: 1px solid #c9b2b2;
-}
-.environmentFoot {
-  margin: 30px 0;
-}
-.environmentFoot .environmentBottom {
-  margin-left: 10px;
-}
+// .enviromentClass {
+//   margin: 0 30px;
+// }
+// .environmentbody {
+//   margin: 10px 0;
+//   height: 470px;
+//   overflow-y: auto;
+//   border-bottom: 1px solid #c9b2b2;
+//   border-top: 1px solid #c9b2b2;
+// }
+// .environmentFoot {
+//   margin: 30px 0;
+// }
+// .environmentFoot .environmentBottom {
+//   margin-left: 10px;
+// }
 
-.addEnvironmentInput {
-  width: 100%;
-  height: 20px;
-  margin-top: 10px;
-  border-radius: 2px;
-  border: 2px solid #ebeef5;
-}
+// .addEnvironmentInput {
+//   width: 100%;
+//   height: 20px;
+//   margin-top: 10px;
+//   border-radius: 2px;
+//   border: 2px solid #ebeef5;
+// }
 
 .Environment {
   position: relative;
@@ -1710,17 +1360,13 @@ export default {
   /* top: 10px; */
   top: -14px;
   margin-bottom: -30px;
+  // .EnvironmentIcon {
+  //   font-size: 15px;
+  //   padding: 12px;
+  //   margin-left: 5px;
+  // }
   .EnvironmentIcon {
-    font-size: 15px;
-    padding: 12px;
-    margin-left: 5px;
-  }
-  .EnvironmentIcon:hover {
-    background: rgb(194, 193, 193);
-    color: #409eff;
-  }
-  .mockRequestsButton {
-    padding: 0px 0px !important ;
+    margin-left: 10px;
   }
 }
 </style>
@@ -1755,12 +1401,7 @@ export default {
 .IR .el-input {
   margin-left: 5px;
 }
-/* .environmentbody .cell{
-    position: relative;
-    width: 100%;
-    height: 100%;
-    
-} */
+
 .IR
   .environmentbody
   .el-table
@@ -1771,18 +1412,6 @@ export default {
   > td {
   background-color: #ffffff !important;
 }
-/* .environmentbody
-  .el-table
-  .el-table__body-wrapper
-  .el-table__body
-  tbody tr .el-table_3_column_14  {
-    padding: none !important;
-  } */
-
-/* .environmentbody .el-table .el-table__body-wrapper .el-table__body .el-table__row  {
-  position: relative;
-  height: 100%;
-} */
 
 .IR .environmentbody .el-table__header .has-gutter .is-leaf .cell {
   text-align: center;
@@ -1797,32 +1426,13 @@ export default {
   .cell
   input {
   width: 100%;
-  /* height: 95%;
-  top: 0px; */
+  height: 95%;
+  top: 0px;
   outline: none;
   border-color: #ffffff !important;
   border-style: none;
 }
 
-/* .environmentbody
-  .el-table
-  .el-table__body-wrapper
-  .el-table__body
-  tbody
-  .el-table__row
-  .cell {
-  width: 100%;
-  top: 0px;
-} */
-
-/* .environmentbody
-  .el-table
-  .el-table__body-wrapper
-  .el-table__body
-  .el-table__row
-  .el-table_3_column_14  {
-    position: relative;
-  } */
 .IR
   .environmentbody
   .el-table

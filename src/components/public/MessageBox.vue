@@ -24,6 +24,9 @@
       <slot name="isUnityBox">
         <!-- 同步数据弹窗 -->
       </slot>
+      <slot name="ischildId">
+        <!-- 同步数据弹窗 -->
+      </slot>
     </div>
   </div>
 </template>
