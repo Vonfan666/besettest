@@ -32,11 +32,14 @@
           </div>
         </div>
         <!-- 新建一级分组 -->
-        <div class="addFiles" @click="addFiles()" v-show="!statusIng.searchStatus">
-          <span class="el-icon-plus"></span>
-          <span>新建文件夹</span>
-        </div>
 
+        <div  v-show="!statusIng.searchStatus">
+          <!-- <span class="el-icon-plus"></span> -->
+          <span class="addFiles el-icon-plus" @click="addFiles()">新建文件夹</span>
+          
+          <el-button type="text" size="small" class="addCaseButton el-icon-plus" @click="addNewCase()">新建用例</el-button>
+        </div>
+        
         <!-- 文档内容 -->
         <div class="FilesContext" v-show="!statusIng.searchStatus">
           <div class="fileName" v-for="(item,index) in caseGroupList" :key="index">
@@ -65,7 +68,7 @@
               v-for="(item1,index1) in item.idCaseGroupFiles"
               :name="item1.id"
               :key="index1"
-              @click="changeColor($event),inCaseList()"
+              @click="changeColor($event),caseLists(item1.id)"
               v-show="fileNameChildStatus[index]"
             >
               <div class="file-father">
@@ -108,15 +111,20 @@
               </template>-->
             </el-table-column>
             <el-table-column prop="name" label="名称"></el-table-column>
-            <el-table-column prop="isInterface.name" label="所属接口" width="250"></el-table-column>
-            <el-table-column prop="status" label="状态" width="80"></el-table-column>
-            <el-table-column prop="createrUser" label="创建人" width="80"></el-table-column>
-            <el-table-column prop="createrTime" label="创建时间" width="150"></el-table-column>
+            <el-table-column prop="CaseGroupId.name" label="所属接口" width="250"></el-table-column>
+            <el-table-column prop="status.name" label="状态" width="80"></el-table-column>
+            <el-table-column prop="userId.name" label="创建人" width="80"></el-table-column>
+            <el-table-column prop="createTime" label="创建时间" width="160"></el-table-column>
+            <el-table-column prop="updateTime" label="更新时间" width="160"></el-table-column>
             <el-table-column fixed="right" label="操作" width="200">
               <template slot-scope="scope">
                 <!-- <el-button @click="handleClick(scope.row)" type="text" size="small">查看</el-button> -->
-                <el-button type="text" size="small">删除</el-button>
-                <el-button type="text" size="small">编辑</el-button>
+                <el-button
+                  type="text"
+                  size="small"
+                  @click="removeCase(scope.row.id,scope.$index)"
+                >删除</el-button>
+                <el-button type="text" size="small" @click="editCase(scope.row.id,scope.$index)">编辑</el-button>
                 <el-button type="text" size="small">单点执行</el-button>
               </template>
             </el-table-column>
@@ -136,10 +144,10 @@
       <div class="right-title">
         <div class="right-title-detail">
           <div class="title-detail">
-            <span class="tt">基本信息</span>
+            <span class="tt">{{caseTitle}}</span>
 
             <div class="et">
-              <el-select v-model="model.chiocsEnvironment" filterable placeholder="请选择环境">
+              <el-select v-model="datas.chiocsEnvironment" filterable placeholder="请选择环境">
                 <el-option
                   v-for="item in Environments"
                   :key="item.name"
@@ -164,7 +172,7 @@
           ></enviroment-box>
 
           <div class="title-detail-context">
-            <el-form :model="datas" :rules="rules" ref="refFrom" label-width="100px">
+            <el-form :model="datas" :rules="rules" ref="refFromS" label-width="100px">
               <div class="interfaName-1">
                 <el-form-item label="执行顺序" prop="order">
                   <el-input placeholder="请输入执行顺序" v-model="datas.order" clearable></el-input>
@@ -206,7 +214,6 @@
                     placeholder="请输入接口名称"
                     clearable
                     v-model="datas.interfaceName"
-                    v-if="inputStatus"
                   ></el-input>
                   <!-- <div contenteditable="true" class="inputStatus" v-if="!inputStatus" :model="datas.interfaceName">
                     <span class="colors">111</span>
@@ -297,32 +304,25 @@
                   <div class="requestsTitile">
                     <el-form :model="beforeAction" ref="refFrom" class="beforeFrom">
                       <div v-for="(item,index) in beforeAction.keys" :key="item.key">
-                        <el-form-item
-                          hide-required-asterisk
-                          class="requestsTitile1"
-                          :prop="'keys.' + index + '.beforeIndex'"
-                          :rules="{ required: true, message: '必填' }"
-                        >
+                        <!-- :prop="'keys.' + index + '.beforeIndex'"
+                        :rules="{ required: true, message: '必填' }"-->
+                        <el-form-item hide-required-asterisk class="requestsTitile1">
                           <el-input
                             placeholder="序号"
                             v-model="item.beforeIndex"
                             @change="changeIndex(index,0)"
                           ></el-input>
                         </el-form-item>
-                        <el-form-item
-                          class="requestsTitile2"
-                          :prop="'keys.'+index+ '.beforeName'"
-                          hide-required-asterisk
-                          :rules="{ required: true, message: '必填' }"
-                        >
+                        <!-- :prop="'keys.'+index+ '.beforeName'"
+                          
+                        :rules="{ required: true, message: '必填' }"-->
+                        <el-form-item class="requestsTitile2" hide-required-asterisk>
                           <el-input v-model="item.beforeName" placeholder="条件名称"></el-input>
                         </el-form-item>
-                        <el-form-item
-                          class="requestsTitile3"
-                          :prop="'keys.'+index+ '.beforeType'"
-                          hide-required-asterisk
-                          :rules="{ required: true, message: '必填' }"
-                        >
+                        <!-- :prop="'keys.'+index+ '.beforeType'"
+                          
+                        :rules="{ required: true, message: '必填' }"-->
+                        <el-form-item class="requestsTitile3" hide-required-asterisk>
                           <el-select
                             placeholder="选择处理类型"
                             v-model="item.beforeType"
@@ -336,12 +336,9 @@
                             ></el-option>
                           </el-select>
                         </el-form-item>
-                        <el-form-item
-                          class="requestsTitile4"
-                          :prop="'keys.'+index+ '.beforePlan'"
-                          hide-required-asterisk
-                          :rules="{ required: true, message: '必填' }"
-                        >
+                        <!-- :prop="'keys.'+index+ '.beforePlan'"
+                        :rules="{ required: true, message: '必填' }"-->
+                        <el-form-item class="requestsTitile4" hide-required-asterisk>
                           <el-select placeholder="选择前置操作" v-model="item.beforePlan">
                             <el-option
                               v-for="(item1,index2)  in selection(index)"
@@ -517,32 +514,24 @@
                   <div class="requestsTitile">
                     <el-form :model="afterAction" ref="refFrom" class="beforeFrom">
                       <div v-for="(item,index) in afterAction.keys" :key="item.key">
-                        <el-form-item
-                          hide-required-asterisk
-                          class="requestsTitile1"
-                          :prop="'keys.' + index + '.beforeIndex'"
-                          :rules="{ required: true, message: '必填' }"
-                        >
+                        <!-- :prop="'keys.' + index + '.beforeIndex'"
+                        :rules="{ required: true, message: '必填' }"-->
+                        <el-form-item hide-required-asterisk class="requestsTitile1">
                           <el-input
                             placeholder="序号"
                             v-model="item.beforeIndex"
                             @change="changeIndex(index,3)"
                           ></el-input>
                         </el-form-item>
-                        <el-form-item
-                          class="requestsTitile2"
-                          :prop="'keys.'+index+ '.beforeName'"
-                          hide-required-asterisk
-                          :rules="{ required: true, message: '必填' }"
-                        >
+                        <!-- :prop="'keys.'+index+ '.beforeName'"
+                          
+                        :rules="{ required: true, message: '必填' }"-->
+                        <el-form-item class="requestsTitile2" hide-required-asterisk>
                           <el-input v-model="item.beforeName" placeholder="条件名称"></el-input>
                         </el-form-item>
-                        <el-form-item
-                          class="requestsTitile3"
-                          :prop="'keys.'+index+ '.beforeType'"
-                          hide-required-asterisk
-                          :rules="{ required: true, message: '必填' }"
-                        >
+                        <!-- :prop="'keys.'+index+ '.beforeType'"                          
+                        :rules="{ required: true, message: '必填' }"-->
+                        <el-form-item class="requestsTitile3" hide-required-asterisk>
                           <el-select placeholder="选择处理类型" v-model="item.beforeType">
                             <el-option
                               v-for="(item1,index1)  in beforeTypeList"
@@ -552,12 +541,9 @@
                             ></el-option>
                           </el-select>
                         </el-form-item>
-                        <el-form-item
-                          class="requestsTitile4"
-                          :prop="'keys.'+index+ '.beforePlan'"
-                          hide-required-asterisk
-                          :rules="{ required: true, message: '必填' }"
-                        >
+                        <!-- :prop="'keys.'+index+ '.beforePlan'"
+                        :rules="{ required: true, message: '必填' }"-->
+                        <el-form-item class="requestsTitile4" hide-required-asterisk>
                           <el-select placeholder="选择后置操作" v-model="item.beforePlan">
                             <el-option
                               v-for="(item1,index2)  in beforePlanList"
@@ -585,6 +571,11 @@
                 </div>
               </div>
             </div>
+          </div>
+          <div>
+            <el-button type="primary" size="small" @click="addCaseSubmit()">确认</el-button>
+            <el-button type="primary" size="small" @click="addCaseSubmit()">调试</el-button>
+            <el-button type="primary" size="small" @click="addCaseSubmit()">查看结果</el-button>
           </div>
         </div>
       </div>
@@ -704,7 +695,11 @@ import {
   RemoveGroup,
   AddCase,
   EditCase,
-  RemoveCase
+  RemoveCase,
+  AddInterfaceCase,
+  CaseList,
+  ClassRemove,
+  CaseEdit
 } from "../../axios/api.js";
 import storage from "../../libs/storage";
 
@@ -717,12 +712,14 @@ export default {
   },
   data() {
     return {
+      caseTitle:"基本信息",
+      currentCaseId: null,
       isUnifyStyle: "width:400px;height:300px",
       pushHeaderText: "",
       pushHeaderStyle: "height:500px;width:500px",
-      model: {
-        chiocsEnvironment: "" //当前选中环境
-      },
+      // model: {
+      //   chiocsEnvironment: "" //当前选中环境
+      // },
       Environments: [], //环境列表
       globarls: [],
       postMethods: [
@@ -793,7 +790,8 @@ export default {
         urlPostType: 1, //请求类型
         caseDetail: "", //用例描述
         postMethods: "",
-        order: ""
+        order: "",
+        chiocsEnvironment: ""
       },
       reqyestDataTypeRadio: 1, //提交的参数类型
       //前置处理器
@@ -891,190 +889,39 @@ export default {
         interfaceName: [
           { required: true, message: "请填写用例名称", trigger: "blur" }
         ],
-        caseGroupId: [{ required: true, message: "请选择分组" }],
-        urlHttp: [{ required: true, message: "请选择协议" }],
-        urlAttr: [{ required: true, message: "请填写主机地址" }],
-        urlPostType: [{ required: true, message: "必填" }],
-        beforeIndex: [{ required: true, message: "必填" }],
-        beforeName: [{ required: true, message: "必填" }],
-        beforeType: [{ required: true, message: "必填" }],
-        beforePlan: [{ required: true, message: "必填" }],
-        addGroupName: [{ required: true, message: "必填" }],
-        addInterfaceName: [{ required: true, message: "必填" }],
-        postMethods: [{ required: true, message: "必填" }],
-        order: [{ required: true, message: "必填" }]
+        caseGroupId: [{ required: true, message: "请选择分组",trigger: "blur"  }],
+        urlHttp: [{ required: true, message: "请选择协议",trigger: "blur"  }],
+        urlAttr: [{ required: true, message: "请填写主机地址",trigger: "blur"  }],
+        urlPostType: [{ required: true, message: "必填",trigger: "blur"  }],
+        beforeIndex: [{ required: true, message: "必填",trigger: "blur"  }],
+        beforeName: [{ required: true, message: "必填",trigger: "blur"  }],
+        beforeType: [{ required: true, message: "必填" ,trigger: "blur" }],
+        beforePlan: [{ required: true, message: "必填" ,trigger: "blur" }],
+        addGroupName: [{ required: true, message: "必填",trigger: "blur"  }],
+        addInterfaceName: [{ required: true, message: "必填",trigger: "blur"  }],
+        postMethods: [{ required: true, message: "必填" ,trigger: "blur" }],
+        order: [{ required: true, message: "必填" ,trigger: "blur" }]
         // beforeName: [{ required: true, message: "请输入名称" }]
       },
       caseList: [
-        {
-          id: 1,
-          order: 1,
-          isTrue: 1,
-          name: "第一个测试接口",
-          isInterface: {
-            id: 1,
-            name: "第一个接口"
-          },
-          status: "已完成",
-          createrUser: "冯凡",
-          createrTime: "2020:05:20 22:28"
-        },
-        {
-          id: 1,
-          order: 1,
-          isTrue: 1,
-          name: "第一个测试接口",
-          isInterface: {
-            id: 1,
-            name: "第一个接口"
-          },
-          status: "已完成",
-          createrUser: "冯凡啊啊",
-          createrTime: "2020:05:20 22:28"
-        },
-        {
-          id: 1,
-          order: 1,
-          isTrue: 1,
-          name: "第一个测试接口",
-          isInterface: {
-            id: 1,
-            name: "第一个接口"
-          },
-          status: "已完成",
-          createrUser: "冯凡",
-          createrTime: "2020:05:20 22:28"
-        },
-        {
-          id: 1,
-          order: 1,
-          isTrue: 1,
-          name: "第一个测试接口",
-          isInterface: {
-            id: 1,
-            name: "第一个接口"
-          },
-          status: "已完成",
-          createrUser: "冯凡",
-          createrTime: "2020:05:20 22:28"
-        },
-        {
-          id: 1,
-          order: 1,
-          isTrue: 1,
-          name: "第一个测试接口",
-          isInterface: {
-            id: 1,
-            name: "第一个接口"
-          },
-          status: "已完成",
-          createrUser: "冯凡",
-          createrTime: "2020:05:20 22:28"
-        },
-        {
-          id: 1,
-          order: 1,
-          isTrue: 1,
-          name: "第一个测试接口",
-          isInterface: {
-            id: 1,
-            name: "第一个接口"
-          },
-          status: "已完成",
-          createrUser: "冯凡",
-          createrTime: "2020:05:20 22:28"
-        },
-        {
-          id: 1,
-          order: 1,
-          isTrue: 1,
-          name: "第一个测试接口",
-          isInterface: {
-            id: 1,
-            name: "第一个接口"
-          },
-          status: "已完成",
-          createrUser: "冯凡",
-          createrTime: "2020:05:20 22:28"
-        },
-        {
-          id: 1,
-          order: 1,
-          isTrue: 1,
-          name: "第一个测试接口",
-          isInterface: {
-            id: 1,
-            name: "第一个接口"
-          },
-          status: "已完成",
-          createrUser: "冯凡",
-          createrTime: "2020:05:20 22:28"
-        },
-        {
-          id: 1,
-          order: 1,
-          isTrue: 1,
-          name: "第一个测试接口",
-          isInterface: {
-            id: 1,
-            name: "第一个接口"
-          },
-          status: "已完成",
-          createrUser: "冯凡",
-          createrTime: "2020:05:20 22:28"
-        },
-        {
-          id: 1,
-          order: 1,
-          isTrue: 1,
-          name: "第一个测试接口",
-          isInterface: {
-            id: 1,
-            name: "第一个接口"
-          },
-          status: "已完成",
-          createrUser: "冯凡",
-          createrTime: "2020:05:20 22:28"
-        },
-        {
-          id: 1,
-          order: 1,
-          isTrue: 1,
-          name: "第一个测试接口",
-          isInterface: {
-            id: 1,
-            name: "第一个接口"
-          },
-          status: "已完成",
-          createrUser: "冯凡",
-          createrTime: "2020:05:20 22:28"
-        },
-        {
-          id: 1,
-          order: 1,
-          isTrue: 1,
-          name: "第一个测试接口",
-          isInterface: {
-            id: 1,
-            name: "第一个接口"
-          },
-          status: "已完成",
-          createrUser: "冯凡",
-          createrTime: "2020:05:20 22:28"
-        },
-        {
-          id: 1,
-          order: 1,
-          isTrue: 1,
-          name: "第一个测试接口",
-          isInterface: {
-            id: 1,
-            name: "第一个接口"
-          },
-          status: "已完成",
-          createrUser: "冯凡",
-          createrTime: "2020:05:20 22:28"
-        }
+        // {
+        //   id: 1,
+        //   createTime: "2020-05-24 18:37:06",
+        //   updateTime: "2020-05-24 18:37:06",
+        //   CaseGroupId: { id: 205, name: "登录注册" },
+        //   data: null,
+        //   headers: null,
+        //   userId: { id: 4, name: "冯凡" },
+        //   status: { id: 1, name: "已完成" },
+        //   name: "正常登录",
+        //   order: 1,
+        //   attr: "/user/logins/",
+        //   detail: null,
+        //   isGlobalsHeader: 0,
+        //   postMethod: 2,
+        //   dataType: 1,
+        //   environmentId: null
+        // }
       ],
       multipleSelection: [] //选中执行的用例id
     };
@@ -1364,7 +1211,6 @@ export default {
                 name: this.caseGroupDatats.addInterfaceName
               }).then(res => {
                 if (res.status === 200) {
-                  
                   this.caseGroupList[findex].idCaseGroupFiles.push(res.results);
                   this.statusIng.caseAddInterfaceBoxStatus = false;
                   this.commandCode = null;
@@ -1500,9 +1346,70 @@ export default {
         return oldValue;
       }
     },
-
+    //清空用例所有内容
+    clearContext() {
+      this.datas.urlAttr = ""; //替换请求地址
+      this.datas.caseDetail = ""; //替换用例描述
+      this.datas.order = "";
+      this.datas.caseGroupId = "";
+      this.datas.interfaceName = "";
+      this.datas.caseDetail = "";
+      this.datas.postMethods="";
+      this.reqyestDataTypeRadio = 1;
+      this.beforeAction = {
+        keys: [
+          {
+            beforeIndex: "", //前置条件中执行顺序
+            beforeName: "", //前置条件名称
+            beforeType: "", //前置条件类型---如文件操作、数据库操作等
+            beforePlan: "", //前置处理--选择文件操作中的具体事务，或者数据库中的具体事务
+            beforeDetail: "" //简要描述
+          }
+        ]
+      };
+      this.requestsHeader = {
+        keys: [
+          {
+            headerKey: "", //请求头key
+            headerValue: "", //请求头value
+            headerDetail: "" //简要描述
+          }
+        ]
+      };
+      this.requestsData = {
+        keys: [
+          {
+            headerKey: "", //请求头key
+            headerValue: "", //请求头value
+            headerDetail: "" //简要描述
+          }
+        ]
+      };
+      this.requestsDataf = {
+        keys: [
+          {
+            isRequestsData: true, //是否选中
+            dataKey: "", //请求key
+            dataValue: "", //请求值
+            dataDetail: "" //请求详情
+          }
+        ]
+      };
+      this.afterAction = {
+        keys: [
+          {
+            beforeIndex: "", //前置条件中执行顺序
+            beforeName: "", //前置条件名称
+            beforeType: "", //前置条件类型---如文件操作、数据库操作等
+            beforePlan: "", //前置处理--选择文件操作中的具体事务，或者数据库中的具体事务
+            beforeDetail: "" //简要描述
+          }
+        ]
+      };
+    },
     //选择接口文档且填充部分类容
     chiocesInterface() {
+      this.clearContext();
       this.InterfaceDetailGet();
     },
     //填充用例内容--请求接口详情完了之后调用--讲道理这是需要给用户选择是否全部替换-或者填充未填写内容
@@ -1586,6 +1493,7 @@ export default {
               });
             }))
           : null;
+          
       }
       // else{
       //   this.requestsDataf.keys.push({
@@ -1639,8 +1547,151 @@ export default {
       this.multipleSelection = val;
       console.log(this.multipleSelection);
     },
+    //确认添加用例
+    addCaseSubmit() {
+      this.$refs.refFromS.validate(valid => {
+        if (valid) {
+          this.addCase();
+        } else {
+          return false;
+        }
+      });
+    },
+
+    //删除用例
+    removeCase(id, index) {
+      ClassRemove({
+        id: id
+      }).then(res => {
+        res.status === 200
+          ? (this.caseList.splice(index, 1), Message.success(res.msg))
+          : Message.error(res.msg);
+      });
+    },
+
+    //编辑用例
+    editCase(id, index) {
+      this.currentCaseId=id
+      this.clearContext();
+      this.CaseEdits(id);
+      this.statusIng.CaselistOrCaseDetailTstatus = true;
+    },
+    //新建用例清空相关数据
+    addNewCase(){
+      this.currentCaseId=null,
+      this.clearContext()
+
+      this.statusIng.CaselistOrCaseDetailTstatus = true;
+      this.caseTitle="新建用例"
+
+    },
+    //获取用例列表之后-同步数据
+    caseUnity(res) {
+      console.log(JSON.stringify(res[0]));
+      this.caseList = res;
+    },
+    //******************************************************************************************************** */
+    //新增成功或者从用例列表出来点击编辑填充数据
+    replace_1(self) {
+      this.datas.urlAttr = self.attr; //替换请求地址
+      this.datas.caseDetail = self.detail; //替换用例描述
+      this.datas.order = self.order;
+      this.datas.caseGroupId = self.CaseGroupId.id;
+      this.datas.interfaceName = self.name;
+      this.datas.caseDetail = self.detail;
+      this.dataType = self.dataType;
+      var type = self.dataType;
+      console.log(type, typeof type);
+      type !== 1 && type !== 3
+        ? (this.reqyestDataTypeRadio = 1)
+        : (this.reqyestDataTypeRadio = type);
+
+      console.log(this.reqyestDataTypeRadio);
+      this.replace_2(self); //替换请求头部数据
+      this.reqyestDataTypeRadio === 1
+        ? this.replace_3(self) //替换请求参数
+        : this.reqyestDataTypeRadio === 3
+        ? this.replace_3f(self)
+        : null;
+      this.datas.postMethods = self.postMethod;
+    },
+    //替换请求头
+    replace_2(self) {
+      console.log(Array.isArray(self.headers));
+      self.headers !== null
+        ? //如果该接口post_header有数据--则先删除之前的内容
+          (this.requestsHeader = self.headers)
+        : null;
+    },
+    replace_3f(self) {
+      console.log("走这里没有");
+      
+        self.data !== null ? (this.requestsDataf = self.data) : null;
+     
+    },
+    //替换请求数据
+    replace_3(self) {
+     
+        self.data !== null? (this.requestsData = self.data) : null;
+      
+    },
+    //********************************************************************************************************* */
     //以下方法为接口请求
     // ________________________________________________________________
+
+    CaseEdits(id) {
+      this.caseTitle="基本信息"
+      CaseEdit({
+        id: id
+      }).then(res => {
+        if (res.status === 200) {
+          
+          console.log("zouni");
+          var self = res.results[0];
+          this.replace_1(self);
+        }
+      });
+    },
+    caseLists(id) {
+      this.inCaseList();
+      CaseList({
+        id: id
+      }).then(res => {
+        res.status === 200 ? this.caseUnity(res.results) : null;
+      });
+    },
+
+    //确认添加用例接口
+    addCase() {
+      var  requestsData=null
+      this.reqyestDataTypeRadio===1
+      ? requestsData=this.requestsData
+      : requestsData=this.requestsDataf
+      AddInterfaceCase({
+        id: this.currentCaseId,
+        name: this.datas.interfaceName,
+        order: this.datas.order,
+        userId: storage.get("userId"),
+        CaseGroupId: this.datas.caseGroupId,
+        postMethod: this.datas.postMethods,
+        dataType: this.reqyestDataTypeRadio,
+        attr: this.datas.urlAttr,
+        status: this.datas.interfaceIsOk,
+        detail: this.caseDetail,
+        // isGlobalsHeader:""  //是否使用全局请起头
+        headers: JSON.stringify(this.requestsHeader),
+        data: JSON.stringify(requestsData),
+        environmentId: this.datas.chiocsEnvironment
+      }).then(res => {
+        res.status === 200
+          ? ((this.currentCaseId = res.results.id),
+            this.replace_1(res.results),
+            this.caseTitle="基本信息",
+            Message.success(res.msg))
+          : null;
+      });
+    },
+
     //查询该项目下的接口文件以及对象的接口文档
     SelectFile() {
       SelectFile({
@@ -1709,7 +1760,7 @@ export default {
     },
     //查询case分组以及用例文件
     groupFileWithInterface() {
-      this.caseGroupListInterface=[]
+      this.caseGroupListInterface = [];
       this.caseGroupList.map(row => {
         this.caseGroupListInterface = this.caseGroupListInterface.concat(
           row.idCaseGroupFiles
@@ -1801,7 +1852,7 @@ export default {
   background: #eee;
 }
 .resize-bar {
-  width: 225px;
+  width: 250px;
   height: inherit;
   resize: horizontal;
   cursor: ew-resize;
@@ -1809,7 +1860,7 @@ export default {
   overflow: scroll;
   margin-left: 0px;
   max-width: 500px;
-  min-width: 200px;
+  min-width: 230px;
 }
 /* 拖拽线 */
 .resize-line {
@@ -1886,6 +1937,16 @@ export default {
     color: #1e87f0;
     margin-top: -10px;
     cursor: pointer;
+    font-size: 15px;
+  }
+  .addCaseButton{
+    display: inline-block;
+    position: absolute;
+    cursor: pointer;
+    margin-top: -21px;
+    color: #1e87f0;
+    left: 10px;
+    font-size: 15px;
   }
   .FilesContext {
     font-size: 13px;

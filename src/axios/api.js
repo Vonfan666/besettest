@@ -178,3 +178,23 @@ export const EditCase=(params)=>{
 export const RemoveCase=(params)=>{
     return postRequest("/users/caseInterface_remove/",params)   
 }
+
+//添加用例
+export const AddInterfaceCase=(params)=>{
+    return postRequest("/users/case_add/",params)   
+}
+
+//删除用例
+export const ClassRemove=(params)=>{
+    return postRequest("/users/case_remove/",params)   
+}
+
+//获取当前用例接口的用例列表
+export const CaseList=(params)=>{
+    return getRequest("/users/case_list/",params)   
+}
+
+//获取当前单个用例数据
+export const CaseEdit=(params)=>{
+    return getRequest("/users/case_edit/",params)   
+}
