@@ -144,7 +144,7 @@
       <div class="right-title">
         <div class="right-title-detail">
           <div class="title-detail">
-            <span class="tt">{{caseTitle}}</span>
+            <span class="tt">基本信息</span>
 
             <div class="et">
               <el-select v-model="datas.chiocsEnvironment" filterable placeholder="请选择环境">
@@ -712,7 +712,6 @@ export default {
   },
   data() {
     return {
-      caseTitle:"基本信息",
       currentCaseId: null,
       isUnifyStyle: "width:400px;height:300px",
       pushHeaderText: "",
@@ -789,9 +788,9 @@ export default {
         urlPort: "", //端口
         urlPostType: 1, //请求类型
         caseDetail: "", //用例描述
-        postMethods: "",
-        order: "",
-        chiocsEnvironment: ""
+        postMethods: "", //请求方法
+        order: "",   //排序
+        chiocsEnvironment: "" //
       },
       reqyestDataTypeRadio: 1, //提交的参数类型
       //前置处理器
@@ -1356,6 +1355,7 @@ export default {
       this.datas.caseDetail = "";
       this.datas.postMethods="";
       this.reqyestDataTypeRadio = 1;
+      
       this.beforeAction = {
         keys: [
           {
@@ -1580,9 +1580,8 @@ export default {
     addNewCase(){
       this.currentCaseId=null,
       this.clearContext()
-
+      this.datas.isInterfaceId=""
       this.statusIng.CaselistOrCaseDetailTstatus = true;
-      this.caseTitle="新建用例"
 
     },
     //获取用例列表之后-同步数据
@@ -1640,7 +1639,6 @@ export default {
     // ________________________________________________________________
 
     CaseEdits(id) {
-      this.caseTitle="基本信息"
       CaseEdit({
         id: id
       }).then(res => {
@@ -1686,7 +1684,6 @@ export default {
         res.status === 200
           ? ((this.currentCaseId = res.results.id),
             this.replace_1(res.results),
-            this.caseTitle="基本信息",
             Message.success(res.msg))
           : null;
       });

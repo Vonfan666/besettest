@@ -19,9 +19,9 @@
                 </el-form-item>
               </el-form>
             </div>
-            <div class="addFiles" @click="addFiles()">
-              <span class="el-icon-plus"></span>
-              <span>新建文件夹</span>
+            <div class="addFiles">
+              <span class="el-icon-plus" style="position: absolute;left: 20px;font-size: 15px;" @click="add()">新建接口</span>
+              <span class="el-icon-plus" @click="addFiles()" style="position: absolute;right: 0px;font-size: 15px;">新建文件夹</span>
             </div>
           </div>
           <!-- 搜索 -->
@@ -124,8 +124,8 @@
         </div>
       </el-dialog>
     </div>
-    <div class="infater-right">
-      <div class="InCon">
+    <div class="infater-right" v-if="statusChild">
+      <div class="InCon" >
         <ir-con ref="irCon"></ir-con>
       </div>
     </div>
@@ -150,6 +150,7 @@
 <script>
 import InfaterContext from "./IntfaterContext.vue";
 import storage from "../../libs/storage";
+import { Loading } from 'element-ui';
 import {
   addFile,
   SelectFile,
@@ -170,6 +171,7 @@ export default {
   },
   data() {
     return {
+      statusChild:true,
       currentid:"",
       styleCode: "height:300px;width:500px", //弹出框大小
       mbFielsStutas: false, //新增文件蒙层状态
@@ -250,6 +252,21 @@ export default {
     };
   },
   methods: {
+    add(){
+      Message("新建接口")
+      this.statusChild = false;
+      console.log("router",this.$route,this.$router)
+
+       this.$nextTick(() => {
+          this.statusChild = true;
+        });
+      let query=this.$route.query
+      let newQquery=JSON.parse(JSON.stringify(query))
+      let path=this.$router.history.current.path
+      delete newQquery.childId
+      this.$router.push({path,query:newQquery})
+
+    },
     open2(msg) {
       this.$message({
         showClose: true,
@@ -777,7 +794,7 @@ export default {
   background: #eee;
 }
 .resize-bar {
-  width: 225px;
+  width: 250px;
   height: inherit;
   resize: horizontal;
   cursor: ew-resize;
@@ -785,7 +802,7 @@ export default {
   overflow: scroll;
   margin-left: 0px;
   max-width: 500px;
-  min-width: 200px;
+  min-width: 230px;
 }
 /* 拖拽线 */
 .resize-line {
@@ -838,7 +855,7 @@ export default {
   cursor: pointer;
 }
 .addFiles {
-  position: absolute;
+  position: relative;
   right: 10px;
   // float: right;
   color: #1e87f0;

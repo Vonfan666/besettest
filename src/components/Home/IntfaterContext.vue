@@ -2,7 +2,7 @@
   <div class="IR">
     <div class="title">
       <span class="t-info">基本信息</span>
-      <div class="Environment">
+      <!-- <div class="Environment">
         <el-form class="top-el-form" :model="model">
           <el-form-item label label-width="63px" label-height="20px" class="top-eft">
             <el-select v-model="model.chiocsEnvironment" placeholder="请选择接口分组">
@@ -17,7 +17,7 @@
             <span class="EnvironmentIcon">选择分组</span>
           </el-form-item>
         </el-form>
-      </div>
+      </div> -->
     </div>
     <div class="top">
       <div class="top-1">
