@@ -817,7 +817,7 @@ export default {
       requestsData: {
         keys: [
           {
-            isRequestsData: true, //是否选中
+            isRequestsData: "true", //是否选中
             dataKey: "", //请求key
             dataValue: "", //请求值
             dataDetail: "" //请求详情
@@ -827,7 +827,7 @@ export default {
       requestsDataf: {
         keys: [
           {
-            isRequestsData: true, //是否选中
+            isRequestsData: "true", //是否选中
             dataKey: "", //请求key
             dataValue: "", //请求值
             dataDetail: "" //请求详情
@@ -1046,7 +1046,7 @@ export default {
           })
         : a === 2 && this.reqyestDataTypeRadio === 1
         ? ele.keys.splice(index + 1, 0, {
-            isRequestsData: true,
+            isRequestsData: "true",
             dataKey: "",
             dataValue: "",
             detaDetail: "",
@@ -1054,7 +1054,7 @@ export default {
           })
         : a === 2 && this.reqyestDataTypeRadio === 3
         ? this.requestsDataf.keys.splice(index + 1, 0, {
-            isRequestsData: true,
+            isRequestsData: "true",
             dataKey: "",
             dataValue: "",
             detaDetail: "",
@@ -1388,7 +1388,7 @@ export default {
       this.requestsDataf = {
         keys: [
           {
-            isRequestsData: true, //是否选中
+            isRequestsData: "true", //是否选中
             dataKey: "", //请求key
             dataValue: "", //请求值
             dataDetail: "" //请求详情
@@ -1459,7 +1459,7 @@ export default {
           ? (this.requestsData.keys.splice(0, this.requestsData.keys.length),
             self.post_data.forEach((item, index) => {
               this.requestsData.keys.push({
-                isRequestsData: true, //是否选中默认为true
+                isRequestsData: "true", //是否选中默认为true
                 dataKey: item.cname,
                 dataValue: item.mockValue,
                 dataDetail: item.detail,
@@ -1485,7 +1485,7 @@ export default {
           ? (this.requestsDataf.keys.splice(0, this.requestsDataf.keys.length),
             self.post_data.forEach((item, index) => {
               this.requestsDataf.keys.push({
-                isRequestsData: true, //是否选中默认为true
+                isRequestsData: "true", //是否选中默认为true
                 dataKey: item.cname,
                 dataValue: item.mockValue,
                 dataDetail: item.detail,

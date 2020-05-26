@@ -720,6 +720,7 @@ export default {
       // console.log("oldData",oldData)
       var falg = 0;
       var fatherList = Object.keys(newData);
+      console.log("newDATA",fatherList,newData)
       // console.log("fatherList", fatherList);
       fatherList.forEach((item, index) => {
         var id = this.chageId(oldData); //改过      11
@@ -730,6 +731,7 @@ export default {
               var typeCode = "Array";
             }
           }
+          
           oldData.splice(oldData.length, 0, {
             cname: item,
             isrequired: "ture",
@@ -743,6 +745,7 @@ export default {
           this.$refs.child.indent.push(falg); //如果是对象则先把这个字段加入对应的边距列表，
           this.forE(newData[item], falg + 15, oldData, id); //然后继续遍历其下的内容  ---去掉newData参数
         } else {
+          console.log("走这里")
           var id = this.chageId(oldData);
           oldData.splice(oldData.length, 0, {
             cname: item,
@@ -752,7 +755,7 @@ export default {
             id: id, //改动
             parentId: 0,
             children: [],
-            mockValue: ""
+            mockValue: newData[item]
           });
           this.$refs.child.indent.push(falg);
         }
@@ -817,6 +820,7 @@ export default {
           } else {
             //如果里面只有键值对-则直接把每个key插入即可
             // var id = this.chageId(oldData)
+            console.log("1111")
             oldData.splice(oldData.length, 0, {
               cname: item,
               isrequired: "ture",
@@ -825,7 +829,7 @@ export default {
               id: id,
               parentId: parentId,
               children: [],
-              mockValue: ""
+              mockValue: obj[item]
             });
             this.$refs.child.indent.push(falg);
           }
