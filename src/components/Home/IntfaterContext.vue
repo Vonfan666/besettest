@@ -752,7 +752,7 @@ export default {
             id: id, //改动
             parentId: 0,
             children: [],
-            mockValue: ""
+            mockValue: newData[item]  //
           });
           this.$refs.child.indent.push(falg);
         }
@@ -783,7 +783,7 @@ export default {
               id: id,
               parentId: parentId,
               children: [],
-              mockValue: ""
+              mockValue: obj[item]
             });
             this.$refs.child.indent.push(falg);
           }
@@ -825,7 +825,7 @@ export default {
               id: id,
               parentId: parentId,
               children: [],
-              mockValue: ""
+              mockValue: obj[item]
             });
             this.$refs.child.indent.push(falg);
           }
@@ -1005,10 +1005,8 @@ export default {
       dicts["id"]=item.id
       dicts["name"]=item.filesName
       this.$parent.list.map(rows=>{
-        if(rows.id===item.file){
-          console.log(rows.id,item.file)
-          console.log(rows)
-          rows.Clist.push(dicts)
+        if(rows.id===item.file && this.$route.query["childId"]!==iem.id){
+         rows.Clist.push(dicts)
         }
       })
     },
