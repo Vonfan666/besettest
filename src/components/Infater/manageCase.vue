@@ -1604,6 +1604,7 @@ export default {
       this.datas.interfaceName = self.name;
       this.datas.caseDetail = self.detail;
       this.dataType = self.dataType;
+      this.datas.chiocsEnvironment=self.environmentId
       var type = self.dataType;
       console.log(type, typeof type);
       type !== 1 && type !== 3
