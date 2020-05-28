@@ -198,3 +198,7 @@ export const CaseList=(params)=>{
 export const CaseEdit=(params)=>{
     return getRequest("/users/case_edit/",params)   
 }
+
+export const Runcase=(params)=>{
+    return postRequest("/users/case_run/",params)   
+}

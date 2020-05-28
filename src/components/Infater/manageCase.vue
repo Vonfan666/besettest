@@ -576,7 +576,7 @@
           </div>
           <div>
             <el-button type="primary" size="small" @click="addCaseSubmit()">确认</el-button>
-            <el-button type="primary" size="small" @click="addCaseSubmit()">调试</el-button>
+            <el-button type="primary" size="small" @click="DebugSubmit()">调试</el-button>
             <el-button type="primary" size="small" @click="addCaseSubmit()">查看结果</el-button>
           </div>
         </div>
@@ -644,40 +644,13 @@
         </div>
       </div>
     </unity-box>
-    <!-- <pushHeader-box v-slot:pushHeader :styleCode="pushHeaderStyle" v-if="statusIng.pushHeaderStatus">
-      <div class="pushHeader" style="margin:10px">
-        <el-input type="pushHeaderText" placeholder="请输入内容" v-model="pushHeaderText"></el-input>
-        <button @click="statusIng.pushHeaderStatus=false">关闭</button>
-        <button @click="test()">提交</button>
-      </div>
-    </pushHeader-box>-->
+    <div>
 
-    <!-- <caseAddFiles-box
-      v-slot:caseAddInterface
-      :styleCode="caseAddFilesBoxStyle"
-      v-if="statusIng.caseAddInterfaceBoxStatus"
-    >
-      <div class="caseBox">
-        <h3>{{caseBoxTtile}}</h3>
-
-        <div class="caseBoxInput">
-          <el-form :model="caseGroupDatats" :rules="rules" ref="refFrom" label-width="80px">
-            <el-form-item :label="caseBoxLable" prop="addInterfaceName">
-              <el-input v-model="caseGroupDatats.addInterfaceName"></el-input>
-            </el-form-item>
-          </el-form>
-        </div>
-        <div class="caseBoxButton">
-          <el-button
-            type="primary"
-            size="small"
-            @click="statusIng.caseAddInterfaceBoxStatus=false"
-          >取消</el-button>
-          <el-button type="primary" size="small" @click="caseAddInterfaceSubmit()">确认</el-button>
-        </div>
-      </div>
-    </caseAddFiles-box>-->
+    <left-box :drawer.sync="statusIng.leftBoxStatuys"></left-box>
   </div>
+  </div>
+
+
 </template>
 
 <script>
@@ -701,7 +674,8 @@ import {
   AddInterfaceCase,
   CaseList,
   ClassRemove,
-  CaseEdit
+  CaseEdit,
+  Runcase,
 } from "../../axios/api.js";
 import storage from "../../libs/storage";
 
@@ -710,10 +684,12 @@ export default {
     "pushHeader-box": () => import("../public/MessageBox.vue"),
     "caseAddFiles-box": () => import("../public/MessageBox.vue"),
     "enviroment-box": () => import("../public/environment.vue"),
-    "unity-box": () => import("../public/MessageBox.vue")
+    "unity-box": () => import("../public/MessageBox.vue"),
+    "left-box":()=>import("../public/manageCaseComponents/leftBox.vue")
   },
   data() {
-    return {
+    return { 
+      // drawer: false,  //左侧弹窗
       currentCaseId: null,
       isUnifyStyle: "width:400px;height:300px",
       pushHeaderText: "",
@@ -744,7 +720,8 @@ export default {
         enviromentStatus: false,
         pushHeaderStatus: true,
         CaselistOrCaseDetailTstatus: true,
-        isUnifyStatus: false
+        isUnifyStatus: false,
+        leftBoxStatuys:false,
       },
       inputStatus: 1, //input输入替换成div输入-显示引用的环境变量的颜色
       searchName: "", //接口搜索名称
@@ -934,6 +911,18 @@ export default {
     };
   },
   methods: {
+    DebugSubmit(){
+      
+      console.log(this.currentCaseId)
+      if(this.currentCaseId){
+        this.RuncaseMethod(this.currentCaseId)
+        
+        this.statusIng.leftBoxStatuys=true
+      }else{
+        Message.error("请选择用例")
+      }
+        
+    },
     ClearBr(key) {
       // key = key.replace(/<\/?.+?>/g, "");
       var key = key.replace(/[\r\n]/g, "||");
@@ -1778,6 +1767,15 @@ export default {
             this.postMethodss())
           : null;
       });
+    },
+    RuncaseMethod(id){
+      Runcase({
+        id:id
+      }).then(res=>{
+        if(res===200){
+          return res.results
+        }
+      })
     }
   },
   Update() {},
