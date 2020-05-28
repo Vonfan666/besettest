@@ -33,13 +33,18 @@
         </div>
         <!-- 新建一级分组 -->
 
-        <div  v-show="!statusIng.searchStatus">
+        <div v-show="!statusIng.searchStatus">
           <!-- <span class="el-icon-plus"></span> -->
           <span class="addFiles el-icon-plus" @click="addFiles()">新建文件夹</span>
-          
-          <el-button type="text" size="small" class="addCaseButton el-icon-plus" @click="addNewCase()">新建用例</el-button>
+
+          <el-button
+            type="text"
+            size="small"
+            class="addCaseButton el-icon-plus"
+            @click="addNewCase()"
+          >新建用例</el-button>
         </div>
-        
+
         <!-- 文档内容 -->
         <div class="FilesContext" v-show="!statusIng.searchStatus">
           <div class="fileName" v-for="(item,index) in caseGroupList" :key="index">
@@ -210,11 +215,7 @@
               <div></div>
               <div class="interfaName">
                 <el-form-item label="用例名称" prop="interfaceName">
-                  <el-input
-                    placeholder="请输入接口名称"
-                    clearable
-                    v-model="datas.interfaceName"
-                  ></el-input>
+                  <el-input placeholder="请输入接口名称" clearable v-model="datas.interfaceName"></el-input>
                   <!-- <div contenteditable="true" class="inputStatus" v-if="!inputStatus" :model="datas.interfaceName">
                     <span class="colors">111</span>
                     <span>3232</span>
@@ -255,13 +256,14 @@
                       ></el-option>
                     </el-select>
                   </div>-->
-
                   <div class="postAttr-2">
-                    <el-input
-                      placeholder="地址:http://192.168.0.0:8080/login"
-                      v-model="datas.urlAttr"
-                      clearable
-                    ></el-input>
+                    <el-form-item prop="urlAttr">
+                      <el-input
+                        placeholder="地址:http://192.168.0.0:8080/login"
+                        v-model="datas.urlAttr"
+                        clearable
+                      ></el-input>
+                    </el-form-item>
                   </div>
                   <!-- <div class="postAttr-3">
                     <el-input placeholder="端口：8080" v-model="datas.urlPort"></el-input>
@@ -789,7 +791,7 @@ export default {
         urlPostType: 1, //请求类型
         caseDetail: "", //用例描述
         postMethods: "", //请求方法
-        order: "",   //排序
+        order: "", //排序
         chiocsEnvironment: "" //
       },
       reqyestDataTypeRadio: 1, //提交的参数类型
@@ -888,18 +890,24 @@ export default {
         interfaceName: [
           { required: true, message: "请填写用例名称", trigger: "blur" }
         ],
-        caseGroupId: [{ required: true, message: "请选择分组",trigger: "blur"  }],
-        urlHttp: [{ required: true, message: "请选择协议",trigger: "blur"  }],
-        urlAttr: [{ required: true, message: "请填写主机地址",trigger: "blur"  }],
-        urlPostType: [{ required: true, message: "必填",trigger: "blur"  }],
-        beforeIndex: [{ required: true, message: "必填",trigger: "blur"  }],
-        beforeName: [{ required: true, message: "必填",trigger: "blur"  }],
-        beforeType: [{ required: true, message: "必填" ,trigger: "blur" }],
-        beforePlan: [{ required: true, message: "必填" ,trigger: "blur" }],
-        addGroupName: [{ required: true, message: "必填",trigger: "blur"  }],
-        addInterfaceName: [{ required: true, message: "必填",trigger: "blur"  }],
-        postMethods: [{ required: true, message: "必填" ,trigger: "blur" }],
-        order: [{ required: true, message: "必填" ,trigger: "blur" }]
+        caseGroupId: [
+          { required: true, message: "请选择分组", trigger: "change" }
+        ],
+        urlHttp: [{ required: true, message: "请选择协议", trigger: "blur" }],
+        urlAttr: [
+          { required: true, message: "请填写主机地址", trigger: "blur" }
+        ],
+        urlPostType: [{ required: true, message: "必填", trigger: "blur" }],
+        beforeIndex: [{ required: true, message: "必填", trigger: "blur" }],
+        beforeName: [{ required: true, message: "必填", trigger: "blur" }],
+        beforeType: [{ required: true, message: "必填", trigger: "blur" }],
+        beforePlan: [{ required: true, message: "必填", trigger: "blur" }],
+        addGroupName: [{ required: true, message: "必填", trigger: "blur" }],
+        addInterfaceName: [
+          { required: true, message: "必填", trigger: "blur" }
+        ],
+        postMethods: [{ required: true, message: "必填", trigger: "change" }],
+        order: [{ required: true, message: "必填", trigger: "blur" }]
         // beforeName: [{ required: true, message: "请输入名称" }]
       },
       caseList: [
@@ -1353,9 +1361,9 @@ export default {
       this.datas.caseGroupId = "";
       this.datas.interfaceName = "";
       this.datas.caseDetail = "";
-      this.datas.postMethods="";
+      this.datas.postMethods = "";
       this.reqyestDataTypeRadio = 1;
-      
+
       this.beforeAction = {
         keys: [
           {
@@ -1493,7 +1501,6 @@ export default {
               });
             }))
           : null;
-          
       }
       // else{
       //   this.requestsDataf.keys.push({
@@ -1571,18 +1578,16 @@ export default {
 
     //编辑用例
     editCase(id, index) {
-      this.currentCaseId=id
+      this.currentCaseId = id;
       this.clearContext();
       this.CaseEdits(id);
       this.statusIng.CaselistOrCaseDetailTstatus = true;
     },
     //新建用例清空相关数据
-    addNewCase(){
-      this.currentCaseId=null,
-      this.clearContext()
-      this.datas.isInterfaceId=""
+    addNewCase() {
+      (this.currentCaseId = null), this.clearContext();
+      this.datas.isInterfaceId = "";
       this.statusIng.CaselistOrCaseDetailTstatus = true;
-
     },
     //获取用例列表之后-同步数据
     caseUnity(res) {
@@ -1599,6 +1604,7 @@ export default {
       this.datas.interfaceName = self.name;
       this.datas.caseDetail = self.detail;
       this.dataType = self.dataType;
+      this.datas.chiocsEnvironment=self.environmentId
       var type = self.dataType;
       console.log(type, typeof type);
       type !== 1 && type !== 3
@@ -1624,15 +1630,12 @@ export default {
     },
     replace_3f(self) {
       console.log("走这里没有");
-      
-        self.data !== null ? (this.requestsDataf = self.data) : null;
-     
+
+      self.data !== null ? (this.requestsDataf = self.data) : null;
     },
     //替换请求数据
     replace_3(self) {
-     
-        self.data !== null? (this.requestsData = self.data) : null;
-      
+      self.data !== null ? (this.requestsData = self.data) : null;
     },
     //********************************************************************************************************* */
     //以下方法为接口请求
@@ -1643,7 +1646,6 @@ export default {
         id: id
       }).then(res => {
         if (res.status === 200) {
-          
           console.log("zouni");
           var self = res.results[0];
           this.replace_1(self);
@@ -1661,10 +1663,10 @@ export default {
 
     //确认添加用例接口
     addCase() {
-      var  requestsData=null
-      this.reqyestDataTypeRadio===1
-      ? requestsData=this.requestsData
-      : requestsData=this.requestsDataf
+      var requestsData = null;
+      this.reqyestDataTypeRadio === 1
+        ? (requestsData = this.requestsData)
+        : (requestsData = this.requestsDataf);
       AddInterfaceCase({
         id: this.currentCaseId,
         name: this.datas.interfaceName,
@@ -1936,7 +1938,7 @@ export default {
     cursor: pointer;
     font-size: 15px;
   }
-  .addCaseButton{
+  .addCaseButton {
     display: inline-block;
     position: absolute;
     cursor: pointer;

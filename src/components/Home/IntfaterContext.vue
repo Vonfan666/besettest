@@ -755,7 +755,10 @@ export default {
             id: id, //改动
             parentId: 0,
             children: [],
+
             mockValue: newData[item]
+
+
           });
           this.$refs.child.indent.push(falg);
         }
@@ -786,7 +789,7 @@ export default {
               id: id,
               parentId: parentId,
               children: [],
-              mockValue: ""
+              mockValue: obj[item]
             });
             this.$refs.child.indent.push(falg);
           }
@@ -978,10 +981,8 @@ export default {
           if (res.results.res_type != null) {
             this.model.resType = res.results.res_type.id;
           }
-
           this.model.infaterName = res.results.filesName;
           //修改左侧导航接口文档名称
-
           // this.$parent.updateFiels.fielsName=res.results[0].filesName
           this.model.postAttr = res.results.post_attr;
           this.model.interDetail = res.results.interface_detail;
@@ -998,8 +999,23 @@ export default {
           if (this.resDatas == null) {
             this.resDatas = [];
           }
+          
+          this.pushAddReq(res.results)
         }
       });
+    },
+    //添加成功之后向列表push一个值进去
+    pushAddReq(item){
+      var dicts={}
+      dicts["createUserName"]=item.create_user
+      dicts["fid"]=item.file
+      dicts["id"]=item.id
+      dicts["name"]=item.filesName
+      this.$parent.list.map(rows=>{
+        if(rows.id===item.file && this.$route.query["childId"]!==iem.id){
+         rows.Clist.push(dicts)
+        }
+      })
     },
     mockRequests() {
       var headers = {};
