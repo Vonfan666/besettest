@@ -644,13 +644,12 @@
         </div>
       </div>
     </unity-box>
-    <div>
-
-    <left-box :drawer.sync="statusIng.leftBoxStatuys"></left-box>
+   
+      <el-drawer title="我是标题" :visible.sync="statusIng.drawerStatus"  :with-header="false" size="50%">
+        <left-box :list.sync="resResults"></left-box>
+      </el-drawer>
+    
   </div>
-  </div>
-
-
 </template>
 
 <script>
@@ -675,7 +674,7 @@ import {
   CaseList,
   ClassRemove,
   CaseEdit,
-  Runcase,
+  Runcase
 } from "../../axios/api.js";
 import storage from "../../libs/storage";
 
@@ -685,11 +684,12 @@ export default {
     "caseAddFiles-box": () => import("../public/MessageBox.vue"),
     "enviroment-box": () => import("../public/environment.vue"),
     "unity-box": () => import("../public/MessageBox.vue"),
-    "left-box":()=>import("../public/manageCaseComponents/leftBox.vue")
+    "left-box": () => import("../public/manageCaseComponents/leftBox.vue")
   },
   data() {
-    return { 
+    return {
       // drawer: false,  //左侧弹窗
+      resResults:null,
       currentCaseId: null,
       isUnifyStyle: "width:400px;height:300px",
       pushHeaderText: "",
@@ -721,7 +721,7 @@ export default {
         pushHeaderStatus: true,
         CaselistOrCaseDetailTstatus: true,
         isUnifyStatus: false,
-        leftBoxStatuys:false,
+        drawerStatus: false
       },
       inputStatus: 1, //input输入替换成div输入-显示引用的环境变量的颜色
       searchName: "", //接口搜索名称
@@ -911,17 +911,15 @@ export default {
     };
   },
   methods: {
-    DebugSubmit(){
-      
-      console.log(this.currentCaseId)
-      if(this.currentCaseId){
-        this.RuncaseMethod(this.currentCaseId)
+    DebugSubmit() {
+      console.log(this.currentCaseId);
+      if (this.currentCaseId) {
+        this.RuncaseMethod(this.currentCaseId);
+        console.log(this.resResults)
         
-        this.statusIng.leftBoxStatuys=true
-      }else{
-        Message.error("请选择用例")
+      } else {
+        Message.error("请选择用例");
       }
-        
     },
     ClearBr(key) {
       // key = key.replace(/<\/?.+?>/g, "");
@@ -1593,7 +1591,7 @@ export default {
       this.datas.interfaceName = self.name;
       this.datas.caseDetail = self.detail;
       this.dataType = self.dataType;
-      this.datas.chiocsEnvironment=self.environmentId
+      this.datas.chiocsEnvironment = self.environmentId;
       var type = self.dataType;
       console.log(type, typeof type);
       type !== 1 && type !== 3
@@ -1768,14 +1766,15 @@ export default {
           : null;
       });
     },
-    RuncaseMethod(id){
+    RuncaseMethod(id) {
       Runcase({
-        id:id
-      }).then(res=>{
-        if(res===200){
-          return res.results
+        id: id
+      }).then(res => {
+        if (res.status === 200) {
+          this.resResults=res.results
+          this.statusIng.drawerStatus = true; //展开左侧
         }
-      })
+      });
     }
   },
   Update() {},
