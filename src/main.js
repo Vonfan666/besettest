@@ -6,9 +6,12 @@ import router from './router'
 import ElementUi  from "element-ui"
 import 'element-ui/lib/theme-chalk/index.css';
 import "../static/icon/iconfont.css"
+
+import JsonViewer from 'vue-json-viewer'
 Vue.config.productionTip = false
 
 
+Vue.use(JsonViewer)
 
 
 // 在调用 Vue.use 前，给 Message 添加 install 方法
