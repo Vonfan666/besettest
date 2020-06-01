@@ -198,3 +198,17 @@ export const CaseList=(params)=>{
 export const CaseEdit=(params)=>{
     return getRequest("/users/case_edit/",params)   
 }
+
+
+// export const Runcase=(params)=>{
+//     return postRequest("/users/case_run/",params)   
+// }
+
+//用例单点执行
+export const Runcase=(params)=>{
+    return postRequest("/users/case_run/",params)   
+}
+//用用例调试
+export const DebugCase=(params)=>{
+    return postRequest("/users/case_debug/",params)   
+}

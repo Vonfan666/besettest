@@ -130,7 +130,7 @@
                   @click="removeCase(scope.row.id,scope.$index)"
                 >删除</el-button>
                 <el-button type="text" size="small" @click="editCase(scope.row.id,scope.$index)">编辑</el-button>
-                <el-button type="text" size="small">单点执行</el-button>
+                <el-button type="text" size="small" @click="executionSubmit(scope.row.id)">单点执行</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -138,8 +138,8 @@
         <div class="caseFoot">
           <div class="caseFoot-1">
             <el-button type="primary" @click="caseListBack()">返回</el-button>
-            <el-button type="primary" size="primary">保存</el-button>
-            <el-button type="primary" size="primary">调试</el-button>
+            <!-- <el-button type="primary" size="primary">保存</el-button> -->
+            <el-button type="primary" size="primary" @click="runAllCase()">全部执行</el-button>
             <el-button type="primary" size="primary">查看结果</el-button>
           </div>
         </div>
@@ -576,7 +576,7 @@
           </div>
           <div>
             <el-button type="primary" size="small" @click="addCaseSubmit()">确认</el-button>
-            <el-button type="primary" size="small" @click="addCaseSubmit()">调试</el-button>
+            <el-button type="primary" size="small" @click="DebugSubmit()">调试</el-button>
             <el-button type="primary" size="small" @click="addCaseSubmit()">查看结果</el-button>
           </div>
         </div>
@@ -644,39 +644,14 @@
         </div>
       </div>
     </unity-box>
-    <!-- <pushHeader-box v-slot:pushHeader :styleCode="pushHeaderStyle" v-if="statusIng.pushHeaderStatus">
-      <div class="pushHeader" style="margin:10px">
-        <el-input type="pushHeaderText" placeholder="请输入内容" v-model="pushHeaderText"></el-input>
-        <button @click="statusIng.pushHeaderStatus=false">关闭</button>
-        <button @click="test()">提交</button>
-      </div>
-    </pushHeader-box>-->
-
-    <!-- <caseAddFiles-box
-      v-slot:caseAddInterface
-      :styleCode="caseAddFilesBoxStyle"
-      v-if="statusIng.caseAddInterfaceBoxStatus"
-    >
-      <div class="caseBox">
-        <h3>{{caseBoxTtile}}</h3>
-
-        <div class="caseBoxInput">
-          <el-form :model="caseGroupDatats" :rules="rules" ref="refFrom" label-width="80px">
-            <el-form-item :label="caseBoxLable" prop="addInterfaceName">
-              <el-input v-model="caseGroupDatats.addInterfaceName"></el-input>
-            </el-form-item>
-          </el-form>
+   
+      <el-drawer :visible.sync="statusIng.drawerStatus"  :with-header="false" size="60%">
+        <div>
+          <left-box :list.sync="resResults" :code.sync="code" ref="letfBox"  v-if="statusIng.drawerStatus"></left-box>
         </div>
-        <div class="caseBoxButton">
-          <el-button
-            type="primary"
-            size="small"
-            @click="statusIng.caseAddInterfaceBoxStatus=false"
-          >取消</el-button>
-          <el-button type="primary" size="small" @click="caseAddInterfaceSubmit()">确认</el-button>
-        </div>
-      </div>
-    </caseAddFiles-box>-->
+        
+      </el-drawer>
+    
   </div>
 </template>
 
@@ -701,7 +676,9 @@ import {
   AddInterfaceCase,
   CaseList,
   ClassRemove,
-  CaseEdit
+  CaseEdit,
+  Runcase,
+  DebugCase,
 } from "../../axios/api.js";
 import storage from "../../libs/storage";
 
@@ -710,10 +687,14 @@ export default {
     "pushHeader-box": () => import("../public/MessageBox.vue"),
     "caseAddFiles-box": () => import("../public/MessageBox.vue"),
     "enviroment-box": () => import("../public/environment.vue"),
-    "unity-box": () => import("../public/MessageBox.vue")
+    "unity-box": () => import("../public/MessageBox.vue"),
+    "left-box": () => import("../public/manageCaseComponents/leftBox.vue")
   },
   data() {
     return {
+      code:null, //判断是否启用websocket
+      // drawer: false,  //左侧弹窗
+      resResults:[],
       currentCaseId: null,
       isUnifyStyle: "width:400px;height:300px",
       pushHeaderText: "",
@@ -744,7 +725,8 @@ export default {
         enviromentStatus: false,
         pushHeaderStatus: true,
         CaselistOrCaseDetailTstatus: true,
-        isUnifyStatus: false
+        isUnifyStatus: false,
+        drawerStatus: false
       },
       inputStatus: 1, //input输入替换成div输入-显示引用的环境变量的颜色
       searchName: "", //接口搜索名称
@@ -934,6 +916,85 @@ export default {
     };
   },
   methods: {
+    runAllCase(){
+      //执行单个测试用例
+      var idList=[]
+      this.caseList.forEach((item,index)=>{
+        idList.push(item.id)
+      })
+      this.statusIng.drawerStatus = true; //展开左侧
+      this.code=idList
+      
+      
+      // var idList=[]
+      // this.caseList.forEach((item,index)=>{
+      //   idList.push(item.id)
+      // })
+      // console.log(idList)
+      // if (idList) {
+      //   this.RuncaseMethod([idList]);
+      //   // console.log(this.resResults)
+        
+      // } else {
+      //   Message.error("请选择用例");
+      // }
+    },
+    executionSubmit(id){
+      //执行单个测试用例
+      var idList=[]
+      idList.push(id)
+      console.log(idList)
+      if (id) {
+        this.RuncaseMethod(idList);
+        // console.log(this.resResults)
+        
+      } else {
+        Message.error("请选择用例");
+      }
+    },
+    DebugSubmit() {
+      //不提交调试测试用例
+      // isRequestsData
+       var requestsData = null;
+      this.reqyestDataTypeRadio === 1
+        ? (requestsData = JSON.parse(JSON.stringify(this.requestsData)))
+        : (requestsData = JSON.parse(JSON.stringify(this.requestsDataf)));
+      requestsData.keys.forEach((item,index)=>{
+        if(item.isRequestsData===false){
+          requestsData.keys.splice(index,1)
+          console.log(requestsData)
+        }
+      })
+      DebugCase({
+        // id: this.currentCaseId,
+        name: this.datas.interfaceName,
+        // order: this.datas.order,
+        // userId: storage.get("userId"),
+        // CaseGroupId: this.datas.caseGroupId,
+        postMethod: this.datas.postMethods,
+        dataType: this.reqyestDataTypeRadio,
+        attr: this.datas.urlAttr,
+        // status: this.datas.interfaceIsOk,
+        // detail: this.caseDetail,
+        // isGlobalsHeader:""  //是否使用全局请起头
+        headers: JSON.stringify(this.requestsHeader),
+        data: JSON.stringify(requestsData),
+        environmentId: this.datas.chiocsEnvironment
+      }).then(res=>{
+        if(res.status===200){
+        var listx=[]
+        listx.push(res.results)
+        this.resResults=listx
+        this.statusIng.drawerStatus = true; //展开左侧
+        // this.$refs.letfBox.leftCaseName=false
+        
+        
+         
+         
+         
+        }
+      })
+    },
     ClearBr(key) {
       // key = key.replace(/<\/?.+?>/g, "");
       var key = key.replace(/[\r\n]/g, "||");
@@ -942,7 +1003,7 @@ export default {
     },
     //将请求头转化为json数据导入
     pushHeaders() {
-      console.log("开始导入");
+      // console.log("开始导入");
       var str = this.ClearBr(this.pushHeaderText);
       var lists = str.split("||");
 
@@ -950,14 +1011,14 @@ export default {
 
       lists.forEach((item, index) => {
         var dic = item.split(":");
-        console.log(dic);
+        // console.log(dic);
         this.requestsHeader.keys.push({
           headerKey: dic[0], //请求头key
           headerValue: dic[1], //请求头value
           headerDetail: "" //简要描述
         });
       });
-      console.log(this.requestsHeader);
+      // console.log(this.requestsHeader);
     },
     //将对象转化为 换行的格式
     reversePushHeader() {
@@ -982,7 +1043,7 @@ export default {
     //点击用例--修改接口文件的背景颜色
     changeColor(self) {
       var ele = self.currentTarget;
-      console.log(ele.classList);
+      // console.log(ele.classList);
       var eles = document.querySelectorAll(".fileName .activeColor");
 
       ele.classList.length === 1
@@ -1024,7 +1085,7 @@ export default {
     },
     //新增前置处理项
     addDictToList(index, a) {
-      console.log(a);
+      // console.log(a);
       var ele = this.isBeforeEle(a);
       a === 0
         ? ele.keys.splice(index + 1, 0, {
@@ -1081,7 +1142,7 @@ export default {
       if (index !== 0) {
         ele.keys.splice(index, 1);
       }
-      console.log(this.requestsHeader);
+      // console.log(this.requestsHeader);
     },
     //编辑顺序时判断是否重复
     changeIndex(index, a) {
@@ -1091,9 +1152,9 @@ export default {
         Message.error("最大值不能超过99");
       } else {
         var isHave = list.map(row => row.beforeIndex);
-        console.log("输入的", typeof list[index].beforeIndex);
+        // console.log("输入的", typeof list[index].beforeIndex);
         isHave.splice(index, 1); //删掉当前输入的,isHave就只剩当前以外的，然后判断当前输入的在不在之前的列表即可判断是否重复
-        console.log(isHave);
+        // console.log(isHave);
         isHave.indexOf(list[index].beforeIndex) >= 0
           ? Message.error("执行顺序不能重复")
           : null;
@@ -1130,16 +1191,16 @@ export default {
     },
     //左侧用例组搜索--
     searchNameMethod() {
-      console.log("揍你", this.searchName, typeof this.searchName);
+      // console.log("揍你", this.searchName, typeof this.searchName);
       var searList = this.caseGroupList.map(row =>
         row.idCaseGroupFiles.filter(rows => rows.name.includes(this.searchName))
       );
-      console.log("searList", searList);
+      // console.log("searList", searList);
       var endSearList = searList.filter(
         row => row.length > 0 && Array.isArray(row)
       );
       this.searchList.splice(0, this.searchList.length);
-      console.log(endSearList);
+      // console.log(endSearList);
       if (endSearList.length > 0) {
         endSearList.forEach((item, index) => {
           this.searchList = this.searchList.concat(item);
@@ -1151,14 +1212,14 @@ export default {
     },
     //点击搜索出来的用例--跳转到对应的组-并打开对应的组-以及当前的背景颜色
     searchResult(fid, cid) {
-      console.log(fid, cid);
+      // console.log(fid, cid);
       this.statusIng.searchStatus = !this.statusIng.searchStatus;
       this.caseGroupList.forEach((item, index) => {
         if (item.id === fid) {
           this.fileNameIcon.splice(index, 1, "el-icon-caret-bottom");
           this.fileNameChildStatus.splice(index, 1, true);
           item.idCaseGroupFiles.forEach((item1, index1) => {
-            console.log(item1.id, cid);
+            // console.log(item1.id, cid);
             if (item1.id === cid) {
               var eles = document.querySelectorAll(".fileName .activeColor");
               eles.forEach((item, index) => {
@@ -1204,7 +1265,7 @@ export default {
     caseAddInterfaceSubmit() {
       var type = this.commandCode.splice(-1)[0];
       if (type === "father") {
-        console.log(this.commandCode[0]);
+        // console.log(this.commandCode[0]);
         var status = this.commandCode[0];
         var fid = this.commandCode[1];
         var findex = this.commandCode[2];
@@ -1258,7 +1319,6 @@ export default {
         }
       }
       if (type === "child") {
-        console.log();
         var status = this.commandCode[0];
         var findex = this.commandCode[2];
         var cid = this.commandCode[3];
@@ -1287,7 +1347,7 @@ export default {
     },
     //操作接口文件
     GroupChildAction(command) {
-      console.log(command);
+      // console.log(command);
       command[0] === "b"
         ? ((this.statusIng.caseAddInterfaceBoxStatus = true),
           (this.caseBoxTtile = "用例接口重命名"),
@@ -1310,7 +1370,7 @@ export default {
     },
     //操作分组文件
     GroupFatherAction(command) {
-      console.log(command);
+      // console.log(command);
       command[0] === "a"
         ? (((this.statusIng.caseAddInterfaceBoxStatus = true),
           (this.caseBoxTtile = "新建用例接口"),
@@ -1340,7 +1400,7 @@ export default {
     requestsTitile2() {},
     requestsTitile3() {},
     requestsTitile4() {
-      console.log("haha");
+      // console.log("haha");
     },
     enviromentAction() {
       this.statusIng.enviromentStatus = !this.statusIng.enviromentStatus;
@@ -1425,12 +1485,12 @@ export default {
       this.datas.urlAttr = self.post_attr; //替换请求地址
       this.datas.caseDetail = self.interface_detail; //替换用例描述
       var type = self.post_type;
-      console.log(type, typeof type);
+      // console.log(type, typeof type);
       type !== 1 && type !== 3
         ? (this.reqyestDataTypeRadio = 1)
         : (this.reqyestDataTypeRadio = type);
 
-      console.log(this.reqyestDataTypeRadio);
+      // console.log(this.reqyestDataTypeRadio);
       this.replaceHeader(self); //替换请求头部数据
       this.reqyestDataTypeRadio === 1
         ? this.replaceData(self) //替换请求参数
@@ -1441,7 +1501,7 @@ export default {
     },
     //替换请求头部数据
     replaceHeader(self) {
-      console.log(Array.isArray(self.post_header));
+      // console.log(Array.isArray(self.post_header));
       if (Array.isArray(self.post_header)) {
         self.post_header.length > 0
           ? //如果该接口post_header有数据--则先删除之前的内容
@@ -1526,7 +1586,7 @@ export default {
     },
     //遍历后台返回的接口文档--并加到filesName去
     filesNames(self) {
-      console.log("111", this.caseGroupList);
+      // console.log("111", this.caseGroupList);
       self.forEach((item, index) => {
         this.filesName = this.filesName.concat(item.Clist);
       });
@@ -1552,7 +1612,7 @@ export default {
     caseSelection(val) {
       //选中的item val是一个对象列表--
       this.multipleSelection = val;
-      console.log(this.multipleSelection);
+      // console.log(this.multipleSelection);
     },
     //确认添加用例
     addCaseSubmit() {
@@ -1591,7 +1651,7 @@ export default {
     },
     //获取用例列表之后-同步数据
     caseUnity(res) {
-      console.log(JSON.stringify(res[0]));
+      // console.log(JSON.stringify(res[0]));
       this.caseList = res;
     },
     //******************************************************************************************************** */
@@ -1604,14 +1664,14 @@ export default {
       this.datas.interfaceName = self.name;
       this.datas.caseDetail = self.detail;
       this.dataType = self.dataType;
-      this.datas.chiocsEnvironment=self.environmentId
+      this.datas.chiocsEnvironment = self.environmentId;
       var type = self.dataType;
-      console.log(type, typeof type);
+      // console.log(type, typeof type);
       type !== 1 && type !== 3
         ? (this.reqyestDataTypeRadio = 1)
         : (this.reqyestDataTypeRadio = type);
 
-      console.log(this.reqyestDataTypeRadio);
+      // console.log(this.reqyestDataTypeRadio);
       this.replace_2(self); //替换请求头部数据
       this.reqyestDataTypeRadio === 1
         ? this.replace_3(self) //替换请求参数
@@ -1622,14 +1682,14 @@ export default {
     },
     //替换请求头
     replace_2(self) {
-      console.log(Array.isArray(self.headers));
+      // console.log(Array.isArray(self.headers));
       self.headers !== null
         ? //如果该接口post_header有数据--则先删除之前的内容
           (this.requestsHeader = self.headers)
         : null;
     },
     replace_3f(self) {
-      console.log("走这里没有");
+      // console.log("走这里没有");
 
       self.data !== null ? (this.requestsDataf = self.data) : null;
     },
@@ -1646,7 +1706,6 @@ export default {
         id: id
       }).then(res => {
         if (res.status === 200) {
-          console.log("zouni");
           var self = res.results[0];
           this.replace_1(self);
         }
@@ -1714,7 +1773,6 @@ export default {
         id: this.datas.isInterfaceId
       }).then(res => {
         if (res.status === 200) {
-          console.log(res.results, "???");
           this.addContext(res.results[0]); //返回接口主题内容
         }
       });
@@ -1723,7 +1781,6 @@ export default {
     EnvironmentsSelect() {
       EnvironmentsSelect().then(res => {
         if (res.status === 200) {
-          console.log(res.results);
           this.Environments = res.results.E_data;
           this.globarls = res.results.G_data;
           // this.statusIng.enviromentStatus = !this.statusIng.enviromentStatus;
@@ -1778,6 +1835,21 @@ export default {
             this.postMethodss())
           : null;
       });
+    },
+    RuncaseMethod(id) {
+      var id=JSON.stringify(id)
+      Runcase({
+        id: id
+      }).then(res => {
+        if (res.status === 200) {
+          this.resResults=res.results
+          this.statusIng.drawerStatus = true; //展开左侧
+         
+          
+        }else{
+          Message.error(res.msg)
+        }
+      });
     }
   },
   Update() {},
@@ -1791,6 +1863,7 @@ export default {
   //   // this.filesNames();
   //   // console.log(JSON.stringify(this.caseGroupList));
   // }
+ 
   watch: {
     $route: {
       handler: function(newValue, oldValue) {
@@ -1800,7 +1873,13 @@ export default {
         }
       },
       deep: true
+    },
+    "statusIng.drawerStatus": function(a,b){
+      if(!a){
+        this.resResults=[]
+      }
     }
+    
   }
 };
 </script>
