@@ -916,14 +916,21 @@ export default {
     };
   },
   methods: {
+
     runAllCase(){
-      //执行单个测试用例
+      //执行整个接口用例  这里是前端排序
+      console.log(this.multipleSelection)
       var idList=[]
-      this.caseList.forEach((item,index)=>{
+      if(this.multipleSelection.length>0){
+        this.multipleSelection.forEach((item,index)=>{
         idList.push(item.id)
       })
       this.statusIng.drawerStatus = true; //展开左侧
       this.code=idList
+      }else{
+        Message.error("请选择需要执行的用例")
+      }
+      
       
       
       // var idList=[]

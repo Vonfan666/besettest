@@ -18,10 +18,10 @@
       <div class="left-box-left" v-if="leftCaseName">
         <div style="margin:10px 10px 0 0">
           <div style="margin:10px">
-            <span>用例名称</span>
+            <span >用例名称</span>
           </div>
-          <li v-for="(item,index) in list" :key="index" :listDict="item">
-            <el-link type="success" @click="caseNameClick(item,index)">{{item.name}}</el-link>
+          <li v-for="(item,index) in list" :key="index" :listDict="item" style="margin:10px;text-align:left;overflow-x:hidden">
+            <el-link :type="caseNameColorList[index]"  @click="caseNameClick(item,index)">{{item.name}}</el-link>
           </li>
         </div>
       </div>
@@ -30,7 +30,7 @@
           <el-tab-pane label="Headers" name="first">
             <div class="Headers">
               <el-collapse v-model="activeNames" @change="handleChange">
-                <el-collapse-item title="请求地址" name="4">
+                <el-collapse-item title="请求地址" name="0">
                   <div class="attr" style="text-align:left">
                     <li>
                       <span>
@@ -50,13 +50,19 @@
                       </span>
                       <span>{{lists.listDictResStatus}}</span>
                     </li>
+                    <li v-if="lists.listDictPostCode===0" style="color:red">
+                      <span>
+                        <b>Errors：</b>
+                      </span>
+                      <span>{{lists.listDictPostErrors}}</span>
+                    </li>
                   </div>
                 </el-collapse-item>
                 <el-collapse-item title="请求头" name="1">
                   <div class="hds" style="text-align:left">
                     <li v-for="(item,index) in Object.keys(lists.listDictPostHeaders)" :key="index">
                       <span>
-                        <b>{{item}}</b>
+                        <b>{{item}}：</b>
                       </span>
                       <span>{{lists.listDictPostHeaders[item]}}</span>
                     </li>
@@ -68,7 +74,7 @@
                     :key="index"
                   >
                     <span>
-                      <b>{{item}}</b>
+                      <b>{{item}}：</b>
                     </span>
                     <span>{{lists.listDictPostresHeaders[item]}}</span>
                   </li>
@@ -76,7 +82,7 @@
                 <el-collapse-item title="请求数据" name="3" style="text-align:left">
                   <li v-for="(item,index) in Object.keys(lists.listDictPostData)" :key="index">
                     <span>
-                      <b>{{item}}</b>
+                      <b>{{item}}：</b>
                     </span>
                     <span>{{lists.listDictPostData[item]}}</span>
                   </li>
@@ -105,16 +111,17 @@ export default {
   props: ["list", "code"],
   data() {
     return {
+      caseNameColorList:[],
       aa: [],
       path: "ws://192.168.0.66:8081/ws/users/case_run/",
       socket: "",
-      activeName: "second",
+      activeName: "first",
       res: {
         postHeader: null,
         postMethods: null,
         resStatus: null
       },
-      activeNames: ["1"],
+      activeNames: ["0"],
       leftCaseName: true,
       listDict: null, //list遍历的item
       lists: {
@@ -125,14 +132,19 @@ export default {
         listDictPostHeaders: {},
         listDictPostresHeaders: {},
         listDictPostResData: {},
-        listDictPostResText: {}
+        listDictPostResText: {},
+        listDictPostCode:1,
+        listDictPostErrors:null
       }
     };
   },
   methods: {
     caseNameClick(item, index) {
       this.listDict = item;
-
+      var objectKeys=Object.keys(this.listDict)
+      objectKeys.indexOf("resHeaders")<0 ? this.listDict["resHeaders"]={} :null
+      objectKeys.indexOf("resData")<0 ? this.listDict["resData"]={} :null
+      objectKeys.indexOf("resText")<0 ? this.listDict["resText"]={} :null
       this.lists.listDictPostUrl = this.listDict.postUrl;
       this.lists.listDictPostMethods = this.listDict.postMethods;
       this.lists.listDictResStatus = this.listDict.resStatus;
@@ -141,9 +153,12 @@ export default {
       this.lists.listDictPostData = this.listDict.postData;
       this.lists.listDictPostResData = this.listDict.resData;
       this.lists.listDictPostResText = this.listDict.resText;
+      this.lists.listDictPostCode = this.listDict.code;
+      this.lists.listDictPostErrors = this.listDict.errors;
+      console.log("errors",this.listDictPostErrors)
       // this.lists.
 
-      console.log(this.listDict);
+      
     },
     //tab组件切换方法
     handleClick(tab, event) {
@@ -182,7 +197,11 @@ export default {
     getMessage: function(msg) {
       var item=JSON.parse(msg.data)
       console.log(item)
+      
       this.list.push(item)
+      item.code===1?this.caseNameColorList.push("success"):null  //正常返回数据
+      item.code===0?this.caseNameColorList.push("danger"):null   //请求异常数据
+      item.code===2?this.caseNameColorList.push("warning"):null  //断言失败
       if(this.list.length>1){
         this.leftCaseName=true
       }
@@ -223,8 +242,7 @@ export default {
       this.socket.close();
     }
     
-    
-    this.$emit("update:code",this.code=null)
+    this.$emit("update:code",null)
     console.log(this.code)
    
     
