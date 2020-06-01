@@ -99,7 +99,9 @@
             <div style="text-align:left;" class="Response">{{lists.listDictPostResText}}</div>
           </el-tab-pane>
 
-          <el-tab-pane label="Assert" name="fourth">定时任务补偿</el-tab-pane>
+          <el-tab-pane label="Assert" name="fourth">
+             <div style="text-align:left;" class="Assert"></div>
+          </el-tab-pane>
         </el-tabs>
       </div>
     </div>
@@ -205,7 +207,7 @@ export default {
       if(this.list.length>1){
         this.leftCaseName=true
       }
-      if(this.list.length>=1){
+      if(this.list.length<=1){
         this.caseNameClick(this.list[0])
       }
       
@@ -256,7 +258,8 @@ export default {
       this.init();
       console.log("obj");
     }
-    this.chiocesLitsOne();
+    this.list.length<=1?
+    this.chiocesLitsOne():null;
   },
   watch: {
     list(a, b) {
