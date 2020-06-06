@@ -71,6 +71,8 @@
                 <el-collapse-item title="返回头" name="2" style="text-align:left">
                   <li
                     v-for="(item,index) in Object.keys(lists.listDictPostresHeaders)"
+
+                    
                     :key="index"
                   >
                     <span>
@@ -142,11 +144,13 @@ export default {
   },
   methods: {
     caseNameClick(item, index) {
+      
       this.listDict = item;
       var objectKeys=Object.keys(this.listDict)
       objectKeys.indexOf("resHeaders")<0 ? this.listDict["resHeaders"]={} :null
       objectKeys.indexOf("resData")<0 ? this.listDict["resData"]={} :null
       objectKeys.indexOf("resText")<0 ? this.listDict["resText"]={} :null
+
       this.lists.listDictPostUrl = this.listDict.postUrl;
       this.lists.listDictPostMethods = this.listDict.postMethods;
       this.lists.listDictResStatus = this.listDict.resStatus;

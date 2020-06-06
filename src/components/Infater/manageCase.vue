@@ -1454,9 +1454,10 @@ export default {
       this.requestsData = {
         keys: [
           {
-            headerKey: "", //请求头key
-            headerValue: "", //请求头value
-            headerDetail: "" //简要描述
+            isRequestsData: "true", //是否选中
+            dataKey: "", //请求头key
+            dataValue: "", //请求头value
+            dataDetail: "" //简要描述
           }
         ]
       };
