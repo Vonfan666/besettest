@@ -106,6 +106,11 @@
       <div class="right-title">
         <div class="title-detail">
           <span class="tt">用例列表</span>
+          <span style="margin-left:50px">当前执行顺序:</span>
+          <span  v-if="statusIng.caseOrderStatus">{{datas.caseOrder}}</span>
+          <input v-model="datas.caseOrder" placeholder="输入执行顺序" style="margin-left:10px;border: none;width: 40px;" v-if="!statusIng.caseOrderStatus">
+          <span style="margin-left:10px;color:#409EFF;cursor: pointer;" v-if="statusIng.caseOrderStatus" @click="statusIng.caseOrderStatus=!statusIng.caseOrderStatus">编辑</span>
+          <span style="margin-left:10px;color:#409EFF;cursor: pointer;" v-if="!statusIng.caseOrderStatus" @click="caseOrderSubmit()">确定</span>
         </div>
         <div class="caseList">
           <el-table :data="caseList" border style="width: 100%" @selection-change="caseSelection">
@@ -679,6 +684,7 @@ import {
   CaseEdit,
   Runcase,
   DebugCase,
+  CaseOrder,CaseOrderGet
 } from "../../axios/api.js";
 import storage from "../../libs/storage";
 
@@ -692,10 +698,12 @@ export default {
   },
   data() {
     return {
+      
       code:null, //判断是否启用websocket
       // drawer: false,  //左侧弹窗
       resResults:[],
       currentCaseId: null,
+      currentInterfaceId:null,
       isUnifyStyle: "width:400px;height:300px",
       pushHeaderText: "",
       pushHeaderStyle: "height:500px;width:500px",
@@ -726,7 +734,8 @@ export default {
         pushHeaderStatus: true,
         CaselistOrCaseDetailTstatus: true,
         isUnifyStatus: false,
-        drawerStatus: false
+        drawerStatus: false,
+        caseOrderStatus:true,
       },
       inputStatus: 1, //input输入替换成div输入-显示引用的环境变量的颜色
       searchName: "", //接口搜索名称
@@ -774,7 +783,8 @@ export default {
         caseDetail: "", //用例描述
         postMethods: "", //请求方法
         order: "", //排序
-        chiocsEnvironment: "" //
+        chiocsEnvironment: "" ,//
+        caseOrder:"",
       },
       reqyestDataTypeRadio: 1, //提交的参数类型
       //前置处理器
@@ -916,7 +926,18 @@ export default {
     };
   },
   methods: {
-
+    caseOrderSubmit(){
+      CaseOrder({
+        id:this.currentInterfaceId,
+        order:this.datas.caseOrder
+      }).then(res=>{
+        if(res.status===200){
+          this.datas.caseOrder=res.order
+          Message.success("修改成功")
+          this.statusIng.caseOrderStatus=true
+        }
+      })
+    },
     runAllCase(){
       //执行整个接口用例  这里是前端排序
       console.log(this.multipleSelection)
@@ -1720,12 +1741,27 @@ export default {
       });
     },
     caseLists(id) {
+      this.currentInterfaceId=id
       this.inCaseList();
+
       CaseList({
         id: id
       }).then(res => {
         res.status === 200 ? this.caseUnity(res.results) : null;
       });
+       CaseOrderGet({
+        id:this.currentInterfaceId
+        
+      }).then(res=>{
+        if(res.status===200){
+          if(res.order){
+            this.datas.caseOrder=res.order
+          }else{
+            this.datas.caseOrder=1
+          }
+          
+        }
+      })
     },
 
     //确认添加用例接口
@@ -1893,6 +1929,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
 .manageCase {
   // overflow: hidden;
   height: 100%;

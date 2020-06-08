@@ -212,3 +212,11 @@ export const Runcase=(params)=>{
 export const DebugCase=(params)=>{
     return postRequest("/users/case_debug/",params)   
 }
+
+export const CaseOrder=(params)=>{
+    return postRequest("/users/case_order/",params)   
+}
+
+export const CaseOrderGet=(params)=>{
+    return getRequest("/users/case_order/",params)   
+}
