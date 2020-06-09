@@ -9,51 +9,52 @@
           :data="tableData"
           style="width: 100%"
           max-height="250"
-          :header-cell-style="textStyle"
-         :cell-style="textStyle"
           >
           <el-table-column
-            prop="id"
-            label="ID"
-            width="150">
-         </el-table-column>
-          <el-table-column
-            prop="name"
+            fixed
+            prop="date"
             label="用例名称"
             width="150">
          </el-table-column>
          <el-table-column
-            prop="postMethod"
+            fixed
+            prop="date"
             label="请求类型"
             width="150">
          </el-table-column>
          <el-table-column
-            prop="isInterface"
+            fixed
+            prop="date"
             label="所属接口"
             width="150">
          </el-table-column>
          <el-table-column
-            prop="isClass"
+            fixed
+            prop="date"
             label="所属分类"
             width="150">
          </el-table-column>
          <el-table-column
-            prop="detail"
+            fixed
+            prop="date"
             label="用例描述"
             width="150">
          </el-table-column>
          <el-table-column
-            prop="user"
+            fixed
+            prop="date"
             label="创建人"
             width="150">
          </el-table-column>
          <el-table-column
-            prop="createTime"
+            fixed
+            prop="date"
             label="创建时间"
             width="150">
          </el-table-column>
          <el-table-column
-            fixed="right"
+            fixed
+            prop="date"
             label="操作"
             width="150">
          </el-table-column>
@@ -68,23 +69,10 @@ export default {
     data(){
         return {
             tableData:[
-                {   
-                    id:"1",
-                    name:"正常登陆",
-                    postMethod:"POST",
-                    isInterface:"登录注册",
-                    isClass:"登录模块",
-                    detail:"正常登陆",
-                    user:"冯凡",
-                    createTime:"2020-06-09 16:49:55",
-
+                {
+                    name:"用例名称"
                 }
             ],
-        }
-    },
-    methods:{
-        textStyle({row, column, rowIndex, columnIndex}){
-            return "text-align:center"
         }
     }
     
@@ -106,3 +94,4 @@ export default {
   }
 }
 </style>>
+
