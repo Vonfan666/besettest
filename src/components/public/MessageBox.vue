@@ -27,6 +27,9 @@
       <slot name="ischildId">
         <!-- 同步数据弹窗 -->
       </slot>
+      <slot name="createCasePlan">
+        <!-- 创建执行计划 -->
+      </slot>
     </div>
   </div>
 </template>

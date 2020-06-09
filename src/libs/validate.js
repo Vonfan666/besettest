@@ -31,8 +31,25 @@ const passwordValidate =
             callback()
         }
     }
+
+
+const caseCname =
+(rule, value, callback) => {
+    var reg = /^[a-zA-Z0-9_]{1,}$/;
+    if (!reg.test(value)) {
+        callback(new Error("输入只能为英文、数字以及下划线"))
+    }
+    // if (!reg.test(value)) {
+    //   callback(new Error('手机号格式错误'));
+    // }
+    else {
+        callback()
+    }
+}
+
 export default {
     phoneValidate,
-    passwordValidate
+    passwordValidate,
+    caseCname
 }
 
