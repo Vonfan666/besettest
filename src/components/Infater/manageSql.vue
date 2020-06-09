@@ -53,6 +53,16 @@
             width="150">
          </el-table-column>
          <el-table-column
+            prop="createTime"
+            label="修改人"
+            width="150">
+         </el-table-column>
+         <el-table-column
+            prop="createTime"
+            label="最后一次修改时间"
+            width="150">
+         </el-table-column>
+         <el-table-column
             fixed="right"
             label="操作"
             width="150">
