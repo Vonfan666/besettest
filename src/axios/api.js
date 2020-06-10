@@ -213,10 +213,32 @@ export const DebugCase=(params)=>{
     return postRequest("/users/case_debug/",params)   
 }
 
+//用例排序
 export const CaseOrder=(params)=>{
     return postRequest("/users/case_order/",params)   
 }
-
+//查看用例排序
 export const CaseOrderGet=(params)=>{
     return getRequest("/users/case_order/",params)   
+}
+
+//新增计划
+export const AddCasePlan=(params)=>{
+    return postRequest("/users/casePlan_add/",params)   
+}
+
+//查看计划列表
+export const getCasePlan=(params)=>{
+    return getRequest("/users/casePlan_get/",params)   
+}
+
+
+//编辑计划
+export const UpdateCasePlan=(params)=>{
+    return postRequest("/users/casePlan_edit/",params)   
+}
+
+//删除计划
+export const DeleteCasePlan=(params)=>{
+    return postRequest("/users/casePlan_delete/",params)   
 }

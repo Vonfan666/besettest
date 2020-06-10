@@ -71,8 +71,6 @@
                 <el-collapse-item title="返回头" name="2" style="text-align:left">
                   <li
                     v-for="(item,index) in Object.keys(lists.listDictPostresHeaders)"
-
-                    
                     :key="index"
                   >
                     <span>
@@ -101,9 +99,7 @@
             <div style="text-align:left;" class="Response">{{lists.listDictPostResText}}</div>
           </el-tab-pane>
 
-          <el-tab-pane label="Assert" name="fourth">
-             <div style="text-align:left;" class="Assert"></div>
-          </el-tab-pane>
+          <el-tab-pane label="Assert" name="fourth">定时任务补偿</el-tab-pane>
         </el-tabs>
       </div>
     </div>
@@ -144,13 +140,11 @@ export default {
   },
   methods: {
     caseNameClick(item, index) {
-      
       this.listDict = item;
       var objectKeys=Object.keys(this.listDict)
       objectKeys.indexOf("resHeaders")<0 ? this.listDict["resHeaders"]={} :null
       objectKeys.indexOf("resData")<0 ? this.listDict["resData"]={} :null
       objectKeys.indexOf("resText")<0 ? this.listDict["resText"]={} :null
-
       this.lists.listDictPostUrl = this.listDict.postUrl;
       this.lists.listDictPostMethods = this.listDict.postMethods;
       this.lists.listDictResStatus = this.listDict.resStatus;
@@ -211,7 +205,7 @@ export default {
       if(this.list.length>1){
         this.leftCaseName=true
       }
-      if(this.list.length<=1){
+      if(this.list.length>=1){
         this.caseNameClick(this.list[0])
       }
       
@@ -262,8 +256,7 @@ export default {
       this.init();
       console.log("obj");
     }
-    this.list.length<=1?
-    this.chiocesLitsOne():null;
+    this.chiocesLitsOne();
   },
   watch: {
     list(a, b) {
