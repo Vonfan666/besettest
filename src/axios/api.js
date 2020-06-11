@@ -242,3 +242,9 @@ export const UpdateCasePlan=(params)=>{
 export const DeleteCasePlan=(params)=>{
     return postRequest("/users/casePlan_delete/",params)   
 }
+
+
+//查看用例列表
+export const GetCaseList=(params)=>{
+    return getRequest("/users/caseList_get/",params)   
+}

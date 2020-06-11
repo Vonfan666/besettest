@@ -8,6 +8,12 @@
           class="el-icon-plus"
           @click="createCasePlanStatus=true;buttonClickStatus=true"
         >新建测试计划</el-button>
+         <el-button
+          type="primary"
+          size="small"
+          class="el-icon-plus"
+          @click="inCaseListRouter()"
+        >查看用例列表</el-button>
       </div>
       <div class="run_body">
         <el-table
@@ -32,8 +38,16 @@
           <el-table-column fixed="right" label="操作" width="230" height="50">
             <template slot-scope="scope">
               <el-button @click="handleClick(scope.row)" type="text" size="small">查看</el-button>
-              <el-button type="text" size="small" @click="editPlan(scope.row,scope.$index);buttonClickStatus=false">编辑</el-button>
-              <el-button type="text" size="small" @click="DeleteCasePlan(scope.row.id,scope.$index)">删除</el-button>
+              <el-button
+                type="text"
+                size="small"
+                @click="editPlan(scope.row,scope.$index);buttonClickStatus=false"
+              >编辑</el-button>
+              <el-button
+                type="text"
+                size="small"
+                @click="DeleteCasePlan(scope.row.id,scope.$index)"
+              >删除</el-button>
               <el-button type="text" size="small">执行</el-button>
               <el-button type="text" size="small">结果</el-button>
             </template>
@@ -41,7 +55,7 @@
         </el-table>
       </div>
     </div>
-    <div class="block"  style="margin-top:30px">
+    <div class="block" style="margin-top:30px">
       <el-pagination
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
@@ -87,8 +101,18 @@
           </div>
           <div class="ccp-foot">
             <el-button type="primary" size="small" @click="close()">取消</el-button>
-            <el-button type="primary" size="small" @click="casePlanAdd();" v-if="buttonClickStatus">创建</el-button>
-            <el-button type="primary" size="small" @click="casePlanUpdate();"  v-if="!buttonClickStatus">更新</el-button>
+            <el-button
+              type="primary"
+              size="small"
+              @click="casePlanAdd();"
+              v-if="buttonClickStatus"
+            >创建</el-button>
+            <el-button
+              type="primary"
+              size="small"
+              @click="casePlanUpdate();"
+              v-if="!buttonClickStatus"
+            >更新</el-button>
           </div>
         </div>
       </createCasePlan>
@@ -108,9 +132,10 @@ export default {
   data() {
     return {
       buttonClickStatus:"true",
-      total: null,
+      total: null,  //数据总条数
       pageSize: 10, //每页显示的数量
       page: 1, //当前请求的页面
+      allPage:null, //总页数
       datas: {
         name: null, //计划名称
         cname: null, //计划英文名--自动化脚本名称
@@ -134,23 +159,26 @@ export default {
       createCasePlanStyle: "height:700px;width:500px",
       createCasePlanStatus: false,
       tableData: [
-        {
-          id: "1",
-          name: "TestCase",
-          cname: "慧投1.01版接口",
-          caseStartTime: "-",
-          status: { id: 0, name: "未执行" },
-          runType: { id: 0, name: "手动执行" },
-          caseEndTime: "-",
-          CaseCount: "888",
-          userId: { id: 1, name: "冯凡" },
-          createTime: "2020-06-09 16:49:55",
-          detail: "不要删除不要删除不要删除"
-        }
+        // {
+        //   id: "1",
+        //   name: "TestCase",
+        //   cname: "慧投1.01版接口",
+        //   caseStartTime: "-",
+        //   status: { id: 0, name: "未执行" },
+        //   runType: { id: 0, name: "手动执行" },
+        //   caseEndTime: "-",
+        //   CaseCount: "888",
+        //   userId: { id: 1, name: "冯凡" },
+        //   createTime: "2020-06-09 16:49:55",
+        //   detail: "不要删除不要删除不要删除"
+        // }
       ]
     };
   },
   methods: {
+    inCaseListRouter(){
+        this.$router.push({"name":"runCaseList"})
+    },
     handleSizeChange(val) {
       this.pageSize = val;
       console.log(111, val);
@@ -185,15 +213,16 @@ export default {
             name: this.datas.name,
             cname: this.datas.cname,
             runType: this.datas.runType,
-            detail: this.datas.detail
+            detail: this.datas.detail,
+            page:this.page,
+            pageSize:this.pageSize,
           }).then(res => {
             res.status == 200
               ? (Message.success("新增成功"),
-                (this.createCasePlanStatus = false),
-                this.page === 1
-                  ? (this.tableData.unshift(res.results),
-                    this.tableData.length > 10 ? this.tableData.pop() : null)
-                  : null)
+                this.allPage=res.allPage,
+                this.total=res.total,
+                this.createCasePlanStatus = false,
+                this.tableData=res.results)   
               : null;
           });
         }else{
@@ -221,6 +250,7 @@ export default {
         var index=this.editPlanIndex
         console.log("item",item,index)
         UpdateCasePlan({
+            projectId:storage.get("projectId"),
             id:item.id,
             name:this.datas.name,
             cname:this.datas.cname,
@@ -241,30 +271,43 @@ export default {
     DeleteCasePlan(id,index){
         //删除计划
         DeleteCasePlan({
-            id:id
+            projectId:storage.get("projectId"),
+            id:id,
+            pageSize:this.pageSize,
+            page:this.page
         }).then(res=>{
             res.status===200
             ?
-            (Message.success("删除成功"),
-            this.tableData.splice(index,1)
+            (Message.success(res.msg),
+            this.tableData=res.results,
+            this.total=res.total,
+            this.allPage=res.allPage,
+            (this.page>this.allPage
+            ?
+            (this.page=this.page-1,
+            this.casePlanList(this.page,this.pageSize))
+            :null)
+            
             )
             :
             null
         })
     },
     casePlanList(page, pageSize) {
+        //计划列表
       getCasePlan({
         projectId: storage.get("projectId"),
         page: page,
         pageSize: pageSize
       }).then(res => {
         res.status === 200
-          ? ((this.tableData = res.results), (this.total = res.total))
+          ? ((this.tableData = res.results), (this.total = res.total),(this.allPage=res.allPage))
           : null;
       });
     }
   },
   mounted() {
+    
     this.casePlanList(this.page, this.pageSize);
   }
 };

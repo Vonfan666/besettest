@@ -47,6 +47,11 @@ export default new Router({
           component: () => import("@/components/Infater/runCase")
         },
         {
+          path: "/BesetTest/runCaseList",
+          name: "runCaseList",
+          component: () => import("@/components/Infater/runCaseList")
+        },
+        {
           path: "/BesetTest/runLog",
           name: "runLog",
           component: () => import("@/components/Infater/runLog")
