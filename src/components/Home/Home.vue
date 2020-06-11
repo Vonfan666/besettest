@@ -622,6 +622,8 @@ export default {
 .home {
   margin: -8px;
   position: absolute;
+  // overflow-x: hidden;
+  // min-height: 800px;
   display: flex;
   width: 100%;
   height: 100%;

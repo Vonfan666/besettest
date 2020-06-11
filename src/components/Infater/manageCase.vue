@@ -113,7 +113,7 @@
           <span style="margin-left:10px;color:#409EFF;cursor: pointer;" v-if="!statusIng.caseOrderStatus" @click="caseOrderSubmit()">确定</span>
         </div>
         <div class="caseList">
-          <el-table :data="caseList" border style="width: 100%" @selection-change="caseSelection">
+          <el-table :data="caseList" border style="width: 100%" @selection-change="caseSelection" v-loading="loading.loading_table" >
             <el-table-column fixed prop="date" type="selection" width="50"></el-table-column>
             <el-table-column prop="order" label="执行顺序" width="80">
               <!-- <template slot-scope="scope" >
@@ -698,7 +698,9 @@ export default {
   },
   data() {
     return {
-      
+      loading:{
+        loading_table:true
+      },
       code:null, //判断是否启用websocket
       // drawer: false,  //左侧弹窗
       resResults:[],
@@ -1754,6 +1756,7 @@ export default {
         
       }).then(res=>{
         if(res.status===200){
+          this.loading.loading_table=false
           if(res.order){
             this.datas.caseOrder=res.order
           }else{

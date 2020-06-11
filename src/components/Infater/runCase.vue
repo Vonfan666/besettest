@@ -17,9 +17,10 @@
       </div>
       <div class="run_body">
         <el-table
+          v-loading="loading.loading_table"
           :data="tableData"
           style="width: 100%"
-          max-height="700"
+          min-height="700"
           border
           :header-cell-style="textStyle"
           :cell-style="textStyle"
@@ -155,6 +156,9 @@ export default {
         runType: [
           { required: true, message: "请选择执行方式", trigger: "change" }
         ]
+      },
+      loading:{
+        loading_table:true
       },
       createCasePlanStyle: "height:700px;width:500px",
       createCasePlanStatus: false,
@@ -301,7 +305,7 @@ export default {
         pageSize: pageSize
       }).then(res => {
         res.status === 200
-          ? ((this.tableData = res.results), (this.total = res.total),(this.allPage=res.allPage))
+          ? ((this.tableData = res.results), (this.total = res.total),(this.allPage=res.allPage),(this.loading.loading_table=false))
           : null;
       });
     }
@@ -317,6 +321,7 @@ export default {
 .runCase {
   width: 100%;
   height: 100%;
+  overflow-x: hidden;
   background: #eee;
   .runCase_context {
     margin: 0 10px;
