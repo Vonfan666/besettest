@@ -27,49 +27,48 @@
         </div>
         <div class="seach">
           请求类型：
-          <li>
-            <el-select
-            clearable 
-              v-model="search.postMethodsId"
-              placeholder="请选择"
-              @change="searchPostMethods()"
-            >
-              <el-option
-                v-for="(item,index) in search.postMethods"
-                :key="index"
-                :label="item.name"
-                :value="item.id"
-              ></el-option>
-            </el-select>
-          </li>
+          <el-select
+            clearable
+            v-model="search.postMethodsId"
+            placeholder="请选择"
+            @change="searchPostMethods()"
+          >
+            <el-option
+              v-for="(item,index) in search.postMethods"
+              :key="index"
+              :label="item.name"
+              :value="item.id"
+            ></el-option>
+          </el-select>
         </div>
         <div class="seach">
-          创建时间：
-          <li>
+          <div class="block">
+            <span class="demonstration">创建时间：</span>
             <el-date-picker
               v-model="createTime"
               type="datetimerange"
-              :picker-options="pickerOptions"
               range-separator="至"
               start-placeholder="开始日期"
               end-placeholder="结束日期"
-              align="right"
+              value-format="yyyy-MM-dd HH:mm:ss"
+              :default-time="['00:00:00', '23:59:59']"
             ></el-date-picker>
-          </li>
+          </div>
         </div>
         <div class="seach">
-          修改时间：
-          <li>
+          
+          <div class="block">
+            <span class="demonstration">修改时间：</span>
             <el-date-picker
               v-model="updateTime"
               type="datetimerange"
-              :picker-options="pickerOptions"
               range-separator="至"
               start-placeholder="开始日期"
               end-placeholder="结束日期"
-              align="right"
+              value-format="yyyy-MM-dd HH:mm:ss"
+              :default-time="['00:00:00', '23:59:59']"
             ></el-date-picker>
-          </li>
+          </div>
         </div>
         <el-button type="primary" size="small" @click="getCaseList()">搜索</el-button>
       </div>
@@ -78,22 +77,28 @@
           v-loading="loading.loading_table"
           :data="tableData"
           style="width: 100%"
-          max-height="600"
+          max-height="700"
           :header-cell-style="textStyle"
           :cell-style="textStyle"
         >
           <el-table-column prop="id" label="ID" width="50"></el-table-column>
           <el-table-column prop="order" label="执行顺序" width="80"></el-table-column>
-          <el-table-column prop="name" label="用例名称" width="150"></el-table-column>
+          <el-table-column prop="name" label="用例名称" fit ></el-table-column>
           <el-table-column prop="postMethod.name" label="请求类型" width="80"></el-table-column>
-          <el-table-column prop="isInterface.name" label="所属接口" width="150"></el-table-column>
+          <el-table-column prop="isInterface.name" label="所属接口" fit></el-table-column>
           <el-table-column prop="isClass.name" label="所属分类" width="150"></el-table-column>
-          <el-table-column prop="detail" label="用例描述" width="150"></el-table-column>
           <el-table-column prop="user.name" label="创建人" width="80"></el-table-column>
           <el-table-column prop="createTime" label="创建时间" width="150"></el-table-column>
           <el-table-column prop="updateUser.name" label="修改人" width="80"></el-table-column>
           <el-table-column prop="updateTime" label="最后一次修改时间" width="150"></el-table-column>
-          <el-table-column fixed="right" label="操作" width="150"></el-table-column>
+          <el-table-column prop="detail" label="用例描述" width="150"></el-table-column>
+          <el-table-column fixed="right" label="操作" width="150">
+              <template slot-scope="scope">
+                  <el-button type="text" size="small">编辑</el-button>
+                  <el-button type="text" size="small">删除</el-button>
+                  <el-button type="text" size="small">调试</el-button>
+              </template>
+          </el-table-column>
         </el-table>
       </div>
       <div class="block" style="margin-top:30px">
@@ -122,37 +127,6 @@ export default {
     return {
       createTime: null,
       updateTime: null,
-      pickerOptions: {
-        shortcuts: [
-          {
-            text: "最近一周",
-            onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-              picker.$emit("pick", [start, end]);
-            }
-          },
-          {
-            text: "最近一个月",
-            onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-              picker.$emit("pick", [start, end]);
-            }
-          },
-          {
-            text: "最近三个月",
-            onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-              picker.$emit("pick", [start, end]);
-            }
-          }
-        ]
-      },
       loading: {
         loading_table: true
       },
@@ -202,20 +176,20 @@ export default {
   methods: {
     getCaseList() {
       //用例搜索
-      console.log(this.createTime);
-      console.log(this.updateTime);
-      console.log(111,this.search.caseName,this.search.isInterface,this.search.postMethodsId,)
-      this.search.caseName===""?this.search.caseName=null:null
-      this.search.isInterface===""?this.search.isInterface=null:null
-      this.search.postMethodsId===""?this.search.postMethodsId=null:null
+  
+      this.search.caseName === "" ? (this.search.caseName = null) : null;
+      this.search.isInterface === "" ? (this.search.isInterface = null) : null;
+      this.search.postMethodsId === ""
+        ? (this.search.postMethodsId = null)
+        : null;
+      
       this.S_GetCaseList(
         this.search.caseName,
         this.search.isInterface,
         this.search.postMethodsId,
         this.createTime,
         this.updateTime
-        );
-      
+      );
     },
     searchPostMethods() {
       //获取选中的值
@@ -223,28 +197,27 @@ export default {
     },
     handleSizeChange(val) {
       this.pageSize = val;
-      console.log(111, val);
       this.S_GetCaseList(
         this.search.caseName,
         this.search.isInterface,
         this.search.postMethodsId,
         this.createTime,
         this.updateTime
-        );
+      );
     },
     handleCurrentChange(val) {
       //选择页面
 
       this.page = val;
       this.loading.loading_table = true;
-      console.log(222, val);
+      
       this.S_GetCaseList(
         this.search.caseName,
         this.search.isInterface,
         this.search.postMethodsId,
         this.createTime,
         this.updateTime
-        );
+      );
     },
     textStyle({ row, column, rowIndex, columnIndex }) {
       return "text-align:center";
@@ -252,13 +225,19 @@ export default {
     inRunCase() {
       this.$router.push({ name: "runCase" });
     },
-    S_GetCaseList(name, isInterface, postMethods,ctime,utime) {
+    S_GetCaseList(name, isInterface, postMethods, ctime, utime) {
+        if (ctime !== null) {
+        var ctime = JSON.stringify(ctime);
+      }
+      if (utime !== null) {
+        var utime = JSON.stringify(utime);
+      }
       GetCaseList({
-        name: name ,
+        name: name,
         isInterface: isInterface,
         postMethods: postMethods,
-        ctime:ctime,
-        utime:utime,
+        ctime: ctime,
+        utime: utime,
         projectId: storage.get("projectId"),
         page: this.page,
         pageSize: this.pageSize
@@ -281,13 +260,23 @@ export default {
   },
   mounted() {
     this.S_GetCaseList(
-        this.search.caseName,
-        this.search.isInterface,
-        this.search.postMethodsId,
-        this.createTime,
-        this.updateTime
-        );
+      this.search.caseName,
+      this.search.isInterface,
+      this.search.postMethodsId,
+      this.createTime,
+      this.updateTime
+    );
     this.S_postMethods();
+  },
+  watch:{
+      "createTime"(a,b){
+          console.log("新",a)
+          console.log("旧",b)
+          
+      },
+      "updateTime"(a,b){
+          console.log("2321",a,b)
+      }
   }
 };
 </script>
@@ -305,7 +294,7 @@ export default {
   .run_title {
     width: 100%;
     text-align: left;
-    padding: 20px 0;
+    padding: 10px 0;
   }
   .run_foot {
     margin: 20px 0;

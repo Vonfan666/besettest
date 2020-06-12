@@ -205,11 +205,11 @@ export default {
       if(this.list.length>1){
         this.leftCaseName=true
       }
-      if(this.list.length>=1){
-        this.caseNameClick(this.list[0])
-      }
+      // if(this.list.length>=1){
+      //   // this.caseNameClick(this.list[0])
+      // }
       
-      console.log(this.list)
+      // console.log(this.list)
     },
     send: function() {
       
