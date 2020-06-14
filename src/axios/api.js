@@ -248,3 +248,14 @@ export const DeleteCasePlan=(params)=>{
 export const GetCaseList=(params)=>{
     return getRequest("/users/caseList_get/",params)   
 }
+
+//编辑用例执行顺序
+export const EditCaseOrder=(params)=>{
+    return postRequest("/users/caseOrder_edit/",params)   
+}
+
+
+//执行测试计划
+export const RunCaseAll=(params)=>{
+    return postRequest("/users/case_run_all/",params)   
+}

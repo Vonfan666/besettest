@@ -25,6 +25,7 @@
         <div class="searchPopOver" v-if="statusIng.searchStatus">
           <div class="search-context">
             <p
+              
               v-for="(item,index) in searchList"
               :key="index"
               @click="searchResult(item.CaseGroupFilesId,item.id)"
@@ -49,7 +50,7 @@
         <div class="FilesContext" v-show="!statusIng.searchStatus">
           <div class="fileName" v-for="(item,index) in caseGroupList" :key="index">
             <div class="fileName-father" @click="isOpen($event,index)">
-              <span :class="fileNameIcon[index]" class="oneFiles">{{item.name}}</span>
+              <span :class="fileNameIcon[index]" class="oneFiles"><span class="el-icon-folder" style="margin:0 2px"></span>{{item.name}}</span>
               <div class="addTextFather">
                 <!-- <div class="addtext-code">
                     <span class="el-icon-plus it-icon-addtext"></span>
@@ -77,7 +78,7 @@
               v-show="fileNameChildStatus[index]"
             >
               <div class="file-father">
-                <span class="file">{{item1.name}}</span>
+                <span class="file ">{{item1.name}}</span>
               </div>
 
               <div class="addTextChild">
@@ -107,8 +108,8 @@
         <div class="title-detail">
           <span class="tt">用例列表</span>
           <span style="margin-left:50px">当前执行顺序:</span>
-          <span  v-if="statusIng.caseOrderStatus">{{datas.caseOrder}}</span>
-          <input v-model="datas.caseOrder" placeholder="输入执行顺序" style="margin-left:10px;border: none;width: 40px;" v-if="!statusIng.caseOrderStatus">
+          <span  v-if="statusIng.caseOrderStatus" style="margin-left:10px">{{datas.caseOrder}}</span>
+          <input v-model="datas.caseOrder" maxlength=7 placeholder="输入执行顺序" style="margin-left:10px;;width: 80px;" v-if="!statusIng.caseOrderStatus">
           <span style="margin-left:10px;color:#409EFF;cursor: pointer;" v-if="statusIng.caseOrderStatus" @click="statusIng.caseOrderStatus=!statusIng.caseOrderStatus">编辑</span>
           <span style="margin-left:10px;color:#409EFF;cursor: pointer;" v-if="!statusIng.caseOrderStatus" @click="caseOrderSubmit()">确定</span>
         </div>
@@ -185,7 +186,7 @@
             <el-form :model="datas" :rules="rules" ref="refFromS" label-width="100px">
               <div class="interfaName-1">
                 <el-form-item label="执行顺序" prop="order">
-                  <el-input placeholder="请输入执行顺序" v-model="datas.order" clearable></el-input>
+                  <el-input placeholder="请输入执行顺序" v-model="datas.order" clearable maxlength="7"></el-input>
                 </el-form-item>
               </div>
               <div class="interfaName-1">
@@ -1783,7 +1784,7 @@ export default {
         dataType: this.reqyestDataTypeRadio,
         attr: this.datas.urlAttr,
         status: this.datas.interfaceIsOk,
-        detail: this.caseDetail,
+        detail: this.datas.caseDetail,
         // isGlobalsHeader:""  //是否使用全局请起头
         headers: JSON.stringify(this.requestsHeader),
         data: JSON.stringify(requestsData),
@@ -2220,6 +2221,7 @@ export default {
         text-align: left;
         margin-left: 10px;
         margin-bottom: 10px;
+        font-size: 10px;
       }
       .requestsTitile {
         // margin-top: 10px;

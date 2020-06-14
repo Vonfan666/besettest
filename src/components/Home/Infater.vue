@@ -39,7 +39,7 @@
               <dt class="it-father"  @click="ItDirection($event,index)">
                 <div class="it-direction">
                   <span :class="iconOpen[index]"></span>
-                  <span class="name" :id="item.id">{{item.name}}</span>
+                  <span class="name" :id="item.id"></span>{{item.name}}</span>
                 </div>
                 <!-- 父级目录的操作项 -->
                 <div class="addText">

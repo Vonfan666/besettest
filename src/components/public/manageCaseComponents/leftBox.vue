@@ -99,7 +99,12 @@
             <div style="text-align:left;" class="Response">{{lists.listDictPostResText}}</div>
           </el-tab-pane>
 
-          <el-tab-pane label="Assert" name="fourth">定时任务补偿</el-tab-pane>
+          <el-tab-pane label="Assert" name="fourth">
+            <div style="text-align:left" class="Assert">
+                 定时任务补偿
+             </div>
+            </el-tab-pane>
+           
         </el-tabs>
       </div>
     </div>
@@ -205,9 +210,10 @@ export default {
       if(this.list.length>1){
         this.leftCaseName=true
       }
-      // if(this.list.length>=1){
-      //   // this.caseNameClick(this.list[0])
-      // }
+      //将返回的第一个结果写入html
+      if(this.list.length===1){
+        this.caseNameClick(this.list[0])
+      }
       
       // console.log(this.list)
     },

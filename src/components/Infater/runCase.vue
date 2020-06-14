@@ -27,7 +27,7 @@
         >
           <el-table-column prop="id" label="Id" width="50"></el-table-column>
           <el-table-column prop="name" label="名称" width="150"></el-table-column>
-          <el-table-column prop="cname" label="中文名称" width="160"></el-table-column>
+          <el-table-column prop="cname" label="脚本名称" width="160"></el-table-column>
           <el-table-column prop="runType.name" label="执行方式" width="80"></el-table-column>
           <el-table-column prop="caseStartTime" label="执行开始时间" width="160"></el-table-column>
           <el-table-column prop="status.name" label="状态" width="150"></el-table-column>
@@ -47,9 +47,9 @@
               <el-button
                 type="text"
                 size="small"
-                @click="DeleteCasePlan(scope.row.id,scope.$index)"
+                @click="D_ClassRemove(scope.row.id,scope.$index)"
               >删除</el-button>
-              <el-button type="text" size="small">执行</el-button>
+              <el-button type="text" size="small" @click="runPlan(scope.row)">执行</el-button>
               <el-button type="text" size="small">结果</el-button>
             </template>
           </el-table-column>
@@ -98,6 +98,12 @@
               <el-form-item prop="code" label="计划描述">
                 <el-input v-model="datas.detail" placeholder="请输入计划描述" clearable></el-input>
               </el-form-item>
+              <el-form-item prop="code" label="每次执行是否重新创建脚本：" class="againScript"><br>
+                 <el-radio-group v-model="datas.againScript">
+                  <el-radio :label="0">否</el-radio>
+                  <el-radio :label="1">是</el-radio>
+                </el-radio-group>
+              </el-form-item>
             </el-form>
           </div>
           <div class="ccp-foot">
@@ -124,7 +130,7 @@
 <script>
 import validator from "@/libs/validate.js";
 import storage from "@/libs/storage.js";
-import { AddCasePlan, getCasePlan,UpdateCasePlan,DeleteCasePlan} from "../../axios/api.js";
+import { AddCasePlan, getCasePlan,UpdateCasePlan,DeleteCasePlan,RunCaseAll} from "../../axios/api.js";
 import { Message } from "element-ui";
 export default {
   components: {
@@ -142,7 +148,9 @@ export default {
         cname: null, //计划英文名--自动化脚本名称
         runType: 0, //执行列表-立即执行  定时执行   轮询
         detail: null,
-        caseStartTime: "" //计划开始时间
+        caseStartTime: "", //计划开始时间
+        againScript:0,  //是否重新创建脚本   1-重新创建      0-不重新创建
+
       },
       //编辑暂存
       editPlanItem:"",
@@ -180,6 +188,40 @@ export default {
     };
   },
   methods: {
+
+     runPlan(item){
+       RunCaseAll({
+         id:item.id
+       }).then(res=>{
+         res.status===200
+         ?
+         Message.success(res.msg)
+         :
+         Message.error(res.msg)
+       })
+     }, 
+
+     D_ClassRemove(item,index) {
+      this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          console.log(arguments)
+          this.DeleteCasePlan(item,item) 
+          // this.$message({
+          //   type: "success",
+          //   message: "删除成功!"
+          // });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除"
+          });
+        });
+    },
     inCaseListRouter(){
         this.$router.push({"name":"runCaseList"})
     },
@@ -201,11 +243,13 @@ export default {
     },
     close() {
         //清空表单
-        this.createCasePlanStatus = false;
-        this.datas.name=""
-        this.datas.cname=""
+        this.datas.name=null
+        this.datas.cname=null
         this.datas.runType=0
-        this.datas.detail=""
+        this.datas.detail=null
+        this.datas.againScript=0
+        this.createCasePlanStatus = false;
+        
     },
     casePlanAdd() {
       //添加计划
@@ -218,6 +262,7 @@ export default {
             cname: this.datas.cname,
             runType: this.datas.runType,
             detail: this.datas.detail,
+            againScript:this.datas.againScript,
             page:this.page,
             pageSize:this.pageSize,
           }).then(res => {
@@ -244,6 +289,7 @@ export default {
         this.datas.runType=item.runType.id
         //时间
         this.datas.detail=item.detail
+        this.datas.againScript=item.againScript
         this.createCasePlanStatus=true
         
 
@@ -259,6 +305,7 @@ export default {
             name:this.datas.name,
             cname:this.datas.cname,
             runType:this.datas.runType,
+            againScript:this.datas.againScript,
             detail:this.datas.detail
         }).then(res=>{
             res.status===200
@@ -266,6 +313,7 @@ export default {
             (
                 this.tableData.splice(index,1,res.results),
                 this.createCasePlanStatus=false,
+                this.close(),
                 Message.success("更新成功")
             )
             :
@@ -350,10 +398,14 @@ export default {
   position: absolute;
   bottom: 20px;
 }
+
 </style>
 
 <style >
 .TextCenter {
   text-align: center;
+}
+.againScript .el-form-item__label{
+  width: 200px !important;
 }
 </style>
