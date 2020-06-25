@@ -653,7 +653,7 @@
    
       <el-drawer :visible.sync="statusIng.drawerStatus"  :with-header="false" size="60%">
         <div>
-          <left-box :list.sync="resResults" :code.sync="code" ref="letfBox"  v-if="statusIng.drawerStatus"></left-box>
+          <left-box :list.sync="resResults" :code.sync="code" :currentInterfaceId="currentInterfaceId" ref="letfBox"  v-if="statusIng.drawerStatus"></left-box>
         </div>
         
       </el-drawer>
@@ -945,12 +945,16 @@ export default {
       //执行整个接口用例  这里是前端排序
       console.log(this.multipleSelection)
       var idList=[]
+      var codeDict={}
       if(this.multipleSelection.length>0){
         this.multipleSelection.forEach((item,index)=>{
         idList.push(item.id)
       })
       this.statusIng.drawerStatus = true; //展开左侧
-      this.code=idList
+      codeDict["idList"]=idList
+      codeDict["userId"]=storage.get("userId")
+      codeDict["interface"]=this.currentInterfaceId
+      this.code=codeDict
       }else{
         Message.error("请选择需要执行的用例")
       }

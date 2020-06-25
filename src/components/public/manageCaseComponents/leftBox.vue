@@ -12,7 +12,11 @@
   </div>-->
   <div class="left-box">
     <div class="title" style="text-align:left">
-      <h3>调试结果</h3>
+      <h3 style="display: inline-block;">调试结果</h3>
+      <div style="float:right;display: inline-block;margin-top: 15px;" class="title-right">
+          <span   @click="clickCont()">请求内容</span>
+          <span @click="clickLog()">执行日志</span>
+        </div>
     </div>
     <div class="left-box-body">
       <div class="left-box-left" v-if="leftCaseName">
@@ -25,7 +29,7 @@
           </li>
         </div>
       </div>
-      <div class="left-box-right">
+      <div class="left-box-right" v-show="contLogStatus">
         <el-tabs v-model="activeName" @tab-click="handleClick">
           <el-tab-pane label="Headers" name="first">
             <div class="Headers">
@@ -107,18 +111,27 @@
            
         </el-tabs>
       </div>
+      <div class="log" v-show="!contLogStatus">
+        <div>
+          <p v-for="(item,index) in  logList" :key="index">{{item}}</p>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import storage from '../../../libs/storage';
 export default {
-  props: ["list", "code"],
+  props: ["list", "code","currentInterfaceId"],
   data() {
     return {
+      logList:[],
+      contLogStatus:true,
       caseNameColorList:[],
       aa: [],
       path: "ws://192.168.0.66:8081/ws/users/case_run/",
+      logPath:"ws://192.168.0.66:8081/ws/users/logList/",
       socket: "",
       activeName: "first",
       res: {
@@ -144,6 +157,23 @@ export default {
     };
   },
   methods: {
+    clickCont(){
+      document.querySelectorAll(".title-right span")[1].style.cssText=
+        "background-color:;color:;border-radius:"
+      document.querySelectorAll(".title-right span")[0].style.cssText=
+        "background-color:rgb(98, 161, 239);color:rgb(248, 248, 251);border-radius: 5px"
+      this.contLogStatus=true
+ 
+      
+    },
+    clickLog(){
+      document.querySelectorAll(".title-right span")[0].style.cssText=
+        "background-color:;color:;border-radius:"
+      document.querySelectorAll(".title-right span")[1].style.cssText=
+        "background-color:rgb(98, 161, 239);color:rgb(248, 248, 251);border-radius: 5px"
+      this.contLogStatus=false
+    },
+
     caseNameClick(item, index) {
       this.listDict = item;
       var objectKeys=Object.keys(this.listDict)
@@ -190,8 +220,48 @@ export default {
         this.socket.onclose=this.close;
       }
     },
+    logInit(){
+       if (typeof WebSocket === "undefined") {
+        alert("您的浏览器不支持socket");
+      } else {
+        // 实例化socket
+        this.socketLog = new WebSocket(this.logPath);
+        // 监听socket连接
+        this.socketLog.onopen = this.openLog;
+        // 监听socket错误信息
+        this.socketLog.onerror = this.errorLog;
+        // 监听socket消息
+        this.socketLog.onmessage = this.getMessageLog;
+
+        this.socketLog.onclose=this.closeLog;
+      }
+    },
+    openLog(){
+      console.log("实时日志链接成功")
+      this.socketLog.send(JSON.stringify(this.code))
+      console.log(this.list)
+    },
+    errorLog: function() {
+      // this.init();
+      console.log("连接错误");
+    },
+    getMessageLog(msg){
+      console.log("执行getMessageLog")
+      console.log("log返回",JSON.parse(msg.data))
+      var  msg=JSON.parse(msg.data)
+      this.logList.push(msg)
+      var div = document.querySelector('.log');
+      div.scrollTop = div.scrollHeight;
+    },
+    sendLog(){
+      this.socketLog.send("params");
+    },
+    closeLog(){
+      console.log("实时日志链接关闭")
+    },
     open: function() {
       console.log("socket连接成功");
+      console.log(this.code,"这是code")
       this.socket.send(JSON.stringify(this.code))
       console.log(this.list)
     },
@@ -247,7 +317,7 @@ export default {
     if(this.code){
       this.socket.close();
     }
-    
+    this.socketLog.close()
     this.$emit("update:code",null)
     console.log(this.code)
    
@@ -255,11 +325,15 @@ export default {
   },
 
   mounted() {
-    
+    console.log(this.currentInterfaceId,"aaa")
+    this.logInit()
+     document.querySelectorAll(".title-right span")[0].style.cssText=
+        "background-color:rgb(98, 161, 239);color:rgb(248, 248, 251);border-radius: 5px"
     console.log("this.code",this.code)
     if (this.code) {
       console.log(this.code);
       this.init();
+      
       console.log("obj");
     }
     this.chiocesLitsOne();
@@ -269,6 +343,8 @@ export default {
       console.log(a, b);
     }
   }
+
+
 };
 </script>
 
@@ -314,11 +390,35 @@ export default {
   background-color: #eee;
   margin-right: 10px;
 }
-.left-box-right {
+.left-box-right,.log{
   display: inline-block;
   flex: 1;
   overflow-x: hidden;
 }
+.log{
+  text-align: left;
+  color: white;
+  background-color: black;
+      overflow-x: hidden;
+    height: 800px;
+}
+.title-right span{
+    // background-color: rgb(98, 161, 239);
+    // color: rgb(248, 248, 251);
+    // border-radius: 5px;
+    padding: 10px 10px;
+    font-size: 15px;
+    
+}
+.title-right span:hover{
+        cursor: pointer;
+        background-color: #ecf5ff;
+        color: #409eff;
+        border: 1px solid rgb(98, 161, 239);
+        border-radius: 5px;
+}
+
+
 </style>>
 
 <style>
