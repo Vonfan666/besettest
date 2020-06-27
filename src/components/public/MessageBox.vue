@@ -33,6 +33,9 @@
        <slot name="caseEdit">
         <!-- 创建执行计划 -->
       </slot>
+      <slot name="debugLogResults">
+        <!-- 创建执行计划 -->
+      </slot>
     </div>
   </div>
 </template>

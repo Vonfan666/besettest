@@ -316,8 +316,9 @@ export default {
     console.log("销毁组件")
     if(this.code){
       this.socket.close();
+      this.socketLog.close()
     }
-    this.socketLog.close()
+    
     this.$emit("update:code",null)
     console.log(this.code)
    
@@ -326,14 +327,14 @@ export default {
 
   mounted() {
     console.log(this.currentInterfaceId,"aaa")
-    this.logInit()
+    
      document.querySelectorAll(".title-right span")[0].style.cssText=
         "background-color:rgb(98, 161, 239);color:rgb(248, 248, 251);border-radius: 5px"
     console.log("this.code",this.code)
     if (this.code) {
       console.log(this.code);
       this.init();
-      
+      this.logInit()
       console.log("obj");
     }
     this.chiocesLitsOne();

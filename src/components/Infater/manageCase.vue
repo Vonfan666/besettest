@@ -25,7 +25,6 @@
         <div class="searchPopOver" v-if="statusIng.searchStatus">
           <div class="search-context">
             <p
-              
               v-for="(item,index) in searchList"
               :key="index"
               @click="searchResult(item.CaseGroupFilesId,item.id)"
@@ -50,7 +49,10 @@
         <div class="FilesContext" v-show="!statusIng.searchStatus">
           <div class="fileName" v-for="(item,index) in caseGroupList" :key="index">
             <div class="fileName-father" @click="isOpen($event,index)">
-              <span :class="fileNameIcon[index]" class="oneFiles"><span class="el-icon-folder" style="margin:0 2px"></span>{{item.name}}</span>
+              <span :class="fileNameIcon[index]" class="oneFiles">
+                <span class="el-icon-folder" style="margin:0 2px"></span>
+                {{item.name}}
+              </span>
               <div class="addTextFather">
                 <!-- <div class="addtext-code">
                     <span class="el-icon-plus it-icon-addtext"></span>
@@ -78,7 +80,7 @@
               v-show="fileNameChildStatus[index]"
             >
               <div class="file-father">
-                <span class="file ">{{item1.name}}</span>
+                <span class="file">{{item1.name}}</span>
               </div>
 
               <div class="addTextChild">
@@ -108,13 +110,33 @@
         <div class="title-detail">
           <span class="tt">用例列表</span>
           <span style="margin-left:50px">当前执行顺序:</span>
-          <span  v-if="statusIng.caseOrderStatus" style="margin-left:10px">{{datas.caseOrder}}</span>
-          <input v-model="datas.caseOrder" maxlength=7 placeholder="输入执行顺序" style="margin-left:10px;;width: 80px;" v-if="!statusIng.caseOrderStatus">
-          <span style="margin-left:10px;color:#409EFF;cursor: pointer;" v-if="statusIng.caseOrderStatus" @click="statusIng.caseOrderStatus=!statusIng.caseOrderStatus">编辑</span>
-          <span style="margin-left:10px;color:#409EFF;cursor: pointer;" v-if="!statusIng.caseOrderStatus" @click="caseOrderSubmit()">确定</span>
+          <span v-if="statusIng.caseOrderStatus" style="margin-left:10px">{{datas.caseOrder}}</span>
+          <input
+            v-model="datas.caseOrder"
+            maxlength="7"
+            placeholder="输入执行顺序"
+            style="margin-left:10px;;width: 80px;"
+            v-if="!statusIng.caseOrderStatus"
+          />
+          <span
+            style="margin-left:10px;color:#409EFF;cursor: pointer;"
+            v-if="statusIng.caseOrderStatus"
+            @click="statusIng.caseOrderStatus=!statusIng.caseOrderStatus"
+          >编辑</span>
+          <span
+            style="margin-left:10px;color:#409EFF;cursor: pointer;"
+            v-if="!statusIng.caseOrderStatus"
+            @click="caseOrderSubmit()"
+          >确定</span>
         </div>
         <div class="caseList">
-          <el-table :data="caseList" border style="width: 100%" @selection-change="caseSelection" v-loading="loading.loading_table" >
+          <el-table
+            :data="caseList"
+            border
+            style="width: 100%"
+            @selection-change="caseSelection"
+            v-loading="loading.loading_table"
+          >
             <el-table-column fixed prop="date" type="selection" width="50"></el-table-column>
             <el-table-column prop="order" label="执行顺序" width="80">
               <!-- <template slot-scope="scope" >
@@ -146,7 +168,7 @@
             <el-button type="primary" @click="caseListBack()">返回</el-button>
             <!-- <el-button type="primary" size="primary">保存</el-button> -->
             <el-button type="primary" size="primary" @click="runAllCase()">全部执行</el-button>
-            <el-button type="primary" size="primary">查看结果</el-button>
+            <el-button type="primary" size="primary" @click="statusIng.resultStatus=true">查看结果</el-button>
           </div>
         </div>
       </div>
@@ -583,7 +605,7 @@
           <div>
             <el-button type="primary" size="small" @click="addCaseSubmit()">确认</el-button>
             <el-button type="primary" size="small" @click="DebugSubmit()">调试</el-button>
-            <el-button type="primary" size="small" @click="addCaseSubmit()">查看结果</el-button>
+            <el-button type="primary" size="small" @click="statusIng.resultStatus=true">查看结果</el-button>
           </div>
         </div>
       </div>
@@ -650,14 +672,52 @@
         </div>
       </div>
     </unity-box>
-   
-      <el-drawer :visible.sync="statusIng.drawerStatus"  :with-header="false" size="60%">
-        <div>
-          <left-box :list.sync="resResults" :code.sync="code" :currentInterfaceId="currentInterfaceId" ref="letfBox"  v-if="statusIng.drawerStatus"></left-box>
+
+    <el-drawer :visible.sync="statusIng.drawerStatus" :with-header="false" size="60%">
+      <div>
+        <left-box
+          :list.sync="resResults"
+          :code.sync="code"
+          :currentInterfaceId="currentInterfaceId"
+          ref="letfBox"
+          v-if="statusIng.drawerStatus"
+        ></left-box>
+      </div>
+    </el-drawer>
+    <div class="result" v-if="statusIng.resultStatus">
+      <results-box
+        :currentInterfaceId="currentInterfaceId"
+        v-slot:debugLogResults
+        :styleCode="resultsStyle"
+      >
+        <div class="result-div">
+          <div class="title">
+            <h3 style=" display: inline-block;">历史结果</h3>
+            <span class="el-icon-close close" @click="statusIng.resultStatus=false"></span>
+          </div>
+          <div class="body">
+            <el-table
+              :data="resultsLog"
+              border
+              style="width: 100%"
+              :header-cell-style="textStyle"
+              :cell-style="textStyle"
+            >
+              <el-table-column prop="createTime" label="执行日期" fit></el-table-column>
+              <el-table-column prop="user" label="执行人" fit></el-table-column>
+              <el-table-column prop="caseCount" label="用例数量" fit></el-table-column>
+              <el-table-column fixed="right" label="操作" width="100">
+                <template slot-scope="scope" fit>
+                  <el-button @click="deletResult(scope.$row)" type="text" size="small">删除</el-button>
+                  <el-button @click="selectResult(scope.$row)" type="text" size="small">查看</el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+          </div>
+          <div class="foot"></div>
         </div>
-        
-      </el-drawer>
-    
+      </results-box>
+    </div>
   </div>
 </template>
 
@@ -685,7 +745,8 @@ import {
   CaseEdit,
   Runcase,
   DebugCase,
-  CaseOrder,CaseOrderGet
+  CaseOrder,
+  CaseOrderGet
 } from "../../axios/api.js";
 import storage from "../../libs/storage";
 
@@ -695,18 +756,42 @@ export default {
     "caseAddFiles-box": () => import("../public/MessageBox.vue"),
     "enviroment-box": () => import("../public/environment.vue"),
     "unity-box": () => import("../public/MessageBox.vue"),
-    "left-box": () => import("../public/manageCaseComponents/leftBox.vue")
+    "left-box": () => import("../public/manageCaseComponents/leftBox.vue"),
+    "results-box": () => import("../public/MessageBox.vue")
   },
   data() {
     return {
-      loading:{
-        loading_table:true
+      resultsLog: [
+        { createTime: "2020-06-26 17:00:00", user: "冯凡", caseCount: 20 },
+        { createTime: "2020-06-26 17:00:00", user: "冯凡", caseCount: 20 },
+        { createTime: "2020-06-26 17:00:00", user: "冯凡", caseCount: 20 },
+        { createTime: "2020-06-26 17:00:00", user: "冯凡", caseCount: 20 },
+        { createTime: "2020-06-26 17:00:00", user: "冯凡", caseCount: 20 },
+        { createTime: "2020-06-26 17:00:00", user: "冯凡", caseCount: 20 },
+        { createTime: "2020-06-26 17:00:00", user: "冯凡", caseCount: 20 },
+        { createTime: "2020-06-26 17:00:00", user: "冯凡", caseCount: 20 },
+        { createTime: "2020-06-26 17:00:00", user: "冯凡", caseCount: 20 },
+        { createTime: "2020-06-26 17:00:00", user: "冯凡", caseCount: 20 },
+        { createTime: "2020-06-26 17:00:00", user: "冯凡", caseCount: 20 },
+        { createTime: "2020-06-26 17:00:00", user: "冯凡", caseCount: 20 },
+        { createTime: "2020-06-26 17:00:00", user: "冯凡", caseCount: 20 },
+        { createTime: "2020-06-26 17:00:00", user: "冯凡", caseCount: 20 },
+        { createTime: "2020-06-26 17:00:00", user: "冯凡", caseCount: 20 },
+        { createTime: "2020-06-26 17:00:00", user: "冯凡", caseCount: 20 },
+        { createTime: "2020-06-26 17:00:00", user: "冯凡", caseCount: 20 },
+        { createTime: "2020-06-26 17:00:00", user: "冯凡", caseCount: 20 },
+        { createTime: "2020-06-26 17:00:00", user: "冯凡", caseCount: 20 },
+        { createTime: "2020-06-26 17:00:00", user: "冯凡", caseCount: 20 }
+      ],
+      loading: {
+        loading_table: true
       },
-      code:null, //判断是否启用websocket
+      resultsStyle: "width:1000px;height:700px",
+      code: null, //判断是否启用websocket
       // drawer: false,  //左侧弹窗
-      resResults:[],
+      resResults: [],
       currentCaseId: null,
-      currentInterfaceId:null,
+      currentInterfaceId: null,
       isUnifyStyle: "width:400px;height:300px",
       pushHeaderText: "",
       pushHeaderStyle: "height:500px;width:500px",
@@ -738,7 +823,8 @@ export default {
         CaselistOrCaseDetailTstatus: true,
         isUnifyStatus: false,
         drawerStatus: false,
-        caseOrderStatus:true,
+        caseOrderStatus: true,
+        resultStatus:false,
       },
       inputStatus: 1, //input输入替换成div输入-显示引用的环境变量的颜色
       searchName: "", //接口搜索名称
@@ -786,8 +872,8 @@ export default {
         caseDetail: "", //用例描述
         postMethods: "", //请求方法
         order: "", //排序
-        chiocsEnvironment: "" ,//
-        caseOrder:"",
+        chiocsEnvironment: "", //
+        caseOrder: ""
       },
       reqyestDataTypeRadio: 1, //提交的参数类型
       //前置处理器
@@ -929,38 +1015,39 @@ export default {
     };
   },
   methods: {
-    caseOrderSubmit(){
-      CaseOrder({
-        id:this.currentInterfaceId,
-        order:this.datas.caseOrder
-      }).then(res=>{
-        if(res.status===200){
-          this.datas.caseOrder=res.order
-          Message.success("修改成功")
-          this.statusIng.caseOrderStatus=true
-        }
-      })
+    textStyle({ row, column, rowIndex, columnIndex }) {
+      return "text-align:center";
     },
-    runAllCase(){
+    caseOrderSubmit() {
+      CaseOrder({
+        id: this.currentInterfaceId,
+        order: this.datas.caseOrder
+      }).then(res => {
+        if (res.status === 200) {
+          this.datas.caseOrder = res.order;
+          Message.success("修改成功");
+          this.statusIng.caseOrderStatus = true;
+        }
+      });
+    },
+    runAllCase() {
       //执行整个接口用例  这里是前端排序
-      console.log(this.multipleSelection)
-      var idList=[]
-      var codeDict={}
-      if(this.multipleSelection.length>0){
-        this.multipleSelection.forEach((item,index)=>{
-        idList.push(item.id)
-      })
-      this.statusIng.drawerStatus = true; //展开左侧
-      codeDict["idList"]=idList
-      codeDict["userId"]=storage.get("userId")
-      codeDict["interface"]=this.currentInterfaceId
-      this.code=codeDict
-      }else{
-        Message.error("请选择需要执行的用例")
+      console.log(this.multipleSelection);
+      var idList = [];
+      var codeDict = {};
+      if (this.multipleSelection.length > 0) {
+        this.multipleSelection.forEach((item, index) => {
+          idList.push(item.id);
+        });
+        this.statusIng.drawerStatus = true; //展开左侧
+        codeDict["idList"] = idList;
+        codeDict["userId"] = storage.get("userId");
+        codeDict["interface"] = this.currentInterfaceId;
+        this.code = codeDict;
+      } else {
+        Message.error("请选择需要执行的用例");
       }
-      
-      
-      
+
       // var idList=[]
       // this.caseList.forEach((item,index)=>{
       //   idList.push(item.id)
@@ -969,20 +1056,19 @@ export default {
       // if (idList) {
       //   this.RuncaseMethod([idList]);
       //   // console.log(this.resResults)
-        
+
       // } else {
       //   Message.error("请选择用例");
       // }
     },
-    executionSubmit(id){
+    executionSubmit(id) {
       //执行单个测试用例
-      var idList=[]
-      idList.push(id)
-      console.log(idList)
+      var idList = [];
+      idList.push(id);
+      console.log(idList);
       if (id) {
         this.RuncaseMethod(idList);
         // console.log(this.resResults)
-        
       } else {
         Message.error("请选择用例");
       }
@@ -990,16 +1076,16 @@ export default {
     DebugSubmit() {
       //不提交调试测试用例
       // isRequestsData
-       var requestsData = null;
+      var requestsData = null;
       this.reqyestDataTypeRadio === 1
         ? (requestsData = JSON.parse(JSON.stringify(this.requestsData)))
         : (requestsData = JSON.parse(JSON.stringify(this.requestsDataf)));
-      requestsData.keys.forEach((item,index)=>{
-        if(item.isRequestsData===false){
-          requestsData.keys.splice(index,1)
-          console.log(requestsData)
+      requestsData.keys.forEach((item, index) => {
+        if (item.isRequestsData === false) {
+          requestsData.keys.splice(index, 1);
+          console.log(requestsData);
         }
-      })
+      });
       DebugCase({
         // id: this.currentCaseId,
         name: this.datas.interfaceName,
@@ -1015,20 +1101,15 @@ export default {
         headers: JSON.stringify(this.requestsHeader),
         data: JSON.stringify(requestsData),
         environmentId: this.datas.chiocsEnvironment
-      }).then(res=>{
-        if(res.status===200){
-        var listx=[]
-        listx.push(res.results)
-        this.resResults=listx
-        this.statusIng.drawerStatus = true; //展开左侧
-        // this.$refs.letfBox.leftCaseName=false
-        
-        
-         
-         
-         
+      }).then(res => {
+        if (res.status === 200) {
+          var listx = [];
+          listx.push(res.results);
+          this.resResults = listx;
+          this.statusIng.drawerStatus = true; //展开左侧
+          // this.$refs.letfBox.leftCaseName=false
         }
-      })
+      });
     },
     ClearBr(key) {
       // key = key.replace(/<\/?.+?>/g, "");
@@ -1748,7 +1829,7 @@ export default {
       });
     },
     caseLists(id) {
-      this.currentInterfaceId=id
+      this.currentInterfaceId = id;
       this.inCaseList();
 
       CaseList({
@@ -1756,20 +1837,18 @@ export default {
       }).then(res => {
         res.status === 200 ? this.caseUnity(res.results) : null;
       });
-       CaseOrderGet({
-        id:this.currentInterfaceId
-        
-      }).then(res=>{
-        if(res.status===200){
-          this.loading.loading_table=false
-          if(res.order){
-            this.datas.caseOrder=res.order
-          }else{
-            this.datas.caseOrder=1
+      CaseOrderGet({
+        id: this.currentInterfaceId
+      }).then(res => {
+        if (res.status === 200) {
+          this.loading.loading_table = false;
+          if (res.order) {
+            this.datas.caseOrder = res.order;
+          } else {
+            this.datas.caseOrder = 1;
           }
-          
         }
-      })
+      });
     },
 
     //确认添加用例接口
@@ -1889,17 +1968,15 @@ export default {
       });
     },
     RuncaseMethod(id) {
-      var id=JSON.stringify(id)
+      var id = JSON.stringify(id);
       Runcase({
         id: id
       }).then(res => {
         if (res.status === 200) {
-          this.resResults=res.results
+          this.resResults = res.results;
           this.statusIng.drawerStatus = true; //展开左侧
-         
-          
-        }else{
-          Message.error(res.msg)
+        } else {
+          Message.error(res.msg);
         }
       });
     }
@@ -1915,7 +1992,7 @@ export default {
   //   // this.filesNames();
   //   // console.log(JSON.stringify(this.caseGroupList));
   // }
- 
+
   watch: {
     $route: {
       handler: function(newValue, oldValue) {
@@ -1926,18 +2003,16 @@ export default {
       },
       deep: true
     },
-    "statusIng.drawerStatus": function(a,b){
-      if(!a){
-        this.resResults=[]
+    "statusIng.drawerStatus": function(a, b) {
+      if (!a) {
+        this.resResults = [];
       }
     }
-    
   }
 };
 </script>
 
 <style lang="scss" scoped>
-
 .manageCase {
   // overflow: hidden;
   height: 100%;
@@ -2351,6 +2426,28 @@ export default {
   // margin-top: 50px;
   text-align: center;
   margin-top: 35px;
+}
+.result {
+  text-align: left;
+ 
+  border: 1px;
+  .result-div {
+    margin: 10px;
+    // background-color: red;
+    height: 100%;
+    .close{
+      float: right;
+      padding:10px;
+    }
+    .title {
+      text-align: center;
+    }
+    .body{
+    overflow-x: hidden;
+      height: 600px;
+
+    }
+  }
 }
 </style>
 
