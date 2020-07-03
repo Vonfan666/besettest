@@ -278,7 +278,7 @@ export default {
       })
         .then(() => {
           console.log(arguments)
-          this.M_ClassRemove(item,item) 
+          this.M_ClassRemove(item,index) 
           // this.$message({
           //   type: "success",
           //   message: "删除成功!"

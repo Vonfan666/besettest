@@ -259,3 +259,20 @@ export const EditCaseOrder=(params)=>{
 export const RunCaseAll=(params)=>{
     return postRequest("/users/case_run_all/",params)   
 }
+
+
+//查看debug测试结果
+export const CaseResults=(params)=>{
+    return getRequest("/users/case_results/",params)   
+}
+
+//删除debug测试结果
+export const CaseResultsDel=(params)=>{
+    return postRequest("/users/case_results_del/",params)   
+}
+
+
+//查看debug测试结果详情
+export const CaseResultsDetail=(params)=>{
+    return getRequest("/users/case_results_detail",params)   
+}

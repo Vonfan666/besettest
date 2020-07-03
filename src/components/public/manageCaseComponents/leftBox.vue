@@ -326,6 +326,8 @@ export default {
   },
 
   mounted() {
+    console.log("this.list",this.list)
+    
     console.log(this.currentInterfaceId,"aaa")
     
      document.querySelectorAll(".title-right span")[0].style.cssText=
@@ -336,6 +338,9 @@ export default {
       this.init();
       this.logInit()
       console.log("obj");
+    }else{
+      console.log(this.list[0].logList)
+      this.logList=this.list[0].logList
     }
     this.chiocesLitsOne();
   },

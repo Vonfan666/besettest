@@ -164,6 +164,7 @@
           </el-table>
         </div>
         <div class="caseFoot">
+          <div class="page"></div>
           <div class="caseFoot-1">
             <el-button type="primary" @click="caseListBack()">返回</el-button>
             <!-- <el-button type="primary" size="primary">保存</el-button> -->
@@ -605,7 +606,11 @@
           <div>
             <el-button type="primary" size="small" @click="addCaseSubmit()">确认</el-button>
             <el-button type="primary" size="small" @click="DebugSubmit()">调试</el-button>
-            <el-button type="primary" size="small" @click="statusIng.resultStatus=true">查看结果</el-button>
+            <el-button
+              type="primary"
+              size="small"
+              @click="page()"
+            >查看结果</el-button>
           </div>
         </div>
       </div>
@@ -702,19 +707,24 @@
               style="width: 100%"
               :header-cell-style="textStyle"
               :cell-style="textStyle"
+              v-loading="loading.loading_results"
             >
               <el-table-column prop="createTime" label="执行日期" fit></el-table-column>
-              <el-table-column prop="user" label="执行人" fit></el-table-column>
+              <el-table-column prop="user.name" label="执行人" fit></el-table-column>
               <el-table-column prop="caseCount" label="用例数量" fit></el-table-column>
               <el-table-column fixed="right" label="操作" width="100">
                 <template slot-scope="scope" fit>
-                  <el-button @click="deletResult(scope.$row)" type="text" size="small">删除</el-button>
-                  <el-button @click="selectResult(scope.$row)" type="text" size="small">查看</el-button>
+                  <el-button @click="deleteTwo(pageRemove,scope.row,type=1)" type="text" size="small" >删除</el-button>
+                  <el-button @click="selectResult(scope.row)" type="text" size="small">查看</el-button>
                 </template>
               </el-table-column>
             </el-table>
           </div>
-          <div class="foot"></div>
+          <div class="foot">
+            
+              <page-box ref="DebugResultPage" ></page-box>
+            
+          </div>
         </div>
       </results-box>
     </div>
@@ -746,7 +756,10 @@ import {
   Runcase,
   DebugCase,
   CaseOrder,
-  CaseOrderGet
+  CaseOrderGet,
+  CaseResults,
+  CaseResultsDel,
+  CaseResultsDetail
 } from "../../axios/api.js";
 import storage from "../../libs/storage";
 
@@ -757,10 +770,13 @@ export default {
     "enviroment-box": () => import("../public/environment.vue"),
     "unity-box": () => import("../public/MessageBox.vue"),
     "left-box": () => import("../public/manageCaseComponents/leftBox.vue"),
-    "results-box": () => import("../public/MessageBox.vue")
+    "results-box": () => import("../public/MessageBox.vue"),
+    "page-box": () => import("../public/page.vue")
+    
   },
   data() {
     return {
+
       resultsLog: [
         { createTime: "2020-06-26 17:00:00", user: "冯凡", caseCount: 20 },
         { createTime: "2020-06-26 17:00:00", user: "冯凡", caseCount: 20 },
@@ -784,9 +800,10 @@ export default {
         { createTime: "2020-06-26 17:00:00", user: "冯凡", caseCount: 20 }
       ],
       loading: {
-        loading_table: true
+        loading_table: true,
+        loading_results:true
       },
-      resultsStyle: "width:1000px;height:700px",
+      resultsStyle: "width:1000px;height:750px",
       code: null, //判断是否启用websocket
       // drawer: false,  //左侧弹窗
       resResults: [],
@@ -824,7 +841,7 @@ export default {
         isUnifyStatus: false,
         drawerStatus: false,
         caseOrderStatus: true,
-        resultStatus:false,
+        resultStatus: false
       },
       inputStatus: 1, //input输入替换成div输入-显示引用的环境变量的颜色
       searchName: "", //接口搜索名称
@@ -1015,6 +1032,94 @@ export default {
     };
   },
   methods: {
+    selectResult(item){
+      CaseResultsDetail({
+        id:item.id
+      }).then(res=>{
+        if(res.status===200){
+          console.log(res.results)
+          var listx = [];
+          listx.push(res.results);
+          this.resResults= listx
+          this.statusIng.drawerStatus = true; //展开左侧
+        }
+      })
+    },
+    deleteTwo(){
+      this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          console.log(arguments)
+          console.log(arguments[0])
+          console.log(arguments[1])
+          console.log(arguments[2])
+          // console.log(func)
+          arguments[0](arguments[1],arguments[2])
+          // this.$message({
+          //   type: "success",
+          //   message: "删除成功!"
+          // });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除"
+          });
+        });
+    },
+    pageRemove(item,type){
+      console.log("item",item)
+      var page=this.$refs.DebugResultPage.currentPage
+      if (this.resultsLog.length===1 && page!==1){
+        page=page-1
+        this.$refs.DebugResultPage.currentPage=page
+      }
+      CaseResultsDel({
+        id:item.id,
+        c_id:item.c_id,
+        page:page,
+        pageSize:this.$refs.DebugResultPage.pageSize,
+        type:type
+      }).then(res=>{
+        if(res.status===200){
+          this.resultsLog = res.results
+          this.$refs.DebugResultPage.total=res.total
+          this.$refs.DebugResultPage.allPage=res.allPage
+          Message.success(res.msg)
+        }
+      })
+
+    },
+    page(page = 1, pageSize = 10,type=1) {
+      var rec=null
+      
+      
+      if (this.currentCaseId === null) {
+        Message.error("请选择用例或分类");
+      } else {
+        this.statusIng.resultStatus=true;  //打开
+        CaseResults({
+          type: type,
+          c_id: this.currentCaseId,
+          page: page,
+          pageSize: pageSize
+        }).then(res => {
+          if (res.status === 200) {
+            this.loading.loading_results=false
+            console.log(res.results)
+            this.resultsLog = res.results
+            this.$refs.DebugResultPage.total=res.total
+            this.$refs.DebugResultPage.allPage=res.allPage
+          }
+        });
+    
+        
+      }
+      return rec
+    },
     textStyle({ row, column, rowIndex, columnIndex }) {
       return "text-align:center";
     },
@@ -1087,10 +1192,10 @@ export default {
         }
       });
       DebugCase({
-        // id: this.currentCaseId,
+        id: this.currentCaseId,
         name: this.datas.interfaceName,
         // order: this.datas.order,
-        // userId: storage.get("userId"),
+        userId: storage.get("userId"),
         // CaseGroupId: this.datas.caseGroupId,
         postMethod: this.datas.postMethods,
         dataType: this.reqyestDataTypeRadio,
@@ -1758,6 +1863,7 @@ export default {
       this.currentCaseId = id;
       this.clearContext();
       this.CaseEdits(id);
+
       this.statusIng.CaselistOrCaseDetailTstatus = true;
     },
     //新建用例清空相关数据
@@ -1970,7 +2076,8 @@ export default {
     RuncaseMethod(id) {
       var id = JSON.stringify(id);
       Runcase({
-        id: id
+        id: id,
+        userId:storage.get("userId")
       }).then(res => {
         if (res.status === 200) {
           this.resResults = res.results;
@@ -2429,23 +2536,22 @@ export default {
 }
 .result {
   text-align: left;
- 
+
   border: 1px;
   .result-div {
     margin: 10px;
     // background-color: red;
     height: 100%;
-    .close{
+    .close {
       float: right;
-      padding:10px;
+      padding: 10px;
     }
     .title {
       text-align: center;
     }
-    .body{
-    overflow-x: hidden;
+    .body {
+      overflow-x: hidden;
       height: 600px;
-
     }
   }
 }
