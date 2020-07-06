@@ -126,7 +126,7 @@ export default {
   props: ["list", "code","currentInterfaceId"],
   data() {
     return {
-      logList:[],
+      logList:[],  //日志列表
       contLogStatus:true,
       caseNameColorList:[],
       aa: [],
