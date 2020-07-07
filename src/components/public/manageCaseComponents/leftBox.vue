@@ -123,9 +123,10 @@
 <script>
 import storage from '../../../libs/storage';
 export default {
-  props: ["list", "code","currentInterfaceId"],
+  props: ["listReslits", "code","currentInterfaceId"],
   data() {
     return {
+      list:[],
       logList:[],  //日志列表
       contLogStatus:true,
       caseNameColorList:[],
@@ -246,6 +247,7 @@ export default {
       console.log("连接错误");
     },
     getMessageLog(msg){
+      console.log("1212121",this.logList)
       console.log("执行getMessageLog")
       console.log("log返回",JSON.parse(msg.data))
       var  msg=JSON.parse(msg.data)
@@ -296,7 +298,7 @@ export default {
     },
     chiocesLitsOne() {
       //默认选中第一个
-      console.log("this.list2", this.code);
+      console.log(this.list)
       console.log(this.list.length);
       if (this.list.length <= 1) {
         this.leftCaseName = false;
@@ -304,10 +306,21 @@ export default {
         this.leftCaseName = true;
       }
       if (this.list.length >= 1) {
+        
         var one = this.list[0];
+        console.log("one",one)
         this.caseNameClick(one, 1);
+
       }
-    }
+      
+    },
+    caseNameColor(row){
+      row.forEach((item,index)=>{
+        item.code===1?this.caseNameColorList.push("success"):null  //正常返回数据
+        item.code===0?this.caseNameColorList.push("danger"):null   //请求异常数据
+        item.code===2?this.caseNameColorList.push("warning"):null  //断言失败
+      })
+  },
   },
 
   destroyed() {
@@ -324,11 +337,12 @@ export default {
    
     
   },
-
+  
   mounted() {
-    console.log("this.list",this.list)
     
-    console.log(this.currentInterfaceId,"aaa")
+    // console.log("this.list",this.list)
+    
+    // console.log(this.currentInterfaceId,"aaa")
     
      document.querySelectorAll(".title-right span")[0].style.cssText=
         "background-color:rgb(98, 161, 239);color:rgb(248, 248, 251);border-radius: 5px"
@@ -339,10 +353,23 @@ export default {
       this.logInit()
       console.log("obj");
     }else{
-      console.log(this.list[0].logList)
-      this.logList=this.list[0].logList
+      console.log(this.listReslits,"3231")
+      this.list=this.listReslits.results
+      this.logList=this.listReslits.logList
+      console.log(this.list)
+      this.caseNameColor(this.list)
+      this.chiocesLitsOne();
+      
     }
-    this.chiocesLitsOne();
+    // else{
+    //   this.logList=this.list.logList
+    // }
+    // if(Object.keys(this.list).indexOf("results")>=0){
+    //     this.logList=this.list.logList
+    //     this.list=this.list.results
+        
+    //   }
+    
   },
   watch: {
     list(a, b) {

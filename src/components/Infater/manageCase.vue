@@ -155,7 +155,7 @@
                 <el-button
                   type="text"
                   size="small"
-                  @click="removeCase(scope.row.id,scope.$index)"
+                  @click="deleteTwo(removeCase,[scope.row.id,scope.$index])"
                 >删除</el-button>
                 <el-button type="text" size="small" @click="editCase(scope.row.id,scope.$index)">编辑</el-button>
                 <el-button type="text" size="small" @click="executionSubmit(scope.row.id)">单点执行</el-button>
@@ -169,7 +169,7 @@
             <el-button type="primary" @click="caseListBack()">返回</el-button>
             <!-- <el-button type="primary" size="primary">保存</el-button> -->
             <el-button type="primary" size="primary" @click="runAllCase()">全部执行</el-button>
-            <el-button type="primary" size="primary" @click="statusIng.resultStatus=true">查看结果</el-button>
+            <el-button type="primary" size="primary" @click="pageAll();pageMethods=pageAll">查看结果</el-button>
           </div>
         </div>
       </div>
@@ -609,7 +609,7 @@
             <el-button
               type="primary"
               size="small"
-              @click="page()"
+              @click="page();pageMethods=page"
             >查看结果</el-button>
           </div>
         </div>
@@ -681,7 +681,7 @@
     <el-drawer :visible.sync="statusIng.drawerStatus" :with-header="false" size="60%">
       <div>
         <left-box
-          :list.sync="resResults"
+          :listReslits.sync="resResults"
           :code.sync="code"
           :currentInterfaceId="currentInterfaceId"
           ref="letfBox"
@@ -714,7 +714,7 @@
               <el-table-column prop="caseCount" label="用例数量" fit></el-table-column>
               <el-table-column fixed="right" label="操作" width="100">
                 <template slot-scope="scope" fit>
-                  <el-button @click="deleteTwo(pageRemove,scope.row,type=1)" type="text" size="small" >删除</el-button>
+                  <el-button @click="deleteTwo(pageRemove,scope.row)" type="text" size="small" >删除</el-button>
                   <el-button @click="selectResult(scope.row)" type="text" size="small">查看</el-button>
                 </template>
               </el-table-column>
@@ -776,7 +776,7 @@ export default {
   },
   data() {
     return {
-
+      pageMethods:this.page,
       resultsLog: [
         { createTime: "2020-06-26 17:00:00", user: "冯凡", caseCount: 20 },
         { createTime: "2020-06-26 17:00:00", user: "冯凡", caseCount: 20 },
@@ -1033,17 +1033,31 @@ export default {
   },
   methods: {
     selectResult(item){
-      CaseResultsDetail({
+      console.log(item)
+      if (item.type===1){
+        CaseResultsDetail({
+        id:item.id
+      }).then(res=>{
+        if(res.status===200){
+  
+          this.resResults= res.results
+          this.statusIng.drawerStatus = true; //展开左侧
+        }
+      })
+      }
+      if (item.type===2){
+        CaseResultsDetail({
         id:item.id
       }).then(res=>{
         if(res.status===200){
           console.log(res.results)
-          var listx = [];
-          listx.push(res.results);
-          this.resResults= listx
+          
+          this.resResults= res.results
           this.statusIng.drawerStatus = true; //展开左侧
         }
       })
+      }
+      
     },
     deleteTwo(){
       this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
@@ -1057,7 +1071,7 @@ export default {
           console.log(arguments[1])
           console.log(arguments[2])
           // console.log(func)
-          arguments[0](arguments[1],arguments[2])
+          arguments[0](arguments[1])
           // this.$message({
           //   type: "success",
           //   message: "删除成功!"
@@ -1070,7 +1084,7 @@ export default {
           });
         });
     },
-    pageRemove(item,type){
+    pageRemove(item){
       console.log("item",item)
       var page=this.$refs.DebugResultPage.currentPage
       if (this.resultsLog.length===1 && page!==1){
@@ -1082,7 +1096,7 @@ export default {
         c_id:item.c_id,
         page:page,
         pageSize:this.$refs.DebugResultPage.pageSize,
-        type:type
+        type:item.type
       }).then(res=>{
         if(res.status===200){
           this.resultsLog = res.results
@@ -1104,6 +1118,33 @@ export default {
         CaseResults({
           type: type,
           c_id: this.currentCaseId,
+          page: page,
+          pageSize: pageSize
+        }).then(res => {
+          if (res.status === 200) {
+            this.loading.loading_results=false
+            console.log(res.results)
+            this.resultsLog = res.results
+            this.$refs.DebugResultPage.total=res.total
+            this.$refs.DebugResultPage.allPage=res.allPage
+          }
+        });
+    
+        
+      }
+      return rec
+    },
+    pageAll(page = 1, pageSize = 10,type=2) {
+      var rec=null
+      
+      
+      if (!this.currentInterfaceId) {
+        Message.error("请选择用例或分类");
+      } else {
+        this.statusIng.resultStatus=true;  //打开
+        CaseResults({
+          type: type,
+          c_id: this.currentInterfaceId,
           page: page,
           pageSize: pageSize
         }).then(res => {
@@ -1208,9 +1249,9 @@ export default {
         environmentId: this.datas.chiocsEnvironment
       }).then(res => {
         if (res.status === 200) {
-          var listx = [];
-          listx.push(res.results);
-          this.resResults = listx;
+          // var listx = [];
+          // listx.push(res.results);
+          this.resResults = res.results
           this.statusIng.drawerStatus = true; //展开左侧
           // this.$refs.letfBox.leftCaseName=false
         }
@@ -1848,7 +1889,10 @@ export default {
     },
 
     //删除用例
-    removeCase(id, index) {
+    removeCase(item) {
+      console.log(item)
+      var id=item[0]
+      var index=item[1]
       ClassRemove({
         id: id
       }).then(res => {

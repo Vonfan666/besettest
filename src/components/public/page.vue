@@ -32,7 +32,7 @@ export default {
         console.log(`每页 ${val} 条`);
         this.pageSize=val
         this.currentPage=1
-        this.$parent.$parent.page(this.currentPage,val)
+        this.$parent.$parent.pageMethods(this.currentPage,val)
 
       },
       handleCurrentChange(val) {   //请求当前页的数据
@@ -40,7 +40,7 @@ export default {
         console.log(`当前页: ${val}`);
         
         this.currentPage=val
-        this.$parent.$parent.page(val,this.pageSize)
+        this.$parent.$parent.pageMethods(val,this.pageSize)
         
         
       }
