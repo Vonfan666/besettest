@@ -169,7 +169,7 @@
             <el-button type="primary" @click="caseListBack()">返回</el-button>
             <!-- <el-button type="primary" size="primary">保存</el-button> -->
             <el-button type="primary" size="primary" @click="runAllCase()">全部执行</el-button>
-            <el-button type="primary" size="primary" @click="pageAll();pageMethods=pageAll">查看结果</el-button>
+            <el-button type="primary" size="primary" @click="pageAll();pageMethods=pageMethods1">查看结果</el-button>
           </div>
         </div>
       </div>
@@ -777,6 +777,7 @@ export default {
   data() {
     return {
       pageMethods:this.page,
+      pageMethods1:this.pageAll,
       resultsLog: [
         { createTime: "2020-06-26 17:00:00", user: "冯凡", caseCount: 20 },
         { createTime: "2020-06-26 17:00:00", user: "冯凡", caseCount: 20 },
@@ -1136,7 +1137,6 @@ export default {
     },
     pageAll(page = 1, pageSize = 10,type=2) {
       var rec=null
-      
       
       if (!this.currentInterfaceId) {
         Message.error("请选择用例或分类");
