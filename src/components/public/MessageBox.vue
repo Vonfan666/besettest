@@ -36,6 +36,9 @@
       <slot name="debugLogResults">
         <!-- 创建执行计划 -->
       </slot>
+      <slot name="RunCaseBox">
+        <!-- 执行过程-->
+      </slot>
     </div>
   </div>
 </template>

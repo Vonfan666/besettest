@@ -8,7 +8,7 @@
           class="el-icon-plus"
           @click="createCasePlanStatus=true;buttonClickStatus=true"
         >新建测试计划</el-button>
-         <el-button
+        <el-button
           type="primary"
           size="small"
           class="el-icon-plus"
@@ -50,7 +50,7 @@
                 @click="D_ClassRemove(scope.row.id,scope.$index)"
               >删除</el-button>
               <el-button type="text" size="small" @click="runPlan(scope.row)">执行</el-button>
-              <el-button type="text" size="small">结果</el-button>
+              <el-button type="text" size="small" @click="runResults(scope.row)">结果</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -98,8 +98,9 @@
               <el-form-item prop="code" label="计划描述">
                 <el-input v-model="datas.detail" placeholder="请输入计划描述" clearable></el-input>
               </el-form-item>
-              <el-form-item prop="code" label="每次执行是否重新创建脚本：" class="againScript"><br>
-                 <el-radio-group v-model="datas.againScript">
+              <el-form-item prop="code" label="每次执行是否重新创建脚本：" class="againScript">
+                <br />
+                <el-radio-group v-model="datas.againScript">
                   <el-radio :label="0">否</el-radio>
                   <el-radio :label="1">是</el-radio>
                 </el-radio-group>
@@ -124,37 +125,76 @@
         </div>
       </createCasePlan>
     </div>
+    <div class="runCaseBox">
+      <run-box v-slot:RunCaseBox :styleCode="runStyleCode" v-if="runCaseBoxStatus">
+        <div style="margin: 10px;">
+          <div class="header">
+            <span style="display:inline-block;text-align: center;font-weight:700">执行过程</span>
+            <span
+              class="el-icon-close close"
+              @click="runCaseBoxStatus=false"
+              style="float:right;padding: 10px;"
+            ></span>
+          </div>
+
+          <div class="body" >
+            <div class="steps">
+              <el-steps :active="0" align-center finish-status="success" > 
+                  <el-step title="初始化" ></el-step>
+                  <el-step title="生成脚本" v-if="createScroptStatus==1"></el-step>
+                  <el-step title="执行脚本" ></el-step>
+                  <el-step title="执行完毕" ></el-step>
+                </el-steps>
+            </div>
+            <div class="log">
+               <div class="text">
+                 </div>  
+
+            </div>
+          </div>
+        </div>
+      </run-box>
+    </div>
   </div>
 </template>
     
 <script>
 import validator from "@/libs/validate.js";
 import storage from "@/libs/storage.js";
-import { AddCasePlan, getCasePlan,UpdateCasePlan,DeleteCasePlan,RunCaseAll} from "../../axios/api.js";
+import {
+  AddCasePlan,
+  getCasePlan,
+  UpdateCasePlan,
+  DeleteCasePlan,
+  RunCaseAll
+} from "../../axios/api.js";
 import { Message } from "element-ui";
 export default {
   components: {
-    createCasePlan: () => import("../public/MessageBox.vue")
+    createCasePlan: () => import("../public/MessageBox.vue"),
+    "run-box": () => import("../public/MessageBox.vue")
   },
   data() {
     return {
-      buttonClickStatus:"true",
-      total: null,  //数据总条数
+      createScroptStatus:1,  //在点击结果或者执行时-判断需不需要重新创建脚本--是展示三项步骤还是四项
+      runCaseBoxStatus: false,
+      runStyleCode: "width:1000px;height:750px",
+      buttonClickStatus: "true",
+      total: null, //数据总条数
       pageSize: 10, //每页显示的数量
       page: 1, //当前请求的页面
-      allPage:null, //总页数
+      allPage: null, //总页数
       datas: {
         name: null, //计划名称
         cname: null, //计划英文名--自动化脚本名称
         runType: 0, //执行列表-立即执行  定时执行   轮询
         detail: null,
         caseStartTime: "", //计划开始时间
-        againScript:0,  //是否重新创建脚本   1-重新创建      0-不重新创建
-
+        againScript: 0 //是否重新创建脚本   1-重新创建      0-不重新创建
       },
       //编辑暂存
-      editPlanItem:"",
-      editPlanIndex:"",
+      editPlanItem: "",
+      editPlanIndex: "",
       rules: {
         name: [{ required: true, message: "输入计划名", trigger: "blur" }],
         cname: [
@@ -165,8 +205,8 @@ export default {
           { required: true, message: "请选择执行方式", trigger: "change" }
         ]
       },
-      loading:{
-        loading_table:true
+      loading: {
+        loading_table: true
       },
       createCasePlanStyle: "height:700px;width:500px",
       createCasePlanStatus: false,
@@ -188,28 +228,29 @@ export default {
     };
   },
   methods: {
+    runResults(item) {
+      this.runCaseBoxStatus = true;
+      this.createScroptStatus=item.againScript
+    },
+    runPlan(item) {
+      RunCaseAll({
+        id: item.id
+      }).then(res => {
+        res.status === 200
+          ? (Message.success(res.msg), (this.runCaseBoxStatus = true))
+          : Message.error(res.msg);
+      });
+    },
 
-     runPlan(item){
-       RunCaseAll({
-         id:item.id
-       }).then(res=>{
-         res.status===200
-         ?
-         Message.success(res.msg)
-         :
-         Message.error(res.msg)
-       })
-     }, 
-
-     D_ClassRemove(item,index) {
+    D_ClassRemove(item, index) {
       this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
       })
         .then(() => {
-          console.log(arguments)
-          this.DeleteCasePlan(item,item) 
+          console.log(arguments);
+          this.DeleteCasePlan(item, item);
           // this.$message({
           //   type: "success",
           //   message: "删除成功!"
@@ -222,8 +263,8 @@ export default {
           });
         });
     },
-    inCaseListRouter(){
-        this.$router.push({"name":"runCaseList"})
+    inCaseListRouter() {
+      this.$router.push({ name: "runCaseList" });
     },
     handleSizeChange(val) {
       this.pageSize = val;
@@ -242,14 +283,13 @@ export default {
       return "text-align:center";
     },
     close() {
-        //清空表单
-        this.datas.name=null
-        this.datas.cname=null
-        this.datas.runType=0
-        this.datas.detail=null
-        this.datas.againScript=0
-        this.createCasePlanStatus = false;
-        
+      //清空表单
+      this.datas.name = null;
+      this.datas.cname = null;
+      this.datas.runType = 0;
+      this.datas.detail = null;
+      this.datas.againScript = 0;
+      this.createCasePlanStatus = false;
     },
     casePlanAdd() {
       //添加计划
@@ -262,104 +302,96 @@ export default {
             cname: this.datas.cname,
             runType: this.datas.runType,
             detail: this.datas.detail,
-            againScript:this.datas.againScript,
-            page:this.page,
-            pageSize:this.pageSize,
+            againScript: this.datas.againScript,
+            page: this.page,
+            pageSize: this.pageSize
           }).then(res => {
             res.status == 200
               ? (Message.success("新增成功"),
-                this.allPage=res.allPage,
-                this.total=res.total,
-                this.createCasePlanStatus = false,
-                this.tableData=res.results)   
+                (this.allPage = res.allPage),
+                (this.total = res.total),
+                (this.createCasePlanStatus = false),
+                (this.tableData = res.results))
               : null;
           });
-        }else{
-            return false
+        } else {
+          return false;
         }
       });
     },
-    editPlan(item,index){
-        //点击编辑按钮
-        this.editPlanItem=item
-        this.editPlanIndex=index
-        console.log(item)
-        this.datas.name=item.name
-        this.datas.cname=item.cname
-        this.datas.runType=item.runType.id
-        //时间
-        this.datas.detail=item.detail
-        this.datas.againScript=item.againScript
-        this.createCasePlanStatus=true
-        
+    editPlan(item, index) {
+      //点击编辑按钮
+      this.editPlanItem = item;
+      this.editPlanIndex = index;
+      console.log(item);
+      this.datas.name = item.name;
+      this.datas.cname = item.cname;
+      this.datas.runType = item.runType.id;
+      //时间
+      this.datas.detail = item.detail;
+      this.datas.againScript = item.againScript;
+      this.createCasePlanStatus = true;
+    },
+    casePlanUpdate() {
+      //点击编辑按钮直接更新
+      var item = this.editPlanItem;
+      var index = this.editPlanIndex;
+      console.log("item", item, index);
+      UpdateCasePlan({
+        projectId: storage.get("projectId"),
+        id: item.id,
+        name: this.datas.name,
+        cname: this.datas.cname,
+        runType: this.datas.runType,
+        againScript: this.datas.againScript,
+        detail: this.datas.detail
+      }).then(res => {
+        res.status === 200
+          ? (this.tableData.splice(index, 1, res.results),
 
+            (this.createCasePlanStatus = false),
+            this.close(),
+            Message.success("更新成功"))
+          : null;
+      });
     },
-    casePlanUpdate(){
-        //点击编辑按钮直接更新
-        var item=this.editPlanItem
-        var index=this.editPlanIndex
-        console.log("item",item,index)
-        UpdateCasePlan({
-            projectId:storage.get("projectId"),
-            id:item.id,
-            name:this.datas.name,
-            cname:this.datas.cname,
-            runType:this.datas.runType,
-            againScript:this.datas.againScript,
-            detail:this.datas.detail
-        }).then(res=>{
-            res.status===200
-            ?
-            (
-                this.tableData.splice(index,1,res.results),
-                this.createCasePlanStatus=false,
-                this.close(),
-                Message.success("更新成功")
-            )
-            :
-            null
-        })
-    },
-    DeleteCasePlan(id,index){
-        //删除计划
-        DeleteCasePlan({
-            projectId:storage.get("projectId"),
-            id:id,
-            pageSize:this.pageSize,
-            page:this.page
-        }).then(res=>{
-            res.status===200
-            ?
-            (Message.success(res.msg),
-            this.tableData=res.results,
-            this.total=res.total,
-            this.allPage=res.allPage,
-            (this.page>this.allPage
-            ?
-            (this.page=this.page-1,
-            this.casePlanList(this.page,this.pageSize))
-            :null)
-            
-            )
-            :
-            null
-        })
+    DeleteCasePlan(id, index) {
+      //删除计划
+      DeleteCasePlan({
+        projectId: storage.get("projectId"),
+        id: id,
+        pageSize: this.pageSize,
+        page: this.page
+      }).then(res => {
+        res.status === 200
+          ? (Message.success(res.msg),
+            (this.tableData = res.results),
+            (this.total = res.total),
+            (this.allPage = res.allPage),
+            this.page > this.allPage
+              ? ((this.page = this.page - 1),
+                this.casePlanList(this.page, this.pageSize))
+              : null)
+          : null;
+      });
     },
     casePlanList(page, pageSize) {
-        //计划列表
+      //计划列表
       getCasePlan({
         projectId: storage.get("projectId"),
         page: page,
         pageSize: pageSize
       }).then(res => {
         res.status === 200
-          ? ((this.tableData = res.results), (this.total = res.total),(this.allPage=res.allPage),(this.loading.loading_table=false))
+          ? ((this.tableData = res.results),
+            (this.total = res.total),
+            (this.allPage = res.allPage),
+            (this.loading.loading_table = false))
           : null;
       });
     }
   },
   mounted() {
-    
     this.casePlanList(this.page, this.pageSize);
   }
 };
@@ -399,13 +431,18 @@ export default {
   bottom: 20px;
 }
 
+.runCaseBox{
+  .log .text{
+    background: black;width: 100%;height: 600px;overflow-x: hidden;
+  }
+}
 </style>
 
 <style >
 .TextCenter {
   text-align: center;
 }
-.againScript .el-form-item__label{
+.againScript .el-form-item__label {
   width: 200px !important;
 }
 </style>

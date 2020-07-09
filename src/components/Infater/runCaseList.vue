@@ -95,7 +95,7 @@
           <el-table-column fixed="right" label="操作" width="150">
             <template slot-scope="scope">
               <el-button type="text" size="small" @click="editCaseOrder(scope.row,scope.$index)">编辑</el-button>
-              <el-button type="text" size="small" @click="D_ClassRemove(scope.row,scope.$index)">删除</el-button>
+              <el-button type="text" size="small" @click="D_ClassRemove(M_ClassRemove,[scope.row,scope.$index])">删除</el-button>
               <el-button type="text" size="small" @click="debugCase(scope.row,scope.$index)">调试</el-button>
             </template>
           </el-table-column>
@@ -270,7 +270,7 @@ export default {
       });
     },
     //二次确认删除
-    D_ClassRemove(item,index) {
+    D_ClassRemove() {
       this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -278,7 +278,9 @@ export default {
       })
         .then(() => {
           console.log(arguments)
-          this.M_ClassRemove(item,index) 
+          console.log(arguments[1][0])
+          arguments[0](arguments[1][0],arguments[1][1])
+          // this.M_ClassRemove(item,index) 
           // this.$message({
           //   type: "success",
           //   message: "删除成功!"
