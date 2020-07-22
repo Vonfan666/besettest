@@ -137,7 +137,7 @@
             ></span>
           </div>
 
-          <div class="body" >
+          <div class="body"   style="margin-top:30px">
             <div class="steps">
               <el-steps :active="0" align-center finish-status="success" > 
                   <el-step title="初始化" ></el-step>
@@ -224,21 +224,65 @@ export default {
         //   createTime: "2020-06-09 16:49:55",
         //   detail: "不要删除不要删除不要删除"
         // }
-      ]
+      ],
+      WebSocket:{
+        path: "ws://192.168.0.66:8081/ws/users/runCaseSelectLog/",
+        socket:"",
+        data:null
+      }
     };
   },
   methods: {
+
+    // websockey
+    init: function() {
+      if (typeof WebSocket === "undefined") {
+        alert("您的浏览器不支持socket");
+      } else {
+        // 实例化socket
+        this.socket = new WebSocket(this.WebSocket.path);
+        // 监听socket连接
+        this.socket.onopen = this.open;
+        // 监听socket错误信息
+        this.socket.onerror = this.error;
+        // 监听socket消息
+        this.socket.onmessage = this.getMessage;
+
+        this.socket.onclose=this.close;
+      }},
+    open:function(){
+      console.log("socket链接成功")
+      this.socket.send(this.WebSocket.data)
+    },
+    getMessage:function(msg){
+
+    },
+    send:function(){
+      this.socket.send(this.WebSocket.data)
+    },
+    close:function(){
+      console.log("socket已经关闭")
+    },
+
     runResults(item) {
       this.runCaseBoxStatus = true;
       this.createScroptStatus=item.againScript
     },
     runPlan(item) {
       RunCaseAll({
-        id: item.id
+        id: item.id,
+        userId:storage.get("userId"),
+        caseCount:item.CaseCount,
+        projectId:storage.get("projectId"),
+        againScript:item.againScript,
+        CaseCount:item.CaseCount
       }).then(res => {
         res.status === 200
           ? (Message.success(res.msg), (this.runCaseBoxStatus = true))
           : Message.error(res.msg);
+          this.WebSocket.data=JSON.stringify(res)
+        this.init()
+        
       });
     },
 
@@ -433,7 +477,11 @@ export default {
 
 .runCaseBox{
   .log .text{
-    background: black;width: 100%;height: 600px;overflow-x: hidden;
+    background: black;
+    width: 100%;
+    height: 600px;
+    overflow-x: hidden;
+    margin-top:10px ;
   }
 }
 </style>
