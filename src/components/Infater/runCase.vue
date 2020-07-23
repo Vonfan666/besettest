@@ -108,7 +108,7 @@
             </el-form>
           </div>
           <div class="ccp-foot">
-            <el-button type="primary" size="small" @click="close()">取消</el-button>
+            <el-button type="primary" size="small" @click="closeTable()">取消</el-button>
             <el-button
               type="primary"
               size="small"
@@ -141,7 +141,7 @@
             <div class="steps">
               <el-steps :active="RunStatus" align-center finish-status="success" > 
                   <el-step title="初始化" ></el-step>
-                  <el-step title="生成脚本" v-if="createScroptStatus==1"></el-step>
+                  <el-step title="生成脚本" v-if="createScriptStatus==1"></el-step>
                   <el-step title="执行脚本" ></el-step>
                   <el-step title="执行完毕" ></el-step>
                 </el-steps>
@@ -178,7 +178,7 @@ export default {
   data() {
     return {
       RunStatus:0,
-      createScroptStatus:1,  //在点击结果或者执行时-判断需不需要重新创建脚本--是展示三项步骤还是四项
+      createScriptStatus:1,  //在点击结果或者执行时-判断需不需要重新创建脚本--是展示三项步骤还是四项
       runCaseBoxStatus: false,
       runStyleCode: "width:1000px;height:750px",
       buttonClickStatus: "true",
@@ -229,9 +229,10 @@ export default {
       ],
       WebSocket:{
         path: "ws://192.168.0.66:8081/ws/users/runCaseSelectLog/",
-        socket:"",
+        
         data:null
       },
+      socket:"",
       logList:[]
     };
   },
@@ -260,15 +261,27 @@ export default {
     getMessage:function(msg){
       var data=JSON.parse(msg.data)
       var log=data.log
+      var status=data.status.status
 
       this.logList.push(log)
-      this.RunStatus=data.status.status
+      this.RunStatus=status
+      if (log=="结束"){
+        this.socket.close()
+      }
+    
+      
+
+
       var div = document.querySelector('.text');
       div.scrollTop = div.scrollHeight;
       console.log(this.RunStatus);
     },
     send:function(){
       this.socket.send(this.WebSocket.data)
+    },
+    error: function() {
+      // this.init();
+      console.log("连接错误");
     },
     close:function(){
       console.log("socket已经关闭")
@@ -280,8 +293,10 @@ export default {
       this.RunStatus=item.againScript
     },
     runPlan(item) {
+    
       this.logList=[]
-      this.RunStatus=-1
+      this.RunStatus=0
+      this.createScriptStatus=item.againScript
       RunCaseAll({
         id: item.id,
         userId:storage.get("userId"),
@@ -339,7 +354,7 @@ export default {
       //tabl文字居中
       return "text-align:center";
     },
-    close() {
+    closeTable() {
       //清空表单
       this.datas.name = null;
       this.datas.cname = null;
@@ -407,7 +422,7 @@ export default {
           ? (this.tableData.splice(index, 1, res.results),
 
             (this.createCasePlanStatus = false),
-            this.close(),
+            this.closeTable(),
             Message.success("更新成功"))
           : null;
       });
