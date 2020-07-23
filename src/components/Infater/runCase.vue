@@ -139,7 +139,7 @@
 
           <div class="body"   style="margin-top:30px">
             <div class="steps">
-              <el-steps :active="0" align-center finish-status="success" > 
+              <el-steps :active="RunStatus" align-center finish-status="success" > 
                   <el-step title="初始化" ></el-step>
                   <el-step title="生成脚本" v-if="createScroptStatus==1"></el-step>
                   <el-step title="执行脚本" ></el-step>
@@ -147,8 +147,9 @@
                 </el-steps>
             </div>
             <div class="log">
-               <div class="text">
-                 </div>  
+               <div class="text" style="text-align: left;color: white;">
+                  <li style="list-style-type: none;" v-for="(item,index) in  logList" :key="index">{{item}}</li>
+               </div>  
 
             </div>
           </div>
@@ -176,6 +177,7 @@ export default {
   },
   data() {
     return {
+      RunStatus:0,
       createScroptStatus:1,  //在点击结果或者执行时-判断需不需要重新创建脚本--是展示三项步骤还是四项
       runCaseBoxStatus: false,
       runStyleCode: "width:1000px;height:750px",
@@ -229,7 +231,8 @@ export default {
         path: "ws://192.168.0.66:8081/ws/users/runCaseSelectLog/",
         socket:"",
         data:null
-      }
+      },
+      logList:[]
     };
   },
   methods: {
@@ -255,20 +258,30 @@ export default {
       this.socket.send(this.WebSocket.data)
     },
     getMessage:function(msg){
+      var data=JSON.parse(msg.data)
+      var log=data.log
 
+      this.logList.push(log)
+      this.RunStatus=data.status.status
+      var div = document.querySelector('.text');
+      div.scrollTop = div.scrollHeight;
+      console.log(this.RunStatus);
     },
     send:function(){
       this.socket.send(this.WebSocket.data)
     },
     close:function(){
       console.log("socket已经关闭")
+
     },
 
     runResults(item) {
       this.runCaseBoxStatus = true;
-      this.createScroptStatus=item.againScript
+      this.RunStatus=item.againScript
     },
     runPlan(item) {
+      this.logList=[]
+      this.RunStatus=-1
       RunCaseAll({
         id: item.id,
         userId:storage.get("userId"),

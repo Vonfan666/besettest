@@ -432,7 +432,7 @@ export default {
   text-align: left;
   color: white;
   background-color: black;
-      overflow-x: hidden;
+    overflow-x: hidden;
     height: 800px;
 }
 .title-right span{
