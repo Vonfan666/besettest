@@ -50,7 +50,7 @@
                 @click="D_ClassRemove(scope.row.id,scope.$index)"
               >删除</el-button>
               <el-button type="text" size="small" @click="runPlan(scope.row)">执行</el-button>
-              <el-button type="text" size="small" @click="runResults(scope.row)">结果</el-button>
+              <el-button type="text" size="small" @click="RunCaseResults.currentCasePlanId=scope.row.id;runResults();">结果</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -156,6 +156,43 @@
         </div>
       </run-box>
     </div>
+    <div class="runCaseResults" v-if="RunCaseResults.runCaseResultsStatus">
+      <results-box :styleCode="RunCaseResults.runStyleCode" v-slot:caseRunResults>
+        <div class="results">
+          <div class="header">
+            <h3 style="display:inline-block" class="title">测试结果</h3>
+            <span style="float:right;margin:10px;cursor: pointer;" class="el-icon-close"  @click="RunCaseResults.runCaseResultsStatus=false;RunCaseResults.loading=true"></span>
+          </div>
+          <div class="body">
+             <el-table
+              :data="RunCaseResults.results"
+              border
+              style="width: 100%"
+              :header-cell-style="textStyle"
+              :cell-style="textStyle"
+              v-loading="RunCaseResults.loading"
+            >
+              <el-table-column prop="createTime" label="执行日期" fit></el-table-column>
+              <el-table-column prop="user.name" label="执行人" fit></el-table-column>
+              <el-table-column prop="caseCount" label="已完成用例总数" fit></el-table-column>
+              <el-table-column prop="assertSuccess" label="断言成功数量" fit></el-table-column>
+              <el-table-column prop="assertFailed" label="断言失败数量" fit></el-table-column>
+              <el-table-column prop="runFailed" label="报错数量" fit></el-table-column>
+              <el-table-column fixed="right" label="操作" width="100">
+                <template slot-scope="scope" fit>
+                  <el-button @click="deleteTwo(pageRemove,scope.row)" type="text" size="small" >删除</el-button>
+                  <el-button @click="selectResult(scope.row)" type="text" size="small">查看</el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+          </div>
+          <div class="foot">
+            <page-box ref="runCaseResult"></page-box>
+          </div>
+          <div></div>
+        </div>
+      </results-box>
+    </div>
   </div>
 </template>
     
@@ -167,19 +204,36 @@ import {
   getCasePlan,
   UpdateCasePlan,
   DeleteCasePlan,
-  RunCaseAll
+  RunCaseAll,
+  CaseResultsDetail,
+  CaseResults,
+  CaseResultsDel
 } from "../../axios/api.js";
+import jsMethods from "@/libs/myJs.js";
 import { Message } from "element-ui";
 export default {
   components: {
     createCasePlan: () => import("../public/MessageBox.vue"),
-    "run-box": () => import("../public/MessageBox.vue")
+    "run-box": () => import("../public/MessageBox.vue"),
+    "results-box": () => import("../public/MessageBox.vue"),
+    "page-box": () => import("../public/page.vue")
   },
   data() {
     return {
+      pageMethods:this.runResults,
+      RunCaseResults:{
+        loading:true,
+        currentCasePlanId:null,
+        runCaseResultsStatus:false, //测试结果弹窗
+        runStyleCode: "width:1200px;height:750px",
+        results:[
+        ]
+      },
+
       RunStatus:0,
       createScriptStatus:1,  //在点击结果或者执行时-判断需不需要重新创建脚本--是展示三项步骤还是四项
       runCaseBoxStatus: false,
+      
       runStyleCode: "width:1000px;height:750px",
       buttonClickStatus: "true",
       total: null, //数据总条数
@@ -288,9 +342,68 @@ export default {
 
     },
 
-    runResults(item) {
-      this.runCaseBoxStatus = true;
-      this.RunStatus=item.againScript
+    //查看执行结果
+    runResults(page = 1, pageSize = 10,type=3) {
+      this.RunCaseResults.runCaseResultsStatus = true;
+      CaseResults({
+        type:type,
+        c_id:this.RunCaseResults.currentCasePlanId,
+        page:page,
+        pageSize:pageSize
+      }).then(res=>{
+        if (res.status===200){
+          console.log("ojbk")
+          this.RunCaseResults.results=res.results
+          this.$refs.runCaseResult.total=res.total
+          this.$refs.runCaseResult.allPage=res.allPage
+          this.RunCaseResults.loading=false
+        }
+      })
+    },
+
+    //删除执行结果
+     pageRemove(item){
+      console.log("item",item)
+      var page=this.$refs.runCaseResult.currentPage
+      console.log(page)
+      console.log(this.RunCaseResults.length)
+      if (this.RunCaseResults.results.length===1 && page!==1){
+        page=page-1
+        this.$refs.runCaseResult.currentPage=page
+      }
+      CaseResultsDel({
+        id:item.id,
+        c_id:item.c_id,
+        page:page,
+        pageSize:this.$refs.runCaseResult.pageSize,
+        type:item.type
+      }).then(res=>{
+        if(res.status===200){
+          this.RunCaseResults.results = res.results
+          this.$refs.runCaseResult.total=res.total
+          this.$refs.runCaseResult.allPage=res.allPage
+          Message.success(res.msg)
+        }
+      })
+
+    },
+     deleteTwo() {
+        this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            type: "warning"
+        })
+            .then(() => {
+                console.log(arguments)
+                arguments[0](arguments[1])
+
+            })
+            .catch(() => {
+                this.$message({
+                    type: "info",
+                    message: "已取消删除"
+                });
+            });
     },
     runPlan(item) {
     
@@ -306,7 +419,7 @@ export default {
         CaseCount:item.CaseCount
       }).then(res => {
         res.status === 200
-          ? (Message.success(res.msg), (this.runCaseBoxStatus = true))
+          ? ( (this.runCaseBoxStatus = true))
           : Message.error(res.msg);
           this.WebSocket.data=JSON.stringify(res)
         this.init()
@@ -406,26 +519,31 @@ export default {
     },
     casePlanUpdate() {
       //点击编辑按钮直接更新
-      var item = this.editPlanItem;
-      var index = this.editPlanIndex;
-      console.log("item", item, index);
-      UpdateCasePlan({
-        projectId: storage.get("projectId"),
-        id: item.id,
-        name: this.datas.name,
-        cname: this.datas.cname,
-        runType: this.datas.runType,
-        againScript: this.datas.againScript,
-        detail: this.datas.detail
-      }).then(res => {
-        res.status === 200
-          ? (this.tableData.splice(index, 1, res.results),
+      this.$refs.refFrom1.validate(valid =>{
+        if(valid){
+          var item = this.editPlanItem;
+          var index = this.editPlanIndex;
+          console.log("item", item, index);
+          UpdateCasePlan({
+            projectId: storage.get("projectId"),
+            id: item.id,
+            name: this.datas.name,
+            cname: this.datas.cname,
+            runType: this.datas.runType,
+            againScript: this.datas.againScript,
+            detail: this.datas.detail
+          }).then(res => {
+            res.status === 200
+              ? (this.tableData.splice(index, 1, res.results),
 
-            (this.createCasePlanStatus = false),
-            this.closeTable(),
-            Message.success("更新成功"))
-          : null;
-      });
+                (this.createCasePlanStatus = false),
+                this.closeTable(),
+                Message.success("更新成功"))
+              : null;
+          });
+            }
+          })
+     
     },
     DeleteCasePlan(id, index) {
       //删除计划
@@ -511,7 +629,12 @@ export default {
     overflow-x: hidden;
     margin-top:10px ;
   }
+  
 }
+.runCaseResults .results .body{
+  height: 620px;
+    overflow-x: hidden;
+  }
 </style>
 
 <style >

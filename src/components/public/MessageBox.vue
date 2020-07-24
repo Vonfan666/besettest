@@ -18,9 +18,7 @@
       <slot name="Cenvironment">
         <!-- 变量 -->
       </slot>
-
       <slot name="pushHeader"></slot>
-
       <slot name="isUnityBox">
         <!-- 同步数据弹窗 -->
       </slot>
@@ -38,6 +36,9 @@
       </slot>
       <slot name="RunCaseBox">
         <!-- 执行过程-->
+      </slot>
+       <slot name="caseRunResults">
+        <!-- 执行测试计划结果-->
       </slot>
     </div>
   </div>

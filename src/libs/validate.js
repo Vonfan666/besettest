@@ -35,9 +35,9 @@ const passwordValidate =
 
 const caseCname =
 (rule, value, callback) => {
-    var reg = /^[a-zA-Z0-9_]{1,}$/;
+    var reg = /^[a-zA-Z][a-zA-Z0-9_]{0,}$/;
     if (!reg.test(value)) {
-        callback(new Error("输入只能为英文、数字以及下划线"))
+        callback(new Error("请输入标准的py脚本文件名称"))
     }
     // if (!reg.test(value)) {
     //   callback(new Error('手机号格式错误'));
