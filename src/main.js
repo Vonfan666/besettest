@@ -4,10 +4,17 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import ElementUi  from "element-ui"
+import 'element-ui/lib/theme-chalk/index.css'  //vue-cron
+
 import 'element-ui/lib/theme-chalk/index.css';
 import "../static/icon/iconfont.css"
 
 import JsonViewer from 'vue-json-viewer'
+
+import VueCron from 'vue-cron'  //全局引入
+Vue.use(VueCron);//使用方式：<vueCron></vueCron>
+
+
 Vue.config.productionTip = false
 
 

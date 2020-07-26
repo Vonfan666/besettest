@@ -103,8 +103,8 @@ export default {
         case "24":
           this.$router.push("/BesetTest/manageSql");
           break;
-        case "11":
-          this.$router.push("/BesetTest/home/infater/text");
+        case "51":
+          this.$router.push("/BesetTest/timedTask");
           break;
         case "11":
           this.$router.push("/BesetTest/home/infater/text");
