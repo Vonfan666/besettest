@@ -29,7 +29,7 @@
           <el-table-column prop="name" label="名称" width="150"></el-table-column>
           <el-table-column prop="cname" label="脚本名称" width="160"></el-table-column>
           <el-table-column prop="runType.name" label="执行方式" width="80"></el-table-column>
-          <el-table-column prop="caseStartTime" label="执行开始时间" width="160"></el-table-column>
+          <el-table-column prop="cron" label="执行开始时间" width="160"></el-table-column>
           <el-table-column prop="status.name" label="状态" width="150"></el-table-column>
           <el-table-column prop="caseEndTime" label="执行完成时间" width="160"></el-table-column>
           <el-table-column prop="CaseCount" label="用例数量" width="100"></el-table-column>
@@ -97,7 +97,7 @@
                     <el-input
                       slot="reference"
                       @click="cron.cronPopover=true"
-                      v-model="cron.cron"
+                      v-model="datas.cron"
                       placeholder="请输入定时策略"
                     ></el-input>
                     <cron @change="changeCron" @close="cron.cronPopover=false" i18n="cn"></cron>
@@ -242,7 +242,7 @@ export default {
     return {
       cron:{
         cronPopover:false,
-            cron:''
+            cron:''  //这个字段放在datas
       },
       pageMethods: this.runResults,
       RunCaseResults: {
@@ -270,6 +270,7 @@ export default {
         detail: null,
         caseStartTime: "", //计划开始时间
         againScript: 0, //是否重新创建脚本   1-重新创建      0-不重新创建
+        cron:null
       },
       //编辑暂存
       editPlanItem: "",
@@ -283,6 +284,7 @@ export default {
         runType: [
           { required: true, message: "请选择执行方式", trigger: "change" },
         ],
+        
       },
       loading: {
         loading_table: true,
@@ -315,7 +317,7 @@ export default {
   },
   methods: {
     changeCron(val){
-            this.cron.cron=val
+            this.datas.cron=val
         },
     // websockey
     init: function () {
@@ -494,6 +496,7 @@ export default {
       this.datas.detail = null;
       this.datas.againScript = 0;
       this.createCasePlanStatus = false;
+      this.datas.cron=null
     },
     casePlanAdd() {
       //添加计划
@@ -507,7 +510,7 @@ export default {
             runType: this.datas.runType,
             detail: this.datas.detail,
             againScript: this.datas.againScript,
-            cron:this.cron.cron,
+            cron:this.datas.cron,
             page: this.page,
             pageSize: this.pageSize,
           }).then((res) => {
@@ -532,6 +535,7 @@ export default {
       this.datas.name = item.name;
       this.datas.cname = item.cname;
       this.datas.runType = item.runType.id;
+      this.datas.cron=item.cron
       //时间
       this.datas.detail = item.detail;
       this.datas.againScript = item.againScript;
@@ -555,7 +559,10 @@ export default {
             detail: this.datas.detail,
           }
           if (this.datas.runType==1){
-            data["cron"]=this.cron.cron
+            if (!this.datas.cron){
+              return Message.error("定时策略不能为空")
+            }
+            data["cron"]=this.datas.cron
           }
          
           UpdateCasePlan(data).then((res) => {
@@ -592,7 +599,7 @@ export default {
     casePlanList(page, pageSize) {
       //计划列表
       getCasePlan({
-        projectId: storage.get("projectId"),
+        projectId: storage.get("projectId"), 
         page: page,
         pageSize: pageSize,
       }).then((res) => {
@@ -616,14 +623,18 @@ export default {
     this.casePlanList(this.page, this.pageSize);
   },
   watch:{
-    "cron.cron"(a,b){
-      var cronList=a.split(" ")
+    "datas.cron"(a,b){
+      var cronList=[]
+      if(a!==null){
+          cronList=a.split(" ")
+      }
+      
       if (cronList.length>5){
         console.log(cronList,typeof cronList)
       
       var sliceCron=cronList.slice(1,-1)
       console.log(sliceCron)
-      this.cron.cron=sliceCron.join(" ")
+      this.datas.cron=sliceCron.join(" ")
       }
       
       
