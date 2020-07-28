@@ -91,7 +91,7 @@
                   <el-radio :label="0">手动执行</el-radio>
                   <el-radio :label="1">定时执行</el-radio>
                 </el-radio-group>
-              <el-form-item v-if="datas.runType==1">
+              <el-form-item v-if="datas.runType==1" >
                 <div class="cron" >
                   <el-popover v-model="cron.cronPopover">
                     <el-input
@@ -104,17 +104,24 @@
                   </el-popover>
                 </div>
               </el-form-item>
-                
+              
               </el-form-item>
-              <el-form-item prop="code" label="计划描述">
-                <el-input v-model="datas.detail" placeholder="请输入计划描述" clearable></el-input>
+              <el-form-item  prop="code" label="开启定时" v-if="datas.runType==1">
+                 <el-radio-group v-model="datas.timedId">
+                  <el-radio :label="0">否</el-radio>
+                  <el-radio :label="1">是</el-radio>
+                </el-radio-group>
               </el-form-item>
+              
               <el-form-item prop="code" label="每次执行是否重新创建脚本：" class="againScript">
                 <br />
                 <el-radio-group v-model="datas.againScript">
                   <el-radio :label="0">否</el-radio>
                   <el-radio :label="1">是</el-radio>
                 </el-radio-group>
+              </el-form-item>
+              <el-form-item prop="code" label="计划描述">
+                <el-input v-model="datas.detail" placeholder="请输入计划描述" clearable></el-input>
               </el-form-item>
             </el-form>
           </div>
@@ -270,7 +277,8 @@ export default {
         detail: null,
         caseStartTime: "", //计划开始时间
         againScript: 0, //是否重新创建脚本   1-重新创建      0-不重新创建
-        cron:null
+        cron:null,
+        timedId:1,
       },
       //编辑暂存
       editPlanItem: "",
@@ -510,6 +518,7 @@ export default {
             runType: this.datas.runType,
             detail: this.datas.detail,
             againScript: this.datas.againScript,
+            timedId:this.datas.timedId,
             cron:this.datas.cron,
             page: this.page,
             pageSize: this.pageSize,
@@ -538,6 +547,7 @@ export default {
       this.datas.cron=item.cron
       //时间
       this.datas.detail = item.detail;
+      this.datas.timedId=item.timedId
       this.datas.againScript = item.againScript;
       this.createCasePlanStatus = true;
     },
@@ -562,7 +572,8 @@ export default {
             if (!this.datas.cron){
               return Message.error("定时策略不能为空")
             }
-            data["cron"]=this.datas.cron
+            data["cron"]=this.datas.cron,
+            data["timedId"]=this.datas.timedId
           }
          
           UpdateCasePlan(data).then((res) => {
@@ -627,14 +638,21 @@ export default {
       var cronList=[]
       if(a!==null){
           cronList=a.split(" ")
+          
       }
       
       if (cronList.length>5){
-        console.log(cronList,typeof cronList)
-      
-      var sliceCron=cronList.slice(1,-1)
-      console.log(sliceCron)
-      this.datas.cron=sliceCron.join(" ")
+        console.log(cronList[4])
+        
+        console.log(cronList)
+        var sliceCron=cronList.slice(1,-1)
+        console.log(sliceCron)
+        if (sliceCron[4]==="?"){
+            console.log(sliceCron,"cronList")
+            sliceCron.splice(4,1,"*")
+            
+          }
+        this.datas.cron=sliceCron.join(" ")
       }
       
       
