@@ -278,7 +278,7 @@ export default {
         caseStartTime: "", //计划开始时间
         againScript: 0, //是否重新创建脚本   1-重新创建      0-不重新创建
         cron:null,
-        timedId:1,
+        timedId:1,  //是否执行
       },
       //编辑暂存
       editPlanItem: "",
