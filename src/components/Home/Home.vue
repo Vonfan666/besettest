@@ -726,7 +726,7 @@ export default {
     margin-top: 20px;
     width: 100%;
     top: 60px;
-    background: red;
+    background: #eee;
     bottom: 0px;
     left: 0px;
   }
