@@ -29,9 +29,10 @@
           <el-table-column prop="name" label="名称" width="150"></el-table-column>
           <el-table-column prop="cname" label="脚本名称" width="160"></el-table-column>
           <el-table-column prop="runType.name" label="执行方式" width="80"></el-table-column>
+          <el-table-column prop="timedId.name" label="定时状态" width="150" ></el-table-column>
           <el-table-column prop="cron" label="执行开始时间" width="160"></el-table-column>
-          <el-table-column prop="status.name" label="状态" width="150"></el-table-column>
-          <el-table-column prop="caseEndTime" label="执行完成时间" width="160"></el-table-column>
+          <el-table-column prop="status.name" label="执行状态" width="150" ></el-table-column>
+          <el-table-column prop="lastRunTime" label="最后执行时间" width="160"></el-table-column>
           <el-table-column prop="CaseCount" label="用例数量" width="100"></el-table-column>
           <el-table-column prop="userId.name" label="创建人" width="150"></el-table-column>
           <el-table-column prop="createTime" label="创建时间" width="160"></el-table-column>
