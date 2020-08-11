@@ -40,6 +40,15 @@
        <slot name="caseRunResults">
         <!-- 执行测试计划结果-->
       </slot>
+      <slot name="addTask">
+        <!-- 添加定时任务-->
+      </slot>
+      <slot name="addSql">
+        <!-- 添加数据库-->
+      </slot>
+      <slot name="writeSql">
+        <!-- 添加sql-->
+      </slot>
     </div>
   </div>
 </template>

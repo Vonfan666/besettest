@@ -106,7 +106,7 @@
 
     <div class="other">
       <el-dialog title="复制接口" :visible.sync="dialogFormVisible">
-        <el-form :model="updateFiels" :rules="rules" ref="copeEle">
+        <el-form :model="updateFiels" :rules="rules" ref="copeEle" >
           <el-form-item label="选择文件夹" prop="updateFiels" label-width="95px">
             <el-select v-model="updateFiels.updateFiels" placeholder="请选择复制到的文件">
               <el-option
@@ -671,20 +671,21 @@ export default {
     },
     watchList(val) {
       this.list = val;
-      this.SelectFileMethod();
+      console.log("312312312")
+      
     }
   },
   created() {
-    this.aa();
+    
   },
   mounted() {
     // console.log("执行了")
+    
     var watchList = this.watchList;
     Bus.$on("listValue", function(val) {
       //监听first组件的txt事件
       watchList(val);
     });
-
     this.SelectFileMethod();
   },
 
@@ -692,45 +693,8 @@ export default {
     $route: {
       handler: function(val, oldVal) {
         if (val.query.projectId != oldVal.query.projectId) {
-          // console.log("假装请求接口", val, typeof val);
-          // if (val.query.projectId == 1) {
-          //   console.log("更改list");
-          //   this.list.splice(
-          //     0,
-          //     this.list.length,
-          //     {
-          //       id: 1,
-          //       name: "首页",
-          //       Clist: [
-          //         {
-          //           id: 11,
-          //           name: "1111"
-          //         },
-          //         { id: 12, name: "11" },
-          //         { id: 13, name: "获取商111家评论" }
-          //       ]
-          //     },
-          //     {
-          //       id: 2,
-          //       name: "获3家列表获取商家列表获取商家列表获取商家列表",
-          //       Clist: [
-          //         {
-          //           id: 21,
-          //           name:
-          //             "获取商家列表获取商家列表获取商家列表获取商家列表获取商家列表获取商家列表"
-          //         },
-          //         { id: 22, name: "获取用户所在城市" },
-          //         { id: 23, name: "获取用户收货地址" },
-          //         { id: 24, name: "优惠券" }
-          //       ]
-          //     },
-          //     {
-          //       id: 3,
-          //       name: "个人中心",
-          //       Clist: []
-          //     }
-          //   );
-          // }
+          this.SelectFileMethod();
+ 
         }
       },
       // 深度观察监听

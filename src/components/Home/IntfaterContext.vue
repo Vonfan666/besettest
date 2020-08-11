@@ -21,7 +21,7 @@
     </div>
     <div class="top">
       <div class="top-1">
-        <el-form class="top-el-form" :model="model">
+        <el-form class="top-el-form" :model="model" size="mini">
           <el-form-item label="请求方法" label-width="63px" class="top-eft">
             <el-select v-model="model.postMethods">
               <el-option
@@ -69,7 +69,7 @@
       </div>
     </div>
     <div class="ir-title top-1">
-      <el-form :model="model" :rules="rules">
+      <el-form :model="model" :rules="rules" size="mini">
         <el-form-item label="接口名称" prop="infaterName" label-width="70px">
           <el-input v-model="model.infaterName" clearable placeholder="请输入接口名称"></el-input>
         </el-form-item>
@@ -147,7 +147,7 @@
                 </el-form>-->
               </div>
               <div v-else>
-                <el-form :model="mockDatas" :rules="rulesMock" ref="mockDataRef">
+                <el-form :model="mockDatas" :rules="rulesMock" ref="mockDataRef" size="mini">
                   <el-form-item prop="mockData">
                     <el-input
                       type="textarea"
@@ -229,7 +229,7 @@
           <h3>添加接口</h3>
         </div>
         <div style="margin:50px 20px;">
-          <el-form :model="model" :rules="rules" ref="ischildRef">
+          <el-form :model="model" :rules="rules" ref="ischildRef" size="mini">
             <el-form-item label="选择分组" prop="ischildGroupId" label-width="70px">
               <el-select v-model="model.ischildGroupId">
                 <el-option

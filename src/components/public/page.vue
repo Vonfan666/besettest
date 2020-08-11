@@ -11,11 +11,16 @@
       :total="total">
     </el-pagination>
   </div>
+
   </div>
 </template>
 
+
+
+
 <script>
 export default {
+    props:["page_Methods"],
     data(){
         return{
             currentPage:1,  //默认当前第一页
@@ -30,9 +35,10 @@ export default {
     methods:{
         handleSizeChange(val) {  //修改每页展示数量-如果并展示当前页--如果总页数小于当前页--则展示最大页码
         console.log(`每页 ${val} 条`);
+        console.log(this.page_Methods)
         this.pageSize=val
         this.currentPage=1
-        this.$parent.$parent.pageMethods(this.currentPage,val)
+        this.page_Methods(this.currentPage,val)
 
       },
       handleCurrentChange(val) {   //请求当前页的数据
@@ -40,7 +46,7 @@ export default {
         console.log(`当前页: ${val}`);
         
         this.currentPage=val
-        this.$parent.$parent.pageMethods(val,this.pageSize)
+        this.page_Methods(val,this.pageSize)
         
         
       }

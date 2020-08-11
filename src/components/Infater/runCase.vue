@@ -31,15 +31,15 @@
           <el-table-column prop="runType.name" label="执行方式" width="80"></el-table-column>
           <el-table-column prop="timedId.name" label="定时状态" width="150" ></el-table-column>
           <el-table-column prop="cron" label="执行开始时间" width="160"></el-table-column>
-          <el-table-column prop="status.name" label="执行状态" width="150" ></el-table-column>
-          <el-table-column prop="lastRunTime" label="最后执行时间" width="160"></el-table-column>
+          <!-- <el-table-column prop="status.name" label="执行状态" width="150" ></el-table-column> -->
+          <!-- <el-table-column prop="lastRunTime" label="最后执行时间" width="160"></el-table-column> -->
           <el-table-column prop="CaseCount" label="用例数量" width="100"></el-table-column>
           <el-table-column prop="userId.name" label="创建人" width="150"></el-table-column>
           <el-table-column prop="createTime" label="创建时间" width="160"></el-table-column>
-          <el-table-column prop="detail" label="备注" width="160"></el-table-column>
-          <el-table-column fixed="right" label="操作" width="230" height="50">
+          <el-table-column prop="detail" label="备注"  fit></el-table-column>
+          <el-table-column fixed="right" label="操作" width="200" height="50">
             <template slot-scope="scope">
-              <el-button @click="handleClick(scope.row)" type="text" size="small">查看</el-button>
+              <!-- <el-button @click="handleClick(scope.row)" type="text" size="small">查看</el-button> -->
               <el-button
                 type="text"
                 size="small"
@@ -108,7 +108,7 @@
               
               </el-form-item>
               <el-form-item  prop="code" label="开启定时" v-if="datas.runType==1">
-                 <el-radio-group v-model="datas.timedId">
+                 <el-radio-group v-model="datas.timedId.id">
                   <el-radio :label="0">否</el-radio>
                   <el-radio :label="1">是</el-radio>
                 </el-radio-group>
@@ -213,7 +213,7 @@
             </el-table>
           </div>
           <div class="foot">
-            <page-box ref="runCaseResult"></page-box>
+            <page-box ref="runCaseResult" :page_Methods="pageMethods"></page-box>
           </div>
           <div></div>
         </div>
@@ -519,7 +519,7 @@ export default {
             runType: this.datas.runType,
             detail: this.datas.detail,
             againScript: this.datas.againScript,
-            timedId:this.datas.timedId,
+            timedId:this.datas.timedId.id,
             cron:this.datas.cron,
             page: this.page,
             pageSize: this.pageSize,
@@ -574,7 +574,7 @@ export default {
               return Message.error("定时策略不能为空")
             }
             data["cron"]=this.datas.cron,
-            data["timedId"]=this.datas.timedId
+            data["timedId"]=this.datas.timedId.id
           }
          
           UpdateCasePlan(data).then((res) => {
@@ -634,7 +634,33 @@ export default {
   mounted() {
     this.casePlanList(this.page, this.pageSize);
   },
+//    watch: {
+//     $route: {
+//       handler: function(newValue, oldValue) {
+//         console.log("路由变化", newValue, oldValue);
+//         if (newValue !== oldValue) {
+//           this.projectList();
+//         }
+//       },
+//       deep: true
+//     },
+//     "statusIng.drawerStatus": function(a, b) {
+//       if (!a) {
+//         this.resResults = [];
+//       }
+//     }
+//   }
+// };
   watch:{
+      $route: {
+      handler: function(newValue, oldValue) {
+        console.log("路由变化", newValue, oldValue);
+        if (newValue !== oldValue) {
+           this.casePlanList(this.page, this.pageSize);
+        }
+      },
+      deep: true
+    }, 
     "datas.cron"(a,b){
       var cronList=[]
       if(a!==null){
@@ -721,15 +747,15 @@ export default {
   width: 200px !important;
 }
 
-.el-tabs__nav-scroll .el-tabs__nav .el-tabs__item:nth-child(1),
-.el-tabs__nav-scroll .el-tabs__nav .el-tabs__item:nth-child(6),
+.el-popover .el-tabs__nav-scroll .el-tabs__nav .el-tabs__item:nth-child(1),
+.el-popover .el-tabs__nav-scroll .el-tabs__nav .el-tabs__item:nth-child(6),
 #changeContab .value,
-.el-tabs__content .el-tab-pane:nth-child(1)
+.el-popover .el-tabs__content .el-tab-pane:nth-child(1)
 {
   display: none;
 }
 
-.el-tabs__content .el-tab-pane:nth-child(2){
+.el-popover .el-tabs__content .el-tab-pane:nth-child(2){
   display:inherit   !important
 }
 .el-popover{

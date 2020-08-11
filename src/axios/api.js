@@ -274,5 +274,31 @@ export const CaseResultsDel=(params)=>{
 
 //查看debug测试结果详情
 export const CaseResultsDetail=(params)=>{
-    return getRequest("/users/case_results_detail",params)   
+    return getRequest("/users/case_results_detail/",params)   
+}
+//新增自己的定时任务列表
+export const addTimedTask=(params)=>{
+    return postRequest("/users/add_timedTask/",params)   
+}
+
+//查看自己的定时任务列表
+export const GetTimedTask=(params)=>{
+    return getRequest("/users/get_timedTask/",params)   
+}
+
+//cron表达式校验
+export const ValidCron=(params)=>{
+    return postRequest("/users/valid_cron/",params)   
+}
+
+
+//删除自己的定时任务
+export const RemoveTimedTask=(params)=>{
+    return postRequest("/users/remove_timedTask/",params)   
+}
+
+
+//编辑自己的定时任务
+export const UpdateTimedTask=(params)=>{
+    return postRequest("/users/update_timedTask/",params)   
 }
