@@ -302,3 +302,60 @@ export const RemoveTimedTask=(params)=>{
 export const UpdateTimedTask=(params)=>{
     return postRequest("/users/update_timedTask/",params)   
 }
+
+//新增数据库连接
+export const addSqlBox=(params)=>{
+    return postRequest("/users/add_sql_box/",params) 
+}
+
+
+//查看数据库连接列表
+export const GetSqlBox=(params)=>{
+    return getRequest("/users/get_sql_box/",params)   
+}
+
+//删除数据库连接
+export const removeSqlBox=(params)=>{
+    return postRequest("/users/remove_sql_box/",params)   
+}
+
+//更新数据库连接
+export const updateSqlBox=(params)=>{
+    return postRequest("/users/update_sql_box/",params)   
+}
+
+// sql  操作
+//新增sql
+export const addSqlStatement=(params)=>{
+    return postRequest("/users/add_sql_statement/",params)   
+}
+
+//查询当前项目所有的数据库连接以及SQL类型
+export const GetBoxOrSqlType=(params)=>{
+    return getRequest("/users/get_boxList_or_SqlType/",params)   
+}
+
+
+
+//新增SQL语句
+export const AddSql=(params)=>{
+    return postRequest("/users/add_sql/",params)   
+}
+//查询sql语句
+export const GetSql=(params)=>{
+    return getRequest("/users/get_sql/",params)   
+}
+
+//修改sql语句
+export const UpdateSql=(params)=>{
+    return postRequest("/users/update_sql/",params)   
+}
+//移除sql语句
+export const RemoveSql=(params)=>{
+    return postRequest("/users/remove_sql/",params)   
+}
+
+//sql查询
+export const ValidSql=(params)=>{
+    return postRequest("/users/valid_sql/",params)   
+}

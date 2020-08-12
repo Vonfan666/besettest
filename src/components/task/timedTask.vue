@@ -349,7 +349,7 @@ export default {
     },
     searchTask(){
       GetTimedTask({
-        page:this.$refs.pageBox.currentPage,
+        page:1,
         pageSize:this.$refs.pageBox.pageSize,
         projectId:storage.get("projectId"),
         taskName:this.search.taskName,

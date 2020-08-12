@@ -13,6 +13,8 @@
   </div>
 
   </div>
+<!-- 父组件写法// <page-box ref="pageBox"  :page_Methods="pageMethods"></page-box> -->
+
 </template>
 
 

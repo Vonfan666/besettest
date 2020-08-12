@@ -103,6 +103,12 @@ export default {
         case "24":
           this.$router.push("/BesetTest/manageSql");
           break;
+        case "31":
+          this.$router.push("/BesetTest/manageSql");
+          break;
+          case "32":
+          this.$router.push("/BesetTest/sqlStatement");
+          break;
         case "51":
           this.$router.push("/BesetTest/timedTask");
           break;

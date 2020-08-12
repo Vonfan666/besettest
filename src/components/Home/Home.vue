@@ -270,10 +270,10 @@ export default {
             { id: "21", name: "用例管理" },
             { id: "22", name: "执行用例" },
             { id: "23", name: "执行日志" },
-            { id: "24", name: "Sql 管理" },
+            // { id: "24", name: "Sql 管理" },
           ],
         },
-        { id: "3", name: "环境配置" },
+        { id: "3", name: "环境配置" ,list:[{ id: "31", name: "数据库管理" },{ id: "32", name: "添加SQL" }]},
         { id: "4", name: "测试报告" },
         { id: "5", name: "定时任务", list: [{id: "51", name: "定时任务"}] },
         {

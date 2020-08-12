@@ -59,7 +59,12 @@ export default new Router({
         {
           path: "/BesetTest/manageSql",
           name: "manageSql",
-          component: () => import("@/components/Infater/manageSql")
+          component: () => import("@/components/sql/manageSql")
+        },
+        {
+          path: "/BesetTest/sqlStatement",
+          name: "sqlStatement",
+          component: () => import("@/components/sql/sqlStatement")
         },
         {
           path: "/BesetTest/timedTask",
