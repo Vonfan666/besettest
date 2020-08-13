@@ -206,7 +206,7 @@
           ></enviroment-box>
 
           <div class="title-detail-context">
-            <el-form :model="datas" :rules="rules" ref="refFromS" label-width="100px">
+            <el-form :model="datas" :rules="rules" ref="refFromS" label-width="100px" size="mini">
               <div class="interfaName-1">
                 <el-form-item label="执行顺序" prop="order">
                   <el-input placeholder="请输入执行顺序" v-model="datas.order" clearable maxlength="7"></el-input>
@@ -302,7 +302,7 @@
               <div class="interfaName-3">
                 <el-form-item label="用例描述" prop>
                   <el-input
-                    :autosize="{minRows:4,maxRows:4}"
+                    :autosize="{minRows:2,maxRows:2}"
                     resize="none"
                     type="textarea"
                     placeholder="请输入用例描述 如:验证正确账号,错误密码情况下,接口返回情况"
@@ -603,7 +603,7 @@
               </div>
             </div>
           </div>
-          <div>
+          <div class="title-detail-class-foot">
             <el-button type="primary" size="small" @click="addCaseSubmit()">确认</el-button>
             <el-button type="primary" size="small" @click="DebugSubmit()">调试</el-button>
             <el-button
@@ -779,26 +779,7 @@ export default {
       pageMethods:this.page,
       pageMethods1:this.pageAll,
       resultsLog: [
-        { createTime: "2020-06-26 17:00:00", user: "冯凡", caseCount: 20 },
-        { createTime: "2020-06-26 17:00:00", user: "冯凡", caseCount: 20 },
-        { createTime: "2020-06-26 17:00:00", user: "冯凡", caseCount: 20 },
-        { createTime: "2020-06-26 17:00:00", user: "冯凡", caseCount: 20 },
-        { createTime: "2020-06-26 17:00:00", user: "冯凡", caseCount: 20 },
-        { createTime: "2020-06-26 17:00:00", user: "冯凡", caseCount: 20 },
-        { createTime: "2020-06-26 17:00:00", user: "冯凡", caseCount: 20 },
-        { createTime: "2020-06-26 17:00:00", user: "冯凡", caseCount: 20 },
-        { createTime: "2020-06-26 17:00:00", user: "冯凡", caseCount: 20 },
-        { createTime: "2020-06-26 17:00:00", user: "冯凡", caseCount: 20 },
-        { createTime: "2020-06-26 17:00:00", user: "冯凡", caseCount: 20 },
-        { createTime: "2020-06-26 17:00:00", user: "冯凡", caseCount: 20 },
-        { createTime: "2020-06-26 17:00:00", user: "冯凡", caseCount: 20 },
-        { createTime: "2020-06-26 17:00:00", user: "冯凡", caseCount: 20 },
-        { createTime: "2020-06-26 17:00:00", user: "冯凡", caseCount: 20 },
-        { createTime: "2020-06-26 17:00:00", user: "冯凡", caseCount: 20 },
-        { createTime: "2020-06-26 17:00:00", user: "冯凡", caseCount: 20 },
-        { createTime: "2020-06-26 17:00:00", user: "冯凡", caseCount: 20 },
-        { createTime: "2020-06-26 17:00:00", user: "冯凡", caseCount: 20 },
-        { createTime: "2020-06-26 17:00:00", user: "冯凡", caseCount: 20 }
+
       ],
       loading: {
         loading_table: true,
@@ -2168,7 +2149,7 @@ export default {
   // overflow: hidden;
   height: 100%;
   background-color: white;
-  min-width: 1000px;
+  
 }
 .manageCase-left {
   height: 100%;
@@ -2379,7 +2360,7 @@ export default {
       width: 100%;
       margin: 10px 0;
       text-align: left;
-      height: 100%;
+      // height: 100%;
       background-color: whitesmoke;
       // background-color: silver;
       // display: flex;
@@ -2403,7 +2384,7 @@ export default {
       .interfaName-3 {
         width: 600px;
         // height: 40px;
-        padding-bottom: 10px;
+        // padding-bottom: 10px;
       }
     }
   }
@@ -2428,9 +2409,12 @@ export default {
       // width: 15%;
     }
   }
+  .title-detail-class-foot{
+    margin-bottom: 20px;
+  }
   .title-detail-class {
-    margin-top: 20px;
-
+    // margin-top: 20px;
+    flex:1;
     .requests-detail {
       width: 100%;
       //   height: 500px;
@@ -2598,7 +2582,16 @@ export default {
       height: 600px;
     }
   }
+  
 }
+.right-title-detail{
+        display: flex;
+        flex-flow: column nowrap;
+        height: 100%;
+  }
+  .requestsContext .el-form-item{
+    margin-bottom: -5px
+  }
 </style>
 
 <style>
@@ -2618,7 +2611,7 @@ export default {
 }
 
 .requestsTitile .el-form-item {
-  margin-bottom: 5px;
+  /* margin-bottom: 5px; */
 }
 .requestsTitile .el-form-item__error {
   margin-top: -2px;

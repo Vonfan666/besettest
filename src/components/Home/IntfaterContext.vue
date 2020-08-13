@@ -68,7 +68,7 @@
         <el-select></el-select>-->
       </div>
     </div>
-    <div class="ir-title top-1">
+    <div class="ir-title">
       <el-form :model="model" :rules="rules" size="mini">
         <el-form-item label="接口名称" prop="infaterName" label-width="70px">
           <el-input v-model="model.infaterName" clearable placeholder="请输入接口名称"></el-input>

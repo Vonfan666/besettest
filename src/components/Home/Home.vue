@@ -629,9 +629,11 @@ export default {
   display: flex;
   width: 100%;
   height: 100%;
-  // min-width: 1500px;
+  min-width: 1200px;
   .left {
-    position: relative;
+    position: relative;  //2020-08-14
+    overflow-x: hidden; //2020-08-14
+
     width: 250px;
     background: #141414;
     height: 100%;
@@ -672,6 +674,7 @@ export default {
     background: #fff;
     flex: 1;
     height: 100%;
+
   }
   .right-top {
     position: relative;
@@ -724,11 +727,12 @@ export default {
   .right-context {
     position: absolute;
     margin-top: 20px;
-    width: 100%;
+    width: 100%;   
     top: 60px;
     background: #eee;
     bottom: 0px;
-    left: 0px;
+    
+    // left: 0px; //2020-08-14
   }
 }
 .addProject {

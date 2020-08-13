@@ -101,7 +101,7 @@
           </el-form>
         </div>
         <div class="foot">
-          <el-button type="primary" size="mini" @click="closeAddTask()">连接测试</el-button>
+          <el-button type="primary" size="mini" @click="ValidSql_M()">连接测试</el-button>
           <el-button type="primary" size="mini" @click="submitSqlBox_M()" v-if="status.addSqlOkStatus">确定</el-button>
           <el-button type="primary" size="mini" @click="updateSqlBox_M()" v-if="status.updateStatus">更新</el-button>
         </div>
@@ -117,7 +117,8 @@ import {
   addSqlStatement,
   GetSqlBox,
   removeSqlBox,
-  updateSqlBox
+  updateSqlBox,
+  ValidSql
 } from  "../../axios/api"
 import { Message } from 'element-ui';
 import storage from '../../libs/storage';
@@ -209,7 +210,7 @@ export default {
       this.sqlFrom.type= 1;
       this.sqlFrom.host= item.host;
       this.sqlFrom.port= item.port;
-      this.sqlFrom.userName= item.userId.name;
+      this.sqlFrom.userName= item.userName;
       this.sqlFrom.database= item.database;
       this.sqlFrom.passWord= item.passWord;
       this.sqlFrom.detail= item.detail;
@@ -303,6 +304,25 @@ export default {
           //清除临时index
           this.status.updateIndex=null,
           Message.success(res.msg)
+        }
+      })
+    },
+    ValidSql_M(){
+      ValidSql({
+        Stype:0,
+        host: this.sqlFrom.host,
+        port: this.sqlFrom.port,
+        database: this.sqlFrom.database,
+        user: this.sqlFrom.userName,
+        passwd: this.sqlFrom.passWord,
+      }).then(res=>{
+        if(res.status===200){
+          if(res.results.code){
+            Message.success(res.results.msg)
+
+          }else{
+            Message.error(res.results.msg)
+          }
         }
       })
     },

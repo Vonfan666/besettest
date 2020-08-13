@@ -95,8 +95,8 @@
                 placeholder="只允许写一条sql,暂不支持同时执行多条"
               ></el-input>
             </el-form-item>
-            <el-form-item label="执行结果" size="mini" v-if="status.validStatus">
-              <!-- <el-input
+            <el-form-item label="执行结果" size="mini" >
+              <el-input
                 type="textarea"
                 :autosize="{ minRows: 4, maxRows: 4}"
                 resize="none"
@@ -104,9 +104,9 @@
                 v-model="writeSql.SqlRunResults"
                 clearable
                 placeholder="[(1,2,3),(4,5,6)]"
-                
-              ></el-input> -->
-              <div class="SqlRunResults">
+                v-if="!status.runStatus"
+              ></el-input>
+              <div class="SqlRunResults"  v-if="status.runStatus">
                 <li v-for="(item,index) in writeSql.SqlRunResults" :key="index">{{item}}</li>
               </div>
             </el-form-item>
@@ -121,7 +121,7 @@
                 :placeholder="resultsAction"
               ></el-input>
             </el-form-item>
-             <el-form-item label="处理结果" size="mini"  v-if="status.validStatus">
+             <el-form-item label="处理结果" size="mini"  v-if="status.actionStatus">
               <el-input
                 type="textarea"
                 :autosize="{ minRows: 4, maxRows: 4}"
@@ -178,7 +178,9 @@ export default {
         writeSqlSatus: false,
         addStatus: false,
         updateStatus: false,
-        validStatus:false,
+        runStatus:false,  //执行结果控制
+        actionStatus:false,  //处理结果控制
+
       },
       writeSqlBox: {
         styleCode: "width:40%;height:70%",
@@ -367,6 +369,7 @@ export default {
     ValidSql_M() {
       //新增SQL时校验sql结果
       ValidSql({
+        Stype:1,
         name: this.writeSql.name,
         BoxId: this.writeSql.BoxId,
         SqlActionResults:this.writeSql.SqlActionResults,
@@ -375,17 +378,37 @@ export default {
         detail: this.writeSql.detail,
       }).then(res=>{
         if(res.status===200){
-            this.status.validStatus = true;
+            this.status.runStatus = true;
 
-          this.writeSql.actionResults=res.results.res
+          var code=parseInt(res.results.code)
           console.log(this.writeSql.actionResults)
-          
-          if (res.results.code===1){
+          if (code===0){  //链接数据库失败
+            this.status.runStatus = false;   
+            this.status.actionStatus = false;
+            this.writeSql.SqlRunResults=res.results.msg
+               
+          }
+          if (code===1){   //结果处理成功
+            this.status.runStatus = true;
+            this.status.actionStatus = true;
             this.writeSql.SqlRunResults=res.results.data
-            
-          }else{
+            this.writeSql.actionResults=res.results.res
+          }
+          if (code===2){   //执行sql失败
+            this.status.runStatus = false;
+            this.status.actionStatus = false;
             this.writeSql.SqlRunResults=res.results.msg
           }
+          if (code===3){  //sql执行成功||结果处理失败
+            this.status.runStatus = true;
+            this.status.actionStatus = true;
+            this.writeSql.SqlRunResults=res.results.data
+            this.writeSql.actionResults=res.results.msg
+            
+            
+          }
+       
+          
           
           Message.success(res.msg)
         }
