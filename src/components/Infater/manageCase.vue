@@ -169,7 +169,11 @@
             <el-button type="primary" @click="caseListBack()">返回</el-button>
             <!-- <el-button type="primary" size="primary">保存</el-button> -->
             <el-button type="primary" size="primary" @click="runAllCase()">全部执行</el-button>
-            <el-button type="primary" size="primary" @click="pageAll();pageMethods=pageMethods1">查看结果</el-button>
+            <el-button
+              type="primary"
+              size="primary"
+              @click="pageAll();pageMethods=pageMethods1"
+            >查看结果</el-button>
           </div>
         </div>
       </div>
@@ -327,8 +331,8 @@
                 <div class="requestsFrom" v-show="statusIng.requestsStatus[0]">
                   <div class="t1">
                     <span class="requestsTitile1">序号</span>
-                    <span class="requestsTitile2">操作名称</span>
                     <span class="requestsTitile3">操作类型</span>
+                    <span class="requestsTitile2">数据库操作</span>
                     <span class="requestsTitile4">操作处理</span>
                     <span class="requestsTitile5">操作描述</span>
                   </div>
@@ -344,40 +348,91 @@
                             @change="changeIndex(index,0)"
                           ></el-input>
                         </el-form-item>
-                        <!-- :prop="'keys.'+index+ '.beforeName'"
+                        <!-- :prop="'keys.'+index+ '.beforeSqlBoxType'"
                           
                         :rules="{ required: true, message: '必填' }"-->
-                        <el-form-item class="requestsTitile2" hide-required-asterisk>
-                          <el-input v-model="item.beforeName" placeholder="条件名称"></el-input>
-                        </el-form-item>
-                        <!-- :prop="'keys.'+index+ '.beforeType'"
-                          
-                        :rules="{ required: true, message: '必填' }"-->
+                        <!-- ———————————— -->
                         <el-form-item class="requestsTitile3" hide-required-asterisk>
                           <el-select
-                            placeholder="选择处理类型"
+                            placeholder="请选择类型"
                             v-model="item.beforeType"
-                            @change="clearBeforePlan(index)"
+                            @change="chioceType(index)"
                           >
                             <el-option
-                              v-for="(item1,index1)  in beforeTypeList"
+                              v-for="(item1,index1)  in beforeActionObj.beforeTypeList"
                               :key="index1"
                               :label="item1.name"
                               :value="item1.id"
                             ></el-option>
                           </el-select>
                         </el-form-item>
-                        <!-- :prop="'keys.'+index+ '.beforePlan'"
+                        <!-- :prop="'keys.'+index+ '.beforeType'"
+                          
                         :rules="{ required: true, message: '必填' }"-->
-                        <el-form-item class="requestsTitile4" hide-required-asterisk>
-                          <el-select placeholder="选择前置操作" v-model="item.beforePlan">
+                        <el-form-item
+                          class="requestsTitile3"
+                          hide-required-asterisk
+                          v-if="parseInt(beforeAction.keys[index].beforeType)===1"
+                        >
+                          <el-select
+                            filterable
+                            placeholder="请选择库"
+                            v-model="item.beforeSqlBoxType"
+                            @change="choiceSqlBox(index)"
+                          >
                             <el-option
-                              v-for="(item1,index2)  in selection(index)"
-                              :key="index2"
+                              v-for="(item1,index1)  in beforeActionObj.sqlBoxList"
+                              :key="index1"
                               :label="item1.name"
                               :value="item1.id"
                             ></el-option>
                           </el-select>
+                        </el-form-item>
+                        <el-form-item
+                          class="requestsTitile3"
+                          hide-required-asterisk
+                          v-if="parseInt(beforeAction.keys[index].beforeType)!==1"
+                        >
+                          <el-select disabled value></el-select>
+                        </el-form-item>
+                        <!-- :prop="'keys.'+index+ '.beforePlan'"
+                        :rules="{ required: true, message: '必填' }"-->
+                        <el-form-item class="requestsTitile4" hide-required-asterisk v-if="beforeAction.keys[index].beforeType==1 && beforeAction.keys[index].beforeSqlBoxType">
+                          <el-select
+                            filterable
+                            placeholder="选择操作"
+                            v-model="item.beforePlan"
+                            @visible-change="chiocePlan(index)"
+                          >
+                            <el-option
+                              v-for="(item1,index1)  in beforeActionObj.actionLists"
+                              :key="index1"
+                              :label="item1.name"
+                              :value="item1.id"
+                            ></el-option>
+                          </el-select>
+                        </el-form-item>
+                        <el-form-item class="requestsTitile4" hide-required-asterisk v-if="beforeAction.keys[index].beforeType==2">
+                          <el-select
+                            filterable
+                            placeholder="选择操作"
+                            v-model="item.beforePlan"
+                            @visible-change="chiocePlan(index)"
+                          >
+                            <el-option
+                              v-for="(item1,index1)  in beforeActionObj.actionLists_2"
+                              :key="index1"
+                              :label="item1.name"
+                              :value="item1.id"
+                            ></el-option>
+                          </el-select>
+                        </el-form-item>
+                         <el-form-item
+                          class="requestsTitile4"
+                          hide-required-asterisk
+                           v-if=" beforeAction.keys[index].beforeType!=2 && (!beforeAction.keys[index].beforeSqlBoxType || beforeAction.keys[index].beforeType!=1 ) "
+                        >
+                          <el-select disabled value></el-select>
                         </el-form-item>
                         <el-form-item class="requestsTitile5">
                           <el-input placeholder="简要描述前置操作" v-model="item.beforeDetail"></el-input>
@@ -554,18 +609,18 @@
                             @change="changeIndex(index,3)"
                           ></el-input>
                         </el-form-item>
-                        <!-- :prop="'keys.'+index+ '.beforeName'"
+                        <!-- :prop="'keys.'+index+ '.beforeSqlBoxType'"
                           
                         :rules="{ required: true, message: '必填' }"-->
                         <el-form-item class="requestsTitile2" hide-required-asterisk>
-                          <el-input v-model="item.beforeName" placeholder="条件名称"></el-input>
+                          <el-input v-model="item.beforeSqlBoxType" placeholder="条件名称"></el-input>
                         </el-form-item>
                         <!-- :prop="'keys.'+index+ '.beforeType'"                          
                         :rules="{ required: true, message: '必填' }"-->
                         <el-form-item class="requestsTitile3" hide-required-asterisk>
                           <el-select placeholder="选择处理类型" v-model="item.beforeType">
                             <el-option
-                              v-for="(item1,index1)  in beforeTypeList"
+                              v-for="(item1,index1)  in beforeActionObj.beforeTypeList"
                               :key="index1"
                               :label="item1.name"
                               :value="item1.id"
@@ -606,11 +661,7 @@
           <div class="title-detail-class-foot">
             <el-button type="primary" size="small" @click="addCaseSubmit()">确认</el-button>
             <el-button type="primary" size="small" @click="DebugSubmit()">调试</el-button>
-            <el-button
-              type="primary"
-              size="small"
-              @click="page();pageMethods=page"
-            >查看结果</el-button>
+            <el-button type="primary" size="small" @click="page();pageMethods=page">查看结果</el-button>
           </div>
         </div>
       </div>
@@ -714,16 +765,14 @@
               <el-table-column prop="caseCount" label="用例数量" fit></el-table-column>
               <el-table-column fixed="right" label="操作" width="100">
                 <template slot-scope="scope" fit>
-                  <el-button @click="deleteTwo(pageRemove,scope.row)" type="text" size="small" >删除</el-button>
+                  <el-button @click="deleteTwo(pageRemove,scope.row)" type="text" size="small">删除</el-button>
                   <el-button @click="selectResult(scope.row)" type="text" size="small">查看</el-button>
                 </template>
               </el-table-column>
             </el-table>
           </div>
           <div class="foot">
-            
-              <page-box ref="DebugResultPage" ></page-box>
-            
+            <page-box ref="DebugResultPage"></page-box>
           </div>
         </div>
       </results-box>
@@ -759,7 +808,9 @@ import {
   CaseOrderGet,
   CaseResults,
   CaseResultsDel,
-  CaseResultsDetail
+  CaseResultsDetail,
+  addSqlBox,
+  GetBoxSqlList,
 } from "../../axios/api.js";
 import storage from "../../libs/storage";
 
@@ -771,19 +822,16 @@ export default {
     "unity-box": () => import("../public/MessageBox.vue"),
     "left-box": () => import("../public/manageCaseComponents/leftBox.vue"),
     "results-box": () => import("../public/MessageBox.vue"),
-    "page-box": () => import("../public/page.vue")
-    
+    "page-box": () => import("../public/page.vue"),
   },
   data() {
     return {
-      pageMethods:this.page,
-      pageMethods1:this.pageAll,
-      resultsLog: [
-
-      ],
+      pageMethods: this.page,
+      pageMethods1: this.pageAll,
+      resultsLog: [],
       loading: {
         loading_table: true,
-        loading_results:true
+        loading_results: true,
       },
       resultsStyle: "width:1000px;height:750px",
       code: null, //判断是否启用websocket
@@ -823,7 +871,7 @@ export default {
         isUnifyStatus: false,
         drawerStatus: false,
         caseOrderStatus: true,
-        resultStatus: false
+        resultStatus: false,
       },
       inputStatus: 1, //input输入替换成div输入-显示引用的环境变量的颜色
       searchName: "", //接口搜索名称
@@ -840,23 +888,23 @@ export default {
       ],
       urlHttp: [
         { id: 1, name: "HTTP" },
-        { id: 2, name: "HTTPS" }
+        { id: 2, name: "HTTPS" },
       ],
 
       //用例状态是否编写完成,已完成后台则会执行这个用例，未完成则不会执行
       interfaceIsOkList: [
         { id: 0, name: "未完成" },
-        { id: 1, name: "已完成" }
+        { id: 1, name: "已完成" },
       ],
       //请求类型,后台返回数据
       urlPostType: [
         { id: 1, name: "GET" },
-        { id: 2, name: "POST" }
+        { id: 2, name: "POST" },
       ],
       //新建分组时的数据
       caseGroupDatats: {
         addGroupName: "", //新建分组的名称
-        addInterfaceName: ""
+        addInterfaceName: "",
       },
       //提交数据
       datas: {
@@ -872,29 +920,58 @@ export default {
         postMethods: "", //请求方法
         order: "", //排序
         chiocsEnvironment: "", //
-        caseOrder: ""
+        caseOrder: "",
       },
       reqyestDataTypeRadio: 1, //提交的参数类型
+      beforeActionObj: {
+        beforeTypeList: [
+          {
+            id: 1,
+            name: "数据库操作",
+            children: this.sqlBoxList,
+          },
+          // {
+          //   id: 2,
+          //   name: "文件处理",
+          //   children: [
+          //     { id: 1, name: "上传文件" },
+          //     { id: 2, name: "文件遍历" },
+          //   ],
+          // },
+        ],
+        sqlBoxList: [],
+        actionLists: [
+          
+        ],
+        actionLists_2:[
+              { id: 1, name: "上传文件" },
+              { id: 2, name: "文件遍历" },
+            ],
+       
+      },
+
       //前置处理器
       beforeAction: {
         keys: [
           {
+
             beforeIndex: "", //前置条件中执行顺序
-            beforeName: "", //前置条件名称
             beforeType: "", //前置条件类型---如文件操作、数据库操作等
+            beforeSqlBoxType: "", //数据库选择
             beforePlan: "", //前置处理--选择文件操作中的具体事务，或者数据库中的具体事务
-            beforeDetail: "" //简要描述
-          }
-        ]
+            beforeDetail: "", //简要描述
+          },
+        ],
       },
+
       requestsHeader: {
         keys: [
           {
             headerKey: "", //请求头key
             headerValue: "", //请求头value
-            headerDetail: "" //简要描述
-          }
-        ]
+            headerDetail: "", //简要描述
+          },
+        ],
       },
       requestsData: {
         keys: [
@@ -902,9 +979,9 @@ export default {
             isRequestsData: "true", //是否选中
             dataKey: "", //请求key
             dataValue: "", //请求值
-            dataDetail: "" //请求详情
-          }
-        ]
+            dataDetail: "", //请求详情
+          },
+        ],
       },
       requestsDataf: {
         keys: [
@@ -912,148 +989,94 @@ export default {
             isRequestsData: "true", //是否选中
             dataKey: "", //请求key
             dataValue: "", //请求值
-            dataDetail: "" //请求详情
-          }
-        ]
+            dataDetail: "", //请求详情
+          },
+        ],
       },
       afterAction: {
         keys: [
           {
             beforeIndex: "", //前置条件中执行顺序
-            beforeName: "", //前置条件名称
+            beforeSqlBoxType: "", //数据库选择
             beforeType: "", //前置条件类型---如文件操作、数据库操作等
             beforePlan: "", //前置处理--选择文件操作中的具体事务，或者数据库中的具体事务
-            beforeDetail: "" //简要描述
-          }
-        ]
+            beforeDetail: "", //简要描述
+          },
+        ],
       },
-      beforeTypeList: [
-        {
-          id: 1,
-          name: "文件处理",
-          children: [
-            { id: 1, name: "上传文件" },
-            { id: 2, name: "文件遍历" }
-          ]
-        },
-        {
-          id: 2,
-          name: "数据库操作",
-          children: [
-            { id: 1, name: "修改商品价格" },
-            { id: 2, name: "新增待付款订单" },
-            { id: 3, name: "订单表同步" },
-            { id: 4, name: "添加收货地址" },
-            { id: 5, name: "使用优惠券" }
-          ]
-        },
-        {
-          id: 3,
-          name: "执行py脚本",
-          children: []
-        },
-        {
-          id: 4,
-          name: "请求接口",
-          children: [
-            { id: 1, name: "获取token" },
-            { id: 2, name: "请求上一个接口" }
-          ]
-        }
-      ],
+
       beforePlanList: [
         { Pid: 1, id: 1, name: "上传文件" },
-        { Pid: 1, id: 2, name: "新增数据" }
+        { Pid: 1, id: 2, name: "新增数据" },
       ],
       beforePlanListCode: [],
       rules: {
         interfaceName: [
-          { required: true, message: "请填写用例名称", trigger: "blur" }
+          { required: true, message: "请填写用例名称", trigger: "blur" },
         ],
         caseGroupId: [
-          { required: true, message: "请选择分组", trigger: "change" }
+          { required: true, message: "请选择分组", trigger: "change" },
         ],
         urlHttp: [{ required: true, message: "请选择协议", trigger: "blur" }],
         urlAttr: [
-          { required: true, message: "请填写主机地址", trigger: "blur" }
+          { required: true, message: "请填写主机地址", trigger: "blur" },
         ],
         urlPostType: [{ required: true, message: "必填", trigger: "blur" }],
         beforeIndex: [{ required: true, message: "必填", trigger: "blur" }],
-        beforeName: [{ required: true, message: "必填", trigger: "blur" }],
+        beforeSqlBoxType: [{ required: true, message: "必填", trigger: "blur" }],
         beforeType: [{ required: true, message: "必填", trigger: "blur" }],
         beforePlan: [{ required: true, message: "必填", trigger: "blur" }],
         addGroupName: [{ required: true, message: "必填", trigger: "blur" }],
         addInterfaceName: [
-          { required: true, message: "必填", trigger: "blur" }
+          { required: true, message: "必填", trigger: "blur" },
         ],
         postMethods: [{ required: true, message: "必填", trigger: "change" }],
-        order: [{ required: true, message: "必填", trigger: "blur" }]
-        // beforeName: [{ required: true, message: "请输入名称" }]
+        order: [{ required: true, message: "必填", trigger: "blur" }],
+        // beforeSqlBoxType: [{ required: true, message: "请输入名称" }]
       },
-      caseList: [
-        // {
-        //   id: 1,
-        //   createTime: "2020-05-24 18:37:06",
-        //   updateTime: "2020-05-24 18:37:06",
-        //   CaseGroupId: { id: 205, name: "登录注册" },
-        //   data: null,
-        //   headers: null,
-        //   userId: { id: 4, name: "冯凡" },
-        //   status: { id: 1, name: "已完成" },
-        //   name: "正常登录",
-        //   order: 1,
-        //   attr: "/user/logins/",
-        //   detail: null,
-        //   isGlobalsHeader: 0,
-        //   postMethod: 2,
-        //   dataType: 1,
-        //   environmentId: null
-        // }
-      ],
-      multipleSelection: [] //选中执行的用例id
+      caseList: [],
+      multipleSelection: [], //选中执行的用例id
     };
   },
   methods: {
-    selectResult(item){
-      console.log(item)
-      if (item.type===1){
+    selectResult(item) {
+      console.log(item);
+      if (item.type === 1) {
         CaseResultsDetail({
-        id:item.id
-      }).then(res=>{
-        if(res.status===200){
-  
-          this.resResults= res.results
-          this.statusIng.drawerStatus = true; //展开左侧
-        }
-      })
+          id: item.id,
+        }).then((res) => {
+          if (res.status === 200) {
+            this.resResults = res.results;
+            this.statusIng.drawerStatus = true; //展开左侧
+          }
+        });
       }
-      if (item.type===2){
+      if (item.type === 2) {
         CaseResultsDetail({
-        id:item.id
-      }).then(res=>{
-        if(res.status===200){
-          console.log(res.results)
-          
-          this.resResults= res.results
-          this.statusIng.drawerStatus = true; //展开左侧
-        }
-      })
+          id: item.id,
+        }).then((res) => {
+          if (res.status === 200) {
+            console.log(res.results);
+
+            this.resResults = res.results;
+            this.statusIng.drawerStatus = true; //展开左侧
+          }
+        });
       }
-      
     },
-    deleteTwo(){
+    deleteTwo() {
       this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
-        type: "warning"
+        type: "warning",
       })
         .then(() => {
-          console.log(arguments)
-          console.log(arguments[0])
-          console.log(arguments[1])
-          console.log(arguments[2])
+          console.log(arguments);
+          console.log(arguments[0]);
+          console.log(arguments[1]);
+          console.log(arguments[2]);
           // console.log(func)
-          arguments[0](arguments[1])
+          arguments[0](arguments[1]);
           // this.$message({
           //   type: "success",
           //   message: "删除成功!"
@@ -1062,85 +1085,79 @@ export default {
         .catch(() => {
           this.$message({
             type: "info",
-            message: "已取消删除"
+            message: "已取消删除",
           });
         });
     },
-    pageRemove(item){
-      console.log("item",item)
-      var page=this.$refs.DebugResultPage.currentPage
-      if (this.resultsLog.length===1 && page!==1){
-        page=page-1
-        this.$refs.DebugResultPage.currentPage=page
+    pageRemove(item) {
+      console.log("item", item);
+      var page = this.$refs.DebugResultPage.currentPage;
+      if (this.resultsLog.length === 1 && page !== 1) {
+        page = page - 1;
+        this.$refs.DebugResultPage.currentPage = page;
       }
       CaseResultsDel({
-        id:item.id,
-        c_id:item.c_id,
-        page:page,
-        pageSize:this.$refs.DebugResultPage.pageSize,
-        type:item.type
-      }).then(res=>{
-        if(res.status===200){
-          this.resultsLog = res.results
-          this.$refs.DebugResultPage.total=res.total
-          this.$refs.DebugResultPage.allPage=res.allPage
-          Message.success(res.msg)
+        id: item.id,
+        c_id: item.c_id,
+        page: page,
+        pageSize: this.$refs.DebugResultPage.pageSize,
+        type: item.type,
+      }).then((res) => {
+        if (res.status === 200) {
+          this.resultsLog = res.results;
+          this.$refs.DebugResultPage.total = res.total;
+          this.$refs.DebugResultPage.allPage = res.allPage;
+          Message.success(res.msg);
         }
-      })
-
+      });
     },
-    page(page = 1, pageSize = 10,type=1) {
-      var rec=null
-      
-      
+    page(page = 1, pageSize = 10, type = 1) {
+      var rec = null;
+
       if (this.currentCaseId === null) {
         Message.error("请选择用例或分类");
       } else {
-        this.statusIng.resultStatus=true;  //打开
+        this.statusIng.resultStatus = true; //打开
         CaseResults({
           type: type,
           c_id: this.currentCaseId,
           page: page,
-          pageSize: pageSize
-        }).then(res => {
+          pageSize: pageSize,
+        }).then((res) => {
           if (res.status === 200) {
-            this.loading.loading_results=false
-            console.log(res.results)
-            this.resultsLog = res.results
-            this.$refs.DebugResultPage.total=res.total
-            this.$refs.DebugResultPage.allPage=res.allPage
+            this.loading.loading_results = false;
+            console.log(res.results);
+            this.resultsLog = res.results;
+            this.$refs.DebugResultPage.total = res.total;
+            this.$refs.DebugResultPage.allPage = res.allPage;
           }
         });
-    
-        
       }
-      return rec
+      return rec;
     },
-    pageAll(page = 1, pageSize = 10,type=2) {
-      var rec=null
-      
+    pageAll(page = 1, pageSize = 10, type = 2) {
+      var rec = null;
+
       if (!this.currentInterfaceId) {
         Message.error("请选择用例或分类");
       } else {
-        this.statusIng.resultStatus=true;  //打开
+        this.statusIng.resultStatus = true; //打开
         CaseResults({
           type: type,
           c_id: this.currentInterfaceId,
           page: page,
-          pageSize: pageSize
-        }).then(res => {
+          pageSize: pageSize,
+        }).then((res) => {
           if (res.status === 200) {
-            this.loading.loading_results=false
-            console.log(res.results)
-            this.resultsLog = res.results
-            this.$refs.DebugResultPage.total=res.total
-            this.$refs.DebugResultPage.allPage=res.allPage
+            this.loading.loading_results = false;
+            console.log(res.results);
+            this.resultsLog = res.results;
+            this.$refs.DebugResultPage.total = res.total;
+            this.$refs.DebugResultPage.allPage = res.allPage;
           }
         });
-    
-        
       }
-      return rec
+      return rec;
     },
     textStyle({ row, column, rowIndex, columnIndex }) {
       return "text-align:center";
@@ -1148,8 +1165,8 @@ export default {
     caseOrderSubmit() {
       CaseOrder({
         id: this.currentInterfaceId,
-        order: this.datas.caseOrder
-      }).then(res => {
+        order: this.datas.caseOrder,
+      }).then((res) => {
         if (res.status === 200) {
           this.datas.caseOrder = res.order;
           Message.success("修改成功");
@@ -1227,12 +1244,12 @@ export default {
         // isGlobalsHeader:""  //是否使用全局请起头
         headers: JSON.stringify(this.requestsHeader),
         data: JSON.stringify(requestsData),
-        environmentId: this.datas.chiocsEnvironment
-      }).then(res => {
+        environmentId: this.datas.chiocsEnvironment,
+      }).then((res) => {
         if (res.status === 200) {
           // var listx = [];
           // listx.push(res.results);
-          this.resResults = res.results
+          this.resResults = res.results;
           this.statusIng.drawerStatus = true; //展开左侧
           // this.$refs.letfBox.leftCaseName=false
         }
@@ -1258,7 +1275,7 @@ export default {
         this.requestsHeader.keys.push({
           headerKey: dic[0], //请求头key
           headerValue: dic[1], //请求头value
-          headerDetail: "" //简要描述
+          headerDetail: "", //简要描述
         });
       });
       // console.log(this.requestsHeader);
@@ -1307,9 +1324,9 @@ export default {
     },
     //判断文件个数,并根据个数导入fileNameChildStatus-从而控制每个文件下的文档展示或者显示
     filesLen() {
-      this.caseGroupList.map(row => this.fileNameChildStatus.push(false)); //默认不展示
+      this.caseGroupList.map((row) => this.fileNameChildStatus.push(false)); //默认不展示
       this.caseGroupList.map(
-        row => this.fileNameIcon.push("el-icon-caret-right") //箭头方向向右
+        (row) => this.fileNameIcon.push("el-icon-caret-right") //箭头方向向右
       );
     },
     //判断当前数据请求的是前置操作-请求头-请求参数-后置操作中的哪一个
@@ -1330,31 +1347,35 @@ export default {
     addDictToList(index, a) {
       // console.log(a);
       var ele = this.isBeforeEle(a);
+      // var actionList=this.beforeTypeList[1].children
+      // this.beforeTypeList.actionLists.push([])  //默认新增一个前置操作处理
       a === 0
         ? ele.keys.splice(index + 1, 0, {
             beforeIndex: "",
-            beforeName: "",
+            beforeSqlBoxType: "",
             beforeType: "",
             beforePlan: "",
             beforeDetail: "",
-            key: Date.now()
+            key: Date.now(),
           })
+            // this.beforeTypeList.actionLists.splice(index+1,0,[])  //新增前置操作处理
+          
         : a === 1
         ? (ele.keys.splice(index + 1, 0, {
             headerKey: "",
             headerValue: "",
             headerDetail: "",
-            key: Date.now()
+            key: Date.now(),
           }),
           console.log(this.requestsHeader))
         : a === 3
         ? ele.keys.splice(index + 1, 0, {
             beforeIndex: "",
-            beforeName: "",
+            beforeSqlBoxType: "",
             beforeType: "",
             beforePlan: "",
             beforeDetail: "",
-            key: Date.now()
+            key: Date.now(),
           })
         : a === 2 && this.reqyestDataTypeRadio === 1
         ? ele.keys.splice(index + 1, 0, {
@@ -1362,7 +1383,7 @@ export default {
             dataKey: "",
             dataValue: "",
             detaDetail: "",
-            key: Date.now()
+            key: Date.now(),
           })
         : a === 2 && this.reqyestDataTypeRadio === 3
         ? this.requestsDataf.keys.splice(index + 1, 0, {
@@ -1370,7 +1391,7 @@ export default {
             dataKey: "",
             dataValue: "",
             detaDetail: "",
-            key: Date.now()
+            key: Date.now(),
           })
         : null;
     },
@@ -1394,7 +1415,7 @@ export default {
       if (parseInt(list[index].beforeIndex) > parseInt(99)) {
         Message.error("最大值不能超过99");
       } else {
-        var isHave = list.map(row => row.beforeIndex);
+        var isHave = list.map((row) => row.beforeIndex);
         // console.log("输入的", typeof list[index].beforeIndex);
         isHave.splice(index, 1); //删掉当前输入的,isHave就只剩当前以外的，然后判断当前输入的在不在之前的列表即可判断是否重复
         // console.log(isHave);
@@ -1420,27 +1441,69 @@ export default {
       });
     },
     //这个是为了操作 点击操作操作选项之后--把前置操作的值给去掉
-    clearBeforePlan(index) {
-      this.beforeAction.keys[index].beforePlan = "";
+    chioceType(index) {
+      console.log("chioceType", index);
+      var typeId = this.beforeAction.keys[index].beforeType;
+
+        this.beforeAction.keys[index].beforePlan = "";
+        this.beforeAction.keys[index].beforeSqlBoxType = "";
+    },
+    //选择对应的数据库之后请求全部的sql语句
+    choiceSqlBox(index) {
+      console.log("choiceSqlBox", index);
+      var typeId = this.beforeAction.keys[index].beforeType;
+      var SqlId = this.beforeAction.keys[index].beforeSqlBoxType;
+
+      console.log(SqlId);
+      if (parseInt(typeId) === 1) {
+        this.beforeAction.keys[index].beforePlan = "";
+        var t = this.beforeActionObj.sqlBoxList.filter(
+          (rows) => rows.id == SqlId
+        );
+        this.beforeActionObj.actionLists = t[0].children[0];
+        console.log(this.beforeActionObj.actionLists[index]);
+      }
+    },
+    chiocePlan(index) {
+    //   console.log("chiocePlan", index);
+    //   var typeId = this.beforeAction.keys[index].beforeType;
+    //   console.log(parseInt(typeId));
+    //   if (parseInt(typeId) === 2) {
+    //     this.beforeActionObj.actionLists_2 =this.beforeActionObj.actionLists_2;
+        
+    //   }
+    //   if (parseInt(typeId) === 1) {
+    //     // var SqlId = this.beforeAction.keys[index].beforeSqlBoxType;
+    //     // var t = this.beforeActionObj.sqlBoxList.filter(
+    //     //   (rows) => rows.id == SqlId
+    //     // );
+    //     // console.log(this.beforeActionObj.actionList )
+    //     // this.beforeActionObj.actionList = t[0].children[0];
+    //     this.beforeActionObj.actionLists = this.beforeActionObj.beforeTypeList[1].children
+    //     console.log(this.beforeActionObj.actionLists);
+      // }
     },
     //根据前置类型同步对应的前置操作
+
     selection(index) {
       var index1 = this.beforeAction.keys[index].beforeType;
       if (!index1) {
         return [];
       } else {
-        return this.beforeTypeList[index1 - 1].children;
+        return this.beforeActionObj.beforeTypeList[index1 - 1].children;
       }
     },
     //左侧用例组搜索--
     searchNameMethod() {
       // console.log("揍你", this.searchName, typeof this.searchName);
-      var searList = this.caseGroupList.map(row =>
-        row.idCaseGroupFiles.filter(rows => rows.name.includes(this.searchName))
+      var searList = this.caseGroupList.map((row) =>
+        row.idCaseGroupFiles.filter((rows) =>
+          rows.name.includes(this.searchName)
+        )
       );
       // console.log("searList", searList);
       var endSearList = searList.filter(
-        row => row.length > 0 && Array.isArray(row)
+        (row) => row.length > 0 && Array.isArray(row)
       );
       this.searchList.splice(0, this.searchList.length);
       // console.log(endSearList);
@@ -1482,13 +1545,13 @@ export default {
     //新建文件确认提交
     caseAddGroupSubmit() {
       //先请求添加分组接口
-      this.$refs.AddGroup.validate(valid => {
+      this.$refs.AddGroup.validate((valid) => {
         if (valid) {
           AddGroup({
             projectId: storage.get("projectId"),
             userId: storage.get("userId"),
-            name: this.caseGroupDatats.addGroupName
-          }).then(res => {
+            name: this.caseGroupDatats.addGroupName,
+          }).then((res) => {
             res.status === 200
               ? (this.caseGroupList.push(res.results),
                 //默认添加的该文件不展开
@@ -1514,13 +1577,13 @@ export default {
         var findex = this.commandCode[2];
         if (status === "a") {
           //如果等于a则是用例分组新增
-          this.$refs.refFrom.validate(valid => {
+          this.$refs.refFrom.validate((valid) => {
             if (valid) {
               AddCase({
                 CaseGroupFilesId: fid,
                 userId: storage.get("userId"),
-                name: this.caseGroupDatats.addInterfaceName
-              }).then(res => {
+                name: this.caseGroupDatats.addInterfaceName,
+              }).then((res) => {
                 if (res.status === 200) {
                   this.caseGroupList[findex].idCaseGroupFiles.push(res.results);
                   this.statusIng.caseAddInterfaceBoxStatus = false;
@@ -1535,12 +1598,12 @@ export default {
         if (status === "b") {
           //如果等于b则是编辑分组文件名称
           //请求新增接口成功之后再push到对应的列表
-          this.$refs.refFrom.validate(valid => {
+          this.$refs.refFrom.validate((valid) => {
             if (valid) {
               EditGroup({
                 id: fid,
-                name: this.caseGroupDatats.addInterfaceName
-              }).then(res => {
+                name: this.caseGroupDatats.addInterfaceName,
+              }).then((res) => {
                 res.status === 200
                   ? ((this.caseGroupList[findex].name = res.results.name),
                     //关闭后请求
@@ -1567,12 +1630,12 @@ export default {
         var cid = this.commandCode[3];
         var cindex = this.commandCode[4];
         if (status === "b") {
-          this.$refs.refFrom.validate(valid => {
+          this.$refs.refFrom.validate((valid) => {
             if (valid) {
               EditCase({
                 id: cid,
-                name: this.caseGroupDatats.addInterfaceName
-              }).then(res => {
+                name: this.caseGroupDatats.addInterfaceName,
+              }).then((res) => {
                 res.status === 200
                   ? ((this.caseGroupList[findex].idCaseGroupFiles[cindex].name =
                       res.results.name),
@@ -1598,8 +1661,8 @@ export default {
           (this.commandCode = command))
         : command[0] === "c"
         ? RemoveCase({
-            id: command[3]
-          }).then(res => {
+            id: command[3],
+          }).then((res) => {
             res.status === 200
               ? (this.caseGroupList[command[2]].idCaseGroupFiles.splice(
                   command[4],
@@ -1626,8 +1689,8 @@ export default {
           (this.commandCode = command))
         : command[0] === "c"
         ? RemoveGroup({
-            id: command[1]
-          }).then(res => {
+            id: command[1],
+          }).then((res) => {
             res.status === 200
               ? (this.caseGroupList.splice(command[2], 1),
                 this.groupFileWithInterface(),
@@ -1671,21 +1734,21 @@ export default {
         keys: [
           {
             beforeIndex: "", //前置条件中执行顺序
-            beforeName: "", //前置条件名称
+            beforeSqlBoxType: "", //数据库选择
             beforeType: "", //前置条件类型---如文件操作、数据库操作等
             beforePlan: "", //前置处理--选择文件操作中的具体事务，或者数据库中的具体事务
-            beforeDetail: "" //简要描述
-          }
-        ]
+            beforeDetail: "", //简要描述
+          },
+        ],
       };
       this.requestsHeader = {
         keys: [
           {
             headerKey: "", //请求头key
             headerValue: "", //请求头value
-            headerDetail: "" //简要描述
-          }
-        ]
+            headerDetail: "", //简要描述
+          },
+        ],
       };
       this.requestsData = {
         keys: [
@@ -1693,9 +1756,9 @@ export default {
             isRequestsData: "true", //是否选中
             dataKey: "", //请求头key
             dataValue: "", //请求头value
-            dataDetail: "" //简要描述
-          }
-        ]
+            dataDetail: "", //简要描述
+          },
+        ],
       };
       this.requestsDataf = {
         keys: [
@@ -1703,20 +1766,20 @@ export default {
             isRequestsData: "true", //是否选中
             dataKey: "", //请求key
             dataValue: "", //请求值
-            dataDetail: "" //请求详情
-          }
-        ]
+            dataDetail: "", //请求详情
+          },
+        ],
       };
       this.afterAction = {
         keys: [
           {
             beforeIndex: "", //前置条件中执行顺序
-            beforeName: "", //前置条件名称
+            beforeSqlBoxType: "", //数据库选择
             beforeType: "", //前置条件类型---如文件操作、数据库操作等
             beforePlan: "", //前置处理--选择文件操作中的具体事务，或者数据库中的具体事务
-            beforeDetail: "" //简要描述
-          }
-        ]
+            beforeDetail: "", //简要描述
+          },
+        ],
       };
     },
     //选择接口文档且填充部分类容
@@ -1758,7 +1821,7 @@ export default {
                 headerKey: item.cname,
                 headerValue: item.mockValue,
                 headerDetail: item.detail,
-                key: Date.now()
+                key: Date.now(),
               });
             }))
           : null;
@@ -1775,7 +1838,7 @@ export default {
                 dataKey: item.cname,
                 dataValue: item.mockValue,
                 dataDetail: item.detail,
-                key: Date.now()
+                key: Date.now(),
               });
             }))
           : null;
@@ -1801,7 +1864,7 @@ export default {
                 dataKey: item.cname,
                 dataValue: item.mockValue,
                 dataDetail: item.detail,
-                key: Date.now()
+                key: Date.now(),
               });
             }))
           : null;
@@ -1860,7 +1923,7 @@ export default {
     },
     //确认添加用例
     addCaseSubmit() {
-      this.$refs.refFromS.validate(valid => {
+      this.$refs.refFromS.validate((valid) => {
         if (valid) {
           this.addCase();
         } else {
@@ -1871,12 +1934,12 @@ export default {
 
     //删除用例
     removeCase(item) {
-      console.log(item)
-      var id=item[0]
-      var index=item[1]
+      console.log(item);
+      var id = item[0];
+      var index = item[1];
       ClassRemove({
-        id: id
-      }).then(res => {
+        id: id,
+      }).then((res) => {
         res.status === 200
           ? (this.caseList.splice(index, 1), Message.success(res.msg))
           : Message.error(res.msg);
@@ -1951,8 +2014,8 @@ export default {
 
     CaseEdits(id) {
       CaseEdit({
-        id: id
-      }).then(res => {
+        id: id,
+      }).then((res) => {
         if (res.status === 200) {
           var self = res.results[0];
           this.replace_1(self);
@@ -1964,13 +2027,13 @@ export default {
       this.inCaseList();
 
       CaseList({
-        id: id
-      }).then(res => {
+        id: id,
+      }).then((res) => {
         res.status === 200 ? this.caseUnity(res.results) : null;
       });
       CaseOrderGet({
-        id: this.currentInterfaceId
-      }).then(res => {
+        id: this.currentInterfaceId,
+      }).then((res) => {
         if (res.status === 200) {
           this.loading.loading_table = false;
           if (res.order) {
@@ -2000,10 +2063,11 @@ export default {
         status: this.datas.interfaceIsOk,
         detail: this.datas.caseDetail,
         // isGlobalsHeader:""  //是否使用全局请起头
+        beforeAction:JSON.stringify(this.beforeAction),
         headers: JSON.stringify(this.requestsHeader),
         data: JSON.stringify(requestsData),
-        environmentId: this.datas.chiocsEnvironment
-      }).then(res => {
+        environmentId: this.datas.chiocsEnvironment,
+      }).then((res) => {
         res.status === 200
           ? ((this.currentCaseId = res.results.id),
             this.replace_1(res.results),
@@ -2015,14 +2079,14 @@ export default {
     //查询该项目下的接口文件以及对象的接口文档
     SelectFile() {
       SelectFile({
-        projectId: storage.get("projectId")
-      }).then(res => {
+        projectId: storage.get("projectId"),
+      }).then((res) => {
         res.status === 200 ? this.filesNames(res.results) : null;
       });
     },
     postMethodss() {
       //获取请求方法---获取用力的请求方法
-      postMethods().then(res => {
+      postMethods().then((res) => {
         if (res.status === 200) {
           this.postMethods = res.res_post_methods;
         }
@@ -2032,8 +2096,8 @@ export default {
     InterfaceDetailGet() {
       InterfaceDetailGet({
         projectId: storage.get("projectId"),
-        id: this.datas.isInterfaceId
-      }).then(res => {
+        id: this.datas.isInterfaceId,
+      }).then((res) => {
         if (res.status === 200) {
           this.addContext(res.results[0]); //返回接口主题内容
         }
@@ -2041,7 +2105,7 @@ export default {
     },
     //请求环境变量接口
     EnvironmentsSelect() {
-      EnvironmentsSelect().then(res => {
+      EnvironmentsSelect().then((res) => {
         if (res.status === 200) {
           this.Environments = res.results.E_data;
           this.globarls = res.results.G_data;
@@ -2055,8 +2119,8 @@ export default {
       this.caseGroupList = [];
       projectList({
         id: storage.get("projectId"),
-        userId: storage.get("userId")
-      }).then(res => {
+        userId: storage.get("userId"),
+      }).then((res) => {
         res.status === 200 && res.code === 1
           ? (this.statusIng.isUnifyStatus = true)
           : this.selectionCase();
@@ -2067,8 +2131,8 @@ export default {
       ProjectUnityStatus({
         id: storage.get("projectId"),
         key: key,
-        userId: storage.get("userId")
-      }).then(res => {
+        userId: storage.get("userId"),
+      }).then((res) => {
         res.status === 200
           ? ((this.statusIng.isUnifyStatus = false),
             Message.success(res.msg),
@@ -2079,7 +2143,7 @@ export default {
     //查询case分组以及用例文件
     groupFileWithInterface() {
       this.caseGroupListInterface = [];
-      this.caseGroupList.map(row => {
+      this.caseGroupList.map((row) => {
         this.caseGroupListInterface = this.caseGroupListInterface.concat(
           row.idCaseGroupFiles
         );
@@ -2088,8 +2152,8 @@ export default {
 
     selectionCase() {
       CaseGroup({
-        id: storage.get("projectId")
-      }).then(res => {
+        id: storage.get("projectId"),
+      }).then((res) => {
         res.status === 200
           ? ((this.caseGroupList = res.results),
             this.groupFileWithInterface(),
@@ -2102,8 +2166,8 @@ export default {
       var id = JSON.stringify(id);
       Runcase({
         id: id,
-        userId:storage.get("userId")
-      }).then(res => {
+        userId: storage.get("userId"),
+      }).then((res) => {
         if (res.status === 200) {
           this.resResults = res.results;
           this.statusIng.drawerStatus = true; //展开左侧
@@ -2111,7 +2175,16 @@ export default {
           Message.error(res.msg);
         }
       });
-    }
+    },
+    GetSqlBox_M() {
+      GetBoxSqlList({
+        projectId: storage.get("projectId"),
+      }).then((res) => {
+        if (res.status === 200) {
+          this.beforeActionObj.sqlBoxList = res.results;
+        }
+      });
+    },
   },
   Update() {},
   mounted() {
@@ -2119,6 +2192,7 @@ export default {
     this.SelectFile();
     this.projectList();
     this.EnvironmentsSelect();
+    this.GetSqlBox_M();
   },
   // computed() {
   //   // this.filesNames();
@@ -2127,20 +2201,20 @@ export default {
 
   watch: {
     $route: {
-      handler: function(newValue, oldValue) {
+      handler: function (newValue, oldValue) {
         console.log("路由变化", newValue, oldValue);
         if (newValue !== oldValue) {
           this.projectList();
         }
       },
-      deep: true
+      deep: true,
     },
-    "statusIng.drawerStatus": function(a, b) {
+    "statusIng.drawerStatus": function (a, b) {
       if (!a) {
         this.resResults = [];
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -2149,7 +2223,6 @@ export default {
   // overflow: hidden;
   height: 100%;
   background-color: white;
-  
 }
 .manageCase-left {
   height: 100%;
@@ -2409,12 +2482,12 @@ export default {
       // width: 15%;
     }
   }
-  .title-detail-class-foot{
+  .title-detail-class-foot {
     margin-bottom: 20px;
   }
   .title-detail-class {
     // margin-top: 20px;
-    flex:1;
+    flex: 1;
     .requests-detail {
       width: 100%;
       //   height: 500px;
@@ -2582,16 +2655,15 @@ export default {
       height: 600px;
     }
   }
-  
 }
-.right-title-detail{
-        display: flex;
-        flex-flow: column nowrap;
-        height: 100%;
-  }
-  .requestsContext .el-form-item{
-    margin-bottom: -5px
-  }
+.right-title-detail {
+  display: flex;
+  flex-flow: column nowrap;
+  height: 100%;
+}
+.requestsContext .el-form-item {
+  margin-bottom: -5px;
+}
 </style>
 
 <style>

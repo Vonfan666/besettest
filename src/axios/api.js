@@ -359,3 +359,8 @@ export const RemoveSql=(params)=>{
 export const ValidSql=(params)=>{
     return postRequest("/users/valid_sql/",params)   
 }
+
+// 点获取前置列表 数据库 以及对应的sql数据
+export const GetBoxSqlList=(params)=>{
+    return getRequest("/users/case_get_box_or_sql/",params)   
+}
