@@ -561,7 +561,7 @@ export default {
     // if (this.chioceProject != "") {
     //   this.data.project = this.chioceProject;
     // }
-
+    // this.$router.push({ path: "/BesetTest/home/infater/text"})
     this.nameCode = storage.get("name"); //获取当前用户姓名
 
     projectLast({ userId: storage.get("userId") })

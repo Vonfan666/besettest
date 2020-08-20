@@ -356,13 +356,13 @@
                           <el-select
                             placeholder="请选择类型"
                             v-model="item.beforeType"
-                            @change="chioceType(index)"
+                            @visible-change="chioceAction_V(index)"
                           >
                             <el-option
-                              v-for="(item1,index1)  in beforeActionObj.beforeTypeList"
-                              :key="index1"
+                              v-for="(item1,index_a_1)  in actionLists"
+                              :key="index_a_1"
                               :label="item1.name"
-                              :value="item1.id"
+                              :value="item1.typeC"
                             ></el-option>
                           </el-select>
                         </el-form-item>
@@ -372,68 +372,48 @@
                         <el-form-item
                           class="requestsTitile3"
                           hide-required-asterisk
-                          v-if="parseInt(beforeAction.keys[index].beforeType)===1"
+                          v-if="beforeAction.keys[index].beforeType==1"
                         >
                           <el-select
                             filterable
                             placeholder="请选择库"
                             v-model="item.beforeSqlBoxType"
-                            @change="choiceSqlBox(index)"
+                            @change="sqlAction_D(index) "
+                            @visible-change="sqlAction_V(index)"
                           >
                             <el-option
-                              v-for="(item1,index1)  in beforeActionObj.sqlBoxList"
-                              :key="index1"
-                              :label="item1.name"
-                              :value="item1.id"
+                              v-for="(item2,index_a_2)  in sqlAction_D(index)"
+                              :key="index_a_2"
+                              :label="item2.name"
+                              :value="item2.id"
                             ></el-option>
                           </el-select>
                         </el-form-item>
                         <el-form-item
                           class="requestsTitile3"
                           hide-required-asterisk
-                          v-if="parseInt(beforeAction.keys[index].beforeType)!==1"
+                          v-if="beforeAction.keys[index].beforeType!=1"
                         >
                           <el-select disabled value></el-select>
                         </el-form-item>
                         <!-- :prop="'keys.'+index+ '.beforePlan'"
                         :rules="{ required: true, message: '必填' }"-->
-                        <el-form-item class="requestsTitile4" hide-required-asterisk v-if="beforeAction.keys[index].beforeType==1 && beforeAction.keys[index].beforeSqlBoxType">
+                        <el-form-item class="requestsTitile4" hide-required-asterisk>
                           <el-select
                             filterable
                             placeholder="选择操作"
                             v-model="item.beforePlan"
-                            @visible-change="chiocePlan(index)"
+                            @visible-change="chioceAction_D(index)"
                           >
                             <el-option
-                              v-for="(item1,index1)  in beforeActionObj.actionLists"
+                              v-for="(item1,index1)  in chioceAction_D(index)"
                               :key="index1"
                               :label="item1.name"
                               :value="item1.id"
                             ></el-option>
                           </el-select>
                         </el-form-item>
-                        <el-form-item class="requestsTitile4" hide-required-asterisk v-if="beforeAction.keys[index].beforeType==2">
-                          <el-select
-                            filterable
-                            placeholder="选择操作"
-                            v-model="item.beforePlan"
-                            @visible-change="chiocePlan(index)"
-                          >
-                            <el-option
-                              v-for="(item1,index1)  in beforeActionObj.actionLists_2"
-                              :key="index1"
-                              :label="item1.name"
-                              :value="item1.id"
-                            ></el-option>
-                          </el-select>
-                        </el-form-item>
-                         <el-form-item
-                          class="requestsTitile4"
-                          hide-required-asterisk
-                           v-if=" beforeAction.keys[index].beforeType!=2 && (!beforeAction.keys[index].beforeSqlBoxType || beforeAction.keys[index].beforeType!=1 ) "
-                        >
-                          <el-select disabled value></el-select>
-                        </el-form-item>
+
                         <el-form-item class="requestsTitile5">
                           <el-input placeholder="简要描述前置操作" v-model="item.beforeDetail"></el-input>
                         </el-form-item>
@@ -443,8 +423,11 @@
                         </div>-->
                         <!-- v-if="index===beforeAction.keys.length-1" 只有最后一个有添加删除按钮 -->
                         <el-form-item class="delete">
-                          <el-button @click.prevent="addDictToList(index,0)">添加</el-button>
-                          <el-button @click.prevent="removeListToDict(item,0)" v-if="index!=0">删除</el-button>
+                          <el-button @click.prevent="addDictToList(index,0),addAction(index,0)">添加</el-button>
+                          <el-button
+                            @click.prevent="removeListToDict(item,0),removeAction(index,0)"
+                            v-if="index!=0"
+                          >删除</el-button>
                         </el-form-item>
                       </div>
                     </el-form>
@@ -605,7 +588,7 @@
                         <el-form-item hide-required-asterisk class="requestsTitile1">
                           <el-input
                             placeholder="序号"
-                            v-model="item.beforeIndex"
+                            v-model="item.afterIndex"
                             @change="changeIndex(index,3)"
                           ></el-input>
                         </el-form-item>
@@ -613,27 +596,60 @@
                           
                         :rules="{ required: true, message: '必填' }"-->
                         <el-form-item class="requestsTitile2" hide-required-asterisk>
-                          <el-input v-model="item.beforeSqlBoxType" placeholder="条件名称"></el-input>
+                          <el-select
+                            placeholder="请选择类型"
+                            v-model="item.afterType"
+                            @change="after_sqlAction_V(index)"
+                          >
+                            <el-option
+                              v-for="(item1,index_a_1)  in actionLists"
+                              :key="index_a_1"
+                              :label="item1.name"
+                              :value="item1.typeC"
+                            ></el-option>
+                          </el-select>
                         </el-form-item>
                         <!-- :prop="'keys.'+index+ '.beforeType'"                          
                         :rules="{ required: true, message: '必填' }"-->
-                        <el-form-item class="requestsTitile3" hide-required-asterisk>
-                          <el-select placeholder="选择处理类型" v-model="item.beforeType">
+                        <el-form-item
+                          class="requestsTitile3"
+                          hide-required-asterisk
+                          v-if="afterAction.keys[index].afterType==1"
+                        >
+                          <el-select
+                            placeholder="请选择库"
+                            filterable
+                            v-model="item.afterSqlBoxType"
+                            @change="after_sqlAction_D(index) "
+                            @visible-change="after_sqlAction_V(index)"
+                          >
                             <el-option
-                              v-for="(item1,index1)  in beforeActionObj.beforeTypeList"
+                              v-for="(item1,index1)  in after_sqlAction_D(index)"
                               :key="index1"
                               :label="item1.name"
                               :value="item1.id"
                             ></el-option>
                           </el-select>
                         </el-form-item>
+                        <el-form-item
+                          class="requestsTitile3"
+                          hide-required-asterisk
+                          v-if="afterAction.keys[index].afterType!=1"
+                        >
+                          <el-select disabled value></el-select>
+                        </el-form-item>
                         <!-- :prop="'keys.'+index+ '.beforePlan'"
                         :rules="{ required: true, message: '必填' }"-->
                         <el-form-item class="requestsTitile4" hide-required-asterisk>
-                          <el-select placeholder="选择后置操作" v-model="item.beforePlan">
+                          <el-select
+                            filterable
+                            placeholder="选择操作"
+                            v-model="item.afterPlan"
+                            @visible-change="after_chioceAction_D(index)"
+                          >
                             <el-option
-                              v-for="(item1,index2)  in beforePlanList"
-                              :key="index2"
+                              v-for="(item1,index1)  in after_chioceAction_D(index)"
+                              :key="index1"
                               :label="item1.name"
                               :value="item1.id"
                             ></el-option>
@@ -925,36 +941,32 @@ export default {
       reqyestDataTypeRadio: 1, //提交的参数类型
       beforeActionObj: {
         beforeTypeList: [
-          {
-            id: 1,
-            name: "数据库操作",
-            children: this.sqlBoxList,
-          },
-          // {
-          //   id: 2,
-          //   name: "文件处理",
-          //   children: [
-          //     { id: 1, name: "上传文件" },
-          //     { id: 2, name: "文件遍历" },
-          //   ],
-          // },
+          { index: null, children: { index: null } }, //默认存在一个空字典数据
         ],
-        sqlBoxList: [],
+        sqlBoxList: [], //sql处理数据
         actionLists: [
-          
+          //操作类型数据--目前默认写死-后续数据库新增一个字段返回
+          {},
         ],
-        actionLists_2:[
-              { id: 1, name: "上传文件" },
-              { id: 2, name: "文件遍历" },
-            ],
-       
+        actionLists_2: [
+          //文件处理数据
+          { id: 1, name: "上传文件" },
+          { id: 2, name: "文件遍历" },
+        ],
       },
+      actionLists: [],
 
       //前置处理器
       beforeAction: {
         keys: [
           {
-
+            beforeIndex: 1, //前置条件中执行顺序
+            beforeType: 1, //前置条件类型---如文件操作、数据库操作等
+            beforeSqlBoxType: 44, //数据库选择
+            beforePlan: 13, //前置处理--选择文件操作中的具体事务，或者数据库中的具体事务
+            beforeDetail: "", //简要描述
+          },
+          {
             beforeIndex: "", //前置条件中执行顺序
             beforeType: "", //前置条件类型---如文件操作、数据库操作等
             beforeSqlBoxType: "", //数据库选择
@@ -996,11 +1008,12 @@ export default {
       afterAction: {
         keys: [
           {
-            beforeIndex: "", //前置条件中执行顺序
-            beforeSqlBoxType: "", //数据库选择
-            beforeType: "", //前置条件类型---如文件操作、数据库操作等
-            beforePlan: "", //前置处理--选择文件操作中的具体事务，或者数据库中的具体事务
-            beforeDetail: "", //简要描述
+            afterIndex: "", //前置条件中执行顺序
+            afterType: "", //前置条件类型---如文件操作、数据库操作等
+            afterSqlBoxType: "", //数据库选择
+
+            afterPlan: "", //前置处理--选择文件操作中的具体事务，或者数据库中的具体事务
+            afterDetail: "", //简要描述
           },
         ],
       },
@@ -1023,7 +1036,9 @@ export default {
         ],
         urlPostType: [{ required: true, message: "必填", trigger: "blur" }],
         beforeIndex: [{ required: true, message: "必填", trigger: "blur" }],
-        beforeSqlBoxType: [{ required: true, message: "必填", trigger: "blur" }],
+        beforeSqlBoxType: [
+          { required: true, message: "必填", trigger: "blur" },
+        ],
         beforeType: [{ required: true, message: "必填", trigger: "blur" }],
         beforePlan: [{ required: true, message: "必填", trigger: "blur" }],
         addGroupName: [{ required: true, message: "必填", trigger: "blur" }],
@@ -1358,9 +1373,9 @@ export default {
             beforeDetail: "",
             key: Date.now(),
           })
-            // this.beforeTypeList.actionLists.splice(index+1,0,[])  //新增前置操作处理
-          
-        : a === 1
+        : // this.beforeTypeList.actionLists.splice(index+1,0,[])  //新增前置操作处理
+
+        a === 1
         ? (ele.keys.splice(index + 1, 0, {
             headerKey: "",
             headerValue: "",
@@ -1370,11 +1385,11 @@ export default {
           console.log(this.requestsHeader))
         : a === 3
         ? ele.keys.splice(index + 1, 0, {
-            beforeIndex: "",
-            beforeSqlBoxType: "",
-            beforeType: "",
-            beforePlan: "",
-            beforeDetail: "",
+            afterIndex: "", //8.22-23.22
+            afterType: "",
+            afterSqlBoxType: "",
+            afterPlan: "",
+            afterDetail: "",
             key: Date.now(),
           })
         : a === 2 && this.reqyestDataTypeRadio === 1
@@ -1414,15 +1429,16 @@ export default {
       var list = ele.keys;
       if (parseInt(list[index].beforeIndex) > parseInt(99)) {
         Message.error("最大值不能超过99");
-      } else {
-        var isHave = list.map((row) => row.beforeIndex);
-        // console.log("输入的", typeof list[index].beforeIndex);
-        isHave.splice(index, 1); //删掉当前输入的,isHave就只剩当前以外的，然后判断当前输入的在不在之前的列表即可判断是否重复
-        // console.log(isHave);
-        isHave.indexOf(list[index].beforeIndex) >= 0
-          ? Message.error("执行顺序不能重复")
-          : null;
       }
+      if(!this.is_digitals(list[index].beforeIndex)){
+        Message.error("序号必须为数字");
+      }
+      
+      
+    },
+    is_digitals(str) { 
+          var reg=/^[0-9]*$/; //匹配整数 
+          return reg.test(str);
     },
     //点击前置处理-请求头-请求参数-后置条件修改样式以及v-show
     clickReqTitle(self, index) {
@@ -1441,49 +1457,144 @@ export default {
       });
     },
     //这个是为了操作 点击操作操作选项之后--把前置操作的值给去掉
-    chioceType(index) {
-      console.log("chioceType", index);
-      var typeId = this.beforeAction.keys[index].beforeType;
-
-        this.beforeAction.keys[index].beforePlan = "";
-        this.beforeAction.keys[index].beforeSqlBoxType = "";
+    addAction(index, a) {},
+    removeAction(index, a) {},
+    sqlAction_V(index) {
+      this.beforeAction.keys[index].beforePlan = "";
     },
-    //选择对应的数据库之后请求全部的sql语句
-    choiceSqlBox(index) {
-      console.log("choiceSqlBox", index);
-      var typeId = this.beforeAction.keys[index].beforeType;
-      var SqlId = this.beforeAction.keys[index].beforeSqlBoxType;
-
-      console.log(SqlId);
-      if (parseInt(typeId) === 1) {
-        this.beforeAction.keys[index].beforePlan = "";
-        var t = this.beforeActionObj.sqlBoxList.filter(
-          (rows) => rows.id == SqlId
-        );
-        this.beforeActionObj.actionLists = t[0].children[0];
-        console.log(this.beforeActionObj.actionLists[index]);
+    chioceAction_V(index) {
+      this.beforeAction.keys[index].beforeSqlBoxType = "";
+      this.beforeAction.keys[index].beforePlan = "";
+    },
+    sqlAction_D(index, self) {
+      if (this.beforeAction.keys[index].beforeType === 1) {
+        var list_dict = this.actionLists[
+          this.actionLists
+            .map(
+              (rows) => rows.typeC === this.beforeAction.keys[index].beforeType
+            )
+            .indexOf(true)
+        ];
+        console.log("1", list_dict);
+        if (list_dict !== undefined) {
+          return list_dict.lists;
+        }
+      } else {
+        [];
       }
     },
-    chiocePlan(index) {
-    //   console.log("chiocePlan", index);
-    //   var typeId = this.beforeAction.keys[index].beforeType;
-    //   console.log(parseInt(typeId));
-    //   if (parseInt(typeId) === 2) {
-    //     this.beforeActionObj.actionLists_2 =this.beforeActionObj.actionLists_2;
-        
-    //   }
-    //   if (parseInt(typeId) === 1) {
-    //     // var SqlId = this.beforeAction.keys[index].beforeSqlBoxType;
-    //     // var t = this.beforeActionObj.sqlBoxList.filter(
-    //     //   (rows) => rows.id == SqlId
-    //     // );
-    //     // console.log(this.beforeActionObj.actionList )
-    //     // this.beforeActionObj.actionList = t[0].children[0];
-    //     this.beforeActionObj.actionLists = this.beforeActionObj.beforeTypeList[1].children
-    //     console.log(this.beforeActionObj.actionLists);
-      // }
+    chioceAction_D(index) {
+      if (this.beforeAction.keys[index].beforeType === 1) {
+        var actionType_list = this.actionLists[
+          this.actionLists
+            .map(
+              (rows) => rows.typeC == this.beforeAction.keys[index].beforeType
+            )
+            .indexOf(true)
+        ];
+        if (actionType_list !== undefined) {
+          actionType_list = actionType_list.lists;
+
+          var actionType_index = this.actionLists
+            .map(
+              (rows) => rows.typeC == this.beforeAction.keys[index].beforeType
+            )
+            .indexOf(true);
+          console.log(actionType_list);
+          if (this.beforeAction.keys[index].beforeSqlBoxType) {
+            var lists =
+              actionType_list[
+                actionType_list
+                  .map(
+                    (rows) =>
+                      rows.id == this.beforeAction.keys[index].beforeSqlBoxType
+                  )
+                  .indexOf(true)
+              ].children;
+            console.log("2", lists);
+            if (lists !== undefined) {
+              return lists[0];
+            }
+          }
+        }
+      }
+      if (this.beforeAction.keys[index].beforeType === 2) {
+        var list_dict = this.actionLists[
+          this.actionLists
+            .map(
+              (rows) => rows.typeC === this.beforeAction.keys[index].beforeType
+            )
+            .indexOf(true)
+        ];
+
+        if (list_dict !== undefined) {
+          return list_dict.lists;
+        }
+      } else {
+        return [];
+      }
     },
-    //根据前置类型同步对应的前置操作
+    after_sqlAction_V(index) {
+      this.afterAction.keys[index].afterPlan = "";
+    },
+    after_chioceAction_V(index) {
+      this.afterAction.keys[index].afterSqlBoxType = "";
+      this.afteAction.keys[index].aftePlan = "";
+    },
+    after_sqlAction_D(index, self) {
+      if (this.afterAction.keys[index].afterType === 1) {
+        var list_dict = this.actionLists[
+          this.actionLists
+            .map(
+              (rows) => rows.typeC === this.afterAction.keys[index].afterType
+            )
+            .indexOf(true)
+        ];
+        console.log("1", list_dict);
+        return list_dict.lists;
+      } else {
+        [];
+      }
+    },
+    after_chioceAction_D(index) {
+      if (this.afterAction.keys[index].afterType === 1) {
+        var actionType_list = this.actionLists[
+          this.actionLists
+            .map((rows) => rows.typeC == this.afterAction.keys[index].afterType)
+            .indexOf(true)
+        ].lists;
+        var actionType_index = this.actionLists
+          .map((rows) => rows.typeC == this.afterAction.keys[index].afterType)
+          .indexOf(true);
+        console.log(actionType_list);
+        if (this.afterAction.keys[index].afterSqlBoxType) {
+          var lists =
+            actionType_list[
+              actionType_list
+                .map(
+                  (rows) =>
+                    rows.id == this.afterAction.keys[index].afterSqlBoxType
+                )
+                .indexOf(true)
+            ].children;
+          console.log("2", lists);
+          return lists[0];
+        }
+      }
+      if (this.afterAction.keys[index].afterType === 2) {
+        var list_dict = this.actionLists[
+          this.actionLists
+            .map(
+              (rows) => rows.typeC === this.afterAction.keys[index].afterType
+            )
+            .indexOf(true)
+        ];
+
+        return list_dict.lists;
+      } else {
+        return [];
+      }
+    },
 
     selection(index) {
       var index1 = this.beforeAction.keys[index].beforeType;
@@ -1773,11 +1884,11 @@ export default {
       this.afterAction = {
         keys: [
           {
-            beforeIndex: "", //前置条件中执行顺序
-            beforeSqlBoxType: "", //数据库选择
-            beforeType: "", //前置条件类型---如文件操作、数据库操作等
-            beforePlan: "", //前置处理--选择文件操作中的具体事务，或者数据库中的具体事务
-            beforeDetail: "", //简要描述
+            afterIndex: "", //前置条件中执行顺序
+            afterType: "", //数据库选择
+            afterSqlBoxType: "", //前置条件类型---如文件操作、数据库操作等
+            afterPlan: "", //前置处理--选择文件操作中的具体事务，或者数据库中的具体事务
+            afterDetail: "", //简要描述
           },
         ],
       };
@@ -1923,6 +2034,8 @@ export default {
     },
     //确认添加用例
     addCaseSubmit() {
+      console.log(this.beforeAction);
+      console.log(this.afterAction);
       this.$refs.refFromS.validate((valid) => {
         if (valid) {
           this.addCase();
@@ -2008,6 +2121,11 @@ export default {
     replace_3(self) {
       self.data !== null ? (this.requestsData = self.data) : null;
     },
+    //替换前置操作以及后置操作
+    replace_actions(self){
+      this.beforeAction=self.beforeAction
+      this.afterAction=self.afterAction
+    },
     //********************************************************************************************************* */
     //以下方法为接口请求
     // ________________________________________________________________
@@ -2019,6 +2137,7 @@ export default {
         if (res.status === 200) {
           var self = res.results[0];
           this.replace_1(self);
+          this.replace_actions(self)
         }
       });
     },
@@ -2063,9 +2182,10 @@ export default {
         status: this.datas.interfaceIsOk,
         detail: this.datas.caseDetail,
         // isGlobalsHeader:""  //是否使用全局请起头
-        beforeAction:JSON.stringify(this.beforeAction),
+        beforeAction: JSON.stringify(this.beforeAction),
         headers: JSON.stringify(this.requestsHeader),
         data: JSON.stringify(requestsData),
+        afterAction: JSON.stringify(this.afterAction),
         environmentId: this.datas.chiocsEnvironment,
       }).then((res) => {
         res.status === 200
@@ -2181,7 +2301,7 @@ export default {
         projectId: storage.get("projectId"),
       }).then((res) => {
         if (res.status === 200) {
-          this.beforeActionObj.sqlBoxList = res.results;
+          this.actionLists = res.results;
         }
       });
     },
@@ -2192,6 +2312,8 @@ export default {
     this.SelectFile();
     this.projectList();
     this.EnvironmentsSelect();
+  },
+  created() {
     this.GetSqlBox_M();
   },
   // computed() {

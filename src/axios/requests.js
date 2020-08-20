@@ -26,10 +26,9 @@ axios.interceptors.response.use(response=>{
         case 200:
             break;
         case 401: //一般这个是未登录或者登录失效
-            Message.error(data.msg);
-            // router.replace({   //重定向到登录页面
-            //     name:"Login",
-            // })
+            router.replace({   //重定向到登录页面
+                name:"Login",
+            })
             break;
         case 403:
             Message.error(data.msg);
