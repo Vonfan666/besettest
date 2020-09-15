@@ -14,18 +14,26 @@
     <div class="title" style="text-align:left">
       <h3 style="display: inline-block;">调试结果</h3>
       <div style="float:right;display: inline-block;margin-top: 15px;" class="title-right">
-          <span   @click="clickCont()">请求内容</span>
-          <span @click="clickLog()">执行日志</span>
-        </div>
+        <span @click="clickCont()">请求内容</span>
+        <span @click="clickLog()">执行日志</span>
+      </div>
     </div>
     <div class="left-box-body">
       <div class="left-box-left" v-if="leftCaseName">
         <div style="margin:10px 10px 0 0">
           <div style="margin:10px">
-            <span >用例名称</span>
+            <span>用例名称</span>
           </div>
-          <li v-for="(item,index) in list" :key="index" :listDict="item" style="margin:10px;text-align:left;overflow-x:hidden">
-            <el-link :type="caseNameColorList[index]"  @click="caseNameClick(item,index)">{{item.name}}</el-link>
+          <li
+            v-for="(item,index) in list"
+            :key="index"
+            :listDict="item"
+            style="margin:10px;text-align:left;overflow-x:hidden"
+          >
+            <el-link
+              :type="caseNameColorList[index]"
+              @click="caseNameClick(item,index)"
+            >{{item.name}}</el-link>
           </li>
         </div>
       </div>
@@ -104,11 +112,8 @@
           </el-tab-pane>
 
           <el-tab-pane label="Assert" name="fourth">
-            <div style="text-align:left" class="Assert">
-                 定时任务补偿
-             </div>
-            </el-tab-pane>
-           
+            <div style="text-align:left" class="Assert">定时任务补偿</div>
+          </el-tab-pane>
         </el-tabs>
       </div>
       <div class="log" v-show="!contLogStatus">
@@ -121,24 +126,24 @@
 </template>
 
 <script>
-import storage from '../../../libs/storage';
+import storage from "../../../libs/storage";
 export default {
-  props: ["listReslits", "code","currentInterfaceId"],
+  props: ["listReslits", "code", "currentInterfaceId"],
   data() {
     return {
-      list:[],
-      logList:[],  //日志列表
-      contLogStatus:true,
-      caseNameColorList:[],
+      list: [],
+      logList: [], //日志列表
+      contLogStatus: true,
+      caseNameColorList: [],
       aa: [],
       path: "ws://192.168.0.66:8081/ws/users/case_run/",
-      logPath:"ws://192.168.0.66:8081/ws/users/logList/",
+      logPath: "ws://192.168.0.66:8081/ws/users/logList/",
       socket: "",
       activeName: "first",
       res: {
         postHeader: null,
         postMethods: null,
-        resStatus: null
+        resStatus: null,
       },
       activeNames: ["0"],
       leftCaseName: true,
@@ -152,35 +157,41 @@ export default {
         listDictPostresHeaders: {},
         listDictPostResData: {},
         listDictPostResText: {},
-        listDictPostCode:1,
-        listDictPostErrors:null
-      }
+        listDictPostCode: 1,
+        listDictPostErrors: null,
+      },
     };
   },
   methods: {
-    clickCont(){
-      document.querySelectorAll(".title-right span")[1].style.cssText=
-        "background-color:;color:;border-radius:"
-      document.querySelectorAll(".title-right span")[0].style.cssText=
-        "background-color:rgb(98, 161, 239);color:rgb(248, 248, 251);border-radius: 5px"
-      this.contLogStatus=true
- 
-      
+    clickCont() {
+      document.querySelectorAll(".title-right span")[1].style.cssText =
+        "background-color:;color:;border-radius:";
+      document.querySelectorAll(".title-right span")[0].style.cssText =
+        "background-color:rgb(98, 161, 239);color:rgb(248, 248, 251);border-radius: 5px";
+      this.contLogStatus = true;
     },
-    clickLog(){
-      document.querySelectorAll(".title-right span")[0].style.cssText=
-        "background-color:;color:;border-radius:"
-      document.querySelectorAll(".title-right span")[1].style.cssText=
-        "background-color:rgb(98, 161, 239);color:rgb(248, 248, 251);border-radius: 5px"
-      this.contLogStatus=false
+    clickLog() {
+      document.querySelectorAll(".title-right span")[0].style.cssText =
+        "background-color:;color:;border-radius:";
+      document.querySelectorAll(".title-right span")[1].style.cssText =
+        "background-color:rgb(98, 161, 239);color:rgb(248, 248, 251);border-radius: 5px";
+      this.contLogStatus = false;
     },
 
     caseNameClick(item, index) {
+      console.log("ssasaaas", item);
       this.listDict = item;
-      var objectKeys=Object.keys(this.listDict)
-      objectKeys.indexOf("resHeaders")<0 ? this.listDict["resHeaders"]={} :null
-      objectKeys.indexOf("resData")<0 ? this.listDict["resData"]={} :null
-      objectKeys.indexOf("resText")<0 ? this.listDict["resText"]={} :null
+      var objectKeys = Object.keys(this.listDict);
+      console.log(objectKeys);
+      objectKeys.indexOf("resHeaders") < 0
+        ? (this.listDict["resHeaders"] = {})
+        : null;
+      objectKeys.indexOf("resData") < 0
+        ? (this.listDict["resData"] = {})
+        : null;
+      objectKeys.indexOf("resText") < 0
+        ? (this.listDict["resText"] = {})
+        : null;
       this.lists.listDictPostUrl = this.listDict.postUrl;
       this.lists.listDictPostMethods = this.listDict.postMethods;
       this.lists.listDictResStatus = this.listDict.resStatus;
@@ -190,11 +201,26 @@ export default {
       this.lists.listDictPostResData = this.listDict.resData;
       this.lists.listDictPostResText = this.listDict.resText;
       this.lists.listDictPostCode = this.listDict.code;
-      this.lists.listDictPostErrors = this.listDict.errors;
-      console.log("errors",this.listDictPostErrors)
+        this.lists.listDictPostErrors = this.listDict.errors;
+      console.log("errors", this.listDict);
       // this.lists.
+      if (this.listDict.beforeAction ) {
+        //九月十四修改
+        if (this.listDict.beforeAction.code !== 1) {
+          this.lists.listDictPostCode = 0;
+          this.lists.listDictPostErrors = this.listDict.beforeAction.msg;
+        }
+     
+      }
+      if (this.listDict.afterAction) {
+        //九月十四修改
+ 
+        if (this.listDict.afterAction.code !== 1) {
+          this.lists.listDictPostCode = 0;
+          this.lists.listDictPostErrors = this.listDict.afterAction.msg;
+        }
+      }
 
-      
     },
     //tab组件切换方法
     handleClick(tab, event) {
@@ -205,7 +231,7 @@ export default {
     },
     changeColor() {},
 
-    init: function() {
+    init: function () {
       if (typeof WebSocket === "undefined") {
         alert("您的浏览器不支持socket");
       } else {
@@ -218,11 +244,11 @@ export default {
         // 监听socket消息
         this.socket.onmessage = this.getMessage;
 
-        this.socket.onclose=this.close;
+        this.socket.onclose = this.close;
       }
     },
-    logInit(){
-       if (typeof WebSocket === "undefined") {
+    logInit() {
+      if (typeof WebSocket === "undefined") {
         alert("您的浏览器不支持socket");
       } else {
         // 实例化socket
@@ -234,132 +260,136 @@ export default {
         // 监听socket消息
         this.socketLog.onmessage = this.getMessageLog;
 
-        this.socketLog.onclose=this.closeLog;
+        this.socketLog.onclose = this.closeLog;
       }
     },
-    openLog(){
-      console.log("实时日志链接成功")
-      this.socketLog.send(JSON.stringify(this.code))
-      console.log(this.list)
+    openLog() {
+      console.log("实时日志链接成功");
+      this.socketLog.send(JSON.stringify(this.code));
+      console.log(this.list);
     },
-    errorLog: function() {
+    errorLog: function () {
       // this.init();
       console.log("连接错误");
     },
-    getMessageLog(msg){
-      console.log("1212121",this.logList)
-      console.log("执行getMessageLog")
-      console.log("log返回",JSON.parse(msg.data))
-      var  msg=JSON.parse(msg.data)
-      this.logList.push(msg)
-      var div = document.querySelector('.log');
+    getMessageLog(msg) {
+      var msg = JSON.parse(msg.data);
+      this.logList.push(msg);
+      var div = document.querySelector(".log");
       div.scrollTop = div.scrollHeight;
     },
-    sendLog(){
+    sendLog() {
       this.socketLog.send("params");
     },
-    closeLog(){
-      console.log("实时日志链接关闭")
+    closeLog() {
+      console.log("实时日志链接关闭");
     },
-    open: function() {
+    open: function () {
       console.log("socket连接成功");
-      console.log(this.code,"这是code")
-      this.socket.send(JSON.stringify(this.code))
-      console.log(this.list)
+      console.log(this.code, "这是code");
+      this.socket.send(JSON.stringify(this.code));
+      console.log(this.list);
     },
-    error: function() {
+    error: function () {
       // this.init();
       console.log("连接错误");
     },
-    getMessage: function(msg) {
-      var item=JSON.parse(msg.data)
-      console.log(item)
+    getMessage: function (msg) {
+      var item = JSON.parse(msg.data);
+      console.log(item, "diuduid");
+
+      this.list.push(item);
+      if (item.beforeAction && item.afterAction){
+        item.code === 1 ? this.caseNameColorList.push("success") : null; //正常返回数据
+        item.code === 0 ? this.caseNameColorList.push("danger") : null; //请求异常数据
+
+        item.code === 2 ? this.caseNameColorList.push("warning") : null; //断言失败
+      }
       
-      this.list.push(item)
-      item.code===1?this.caseNameColorList.push("success"):null  //正常返回数据
-      item.code===0?this.caseNameColorList.push("danger"):null   //请求异常数据
-      item.code===2?this.caseNameColorList.push("warning"):null  //断言失败
-      if(this.list.length>1){
-        this.leftCaseName=true
+      if (item.beforeAction) {
+        item.beforeAction.code !== 1
+          ? this.caseNameColorList.push("info")
+          : null; //请求异常数据
+      }
+      if (item.afterAction) {
+        item.afterAction.code !== 1
+          ? this.caseNameColorList.push("info")
+          : null; //请求异常数据
+      }
+      if (this.list.length > 1) {
+        this.leftCaseName = true;
       }
       //将返回的第一个结果写入html
-      if(this.list.length===1){
-        this.caseNameClick(this.list[0])
+      if (this.list.length === 1) {
+        this.caseNameClick(this.list[0]);
       }
-      
+
       // console.log(this.list)
     },
-    send: function() {
-      
+    send: function () {
       this.socket.send("params");
     },
-    close: function() {
+    close: function () {
       console.log("socket已经关闭");
     },
     chiocesLitsOne() {
       //默认选中第一个
-      console.log(this.list)
-      console.log(this.list.length);
-      if (this.list.length <= 1) {
+      if (this.list.length === 1) {
         this.leftCaseName = false;
+        var one = this.list[0];
+
+        this.caseNameClick(one, 1);
       } else {
         this.leftCaseName = true;
-      }
-      if (this.list.length >= 1) {
-        
         var one = this.list[0];
-        console.log("one",one)
+        console.log("one", one);
         this.caseNameClick(one, 1);
-
       }
-      
+      // if (this.list.length >= 1) {
+
+      // }
     },
-    caseNameColor(row){
-      row.forEach((item,index)=>{
-        item.code===1?this.caseNameColorList.push("success"):null  //正常返回数据
-        item.code===0?this.caseNameColorList.push("danger"):null   //请求异常数据
-        item.code===2?this.caseNameColorList.push("warning"):null  //断言失败
-      })
-  },
+    caseNameColor(row) {
+      row.forEach((item, index) => {
+        item.code === 1 ? this.caseNameColorList.push("success") : null; //正常返回数据
+        item.code === 0 ? this.caseNameColorList.push("danger") : null; //请求异常数据
+        item.code === 2 ? this.caseNameColorList.push("warning") : null; //断言失败
+      });
+    },
   },
 
   destroyed() {
     // 销毁监听
-    console.log(this.code)
-    console.log("销毁组件")
-    if(this.code){
+    console.log(this.code);
+    console.log("销毁组件");
+    if (this.code) {
       this.socket.close();
-      this.socketLog.close()
+      this.socketLog.close();
     }
-    
-    this.$emit("update:code",null)
-    console.log(this.code)
-   
-    
+
+    this.$emit("update:code", null);
+    console.log(this.code);
   },
-  
+
   mounted() {
-    
     // console.log("this.list",this.list)
-    
+
     // console.log(this.currentInterfaceId,"aaa")
-    
-     document.querySelectorAll(".title-right span")[0].style.cssText=
-        "background-color:rgb(98, 161, 239);color:rgb(248, 248, 251);border-radius: 5px"
-    console.log("this.code",this.code)
+    document.querySelectorAll(".title-right span")[0].style.cssText =
+      "background-color:rgb(98, 161, 239);color:rgb(248, 248, 251);border-radius: 5px";
+    console.log("this.code", this.code);
     if (this.code) {
       console.log(this.code);
       this.init();
-      this.logInit()
+      this.logInit();
       console.log("obj");
-    }else{
-      console.log(this.listReslits,"3231")
-      this.list=this.listReslits.results
-      this.logList=this.listReslits.logList
-      console.log(this.list)
-      this.caseNameColor(this.list)
+    } else {
+      console.log(this.listReslits, "3231");
+      this.list = this.listReslits.results;
+      this.logList = this.listReslits.logList;
+      console.log(this.list);
+      this.caseNameColor(this.list);
       this.chiocesLitsOne();
-      
     }
     // else{
     //   this.logList=this.list.logList
@@ -367,17 +397,14 @@ export default {
     // if(Object.keys(this.list).indexOf("results")>=0){
     //     this.logList=this.list.logList
     //     this.list=this.list.results
-        
+
     //   }
-    
   },
   watch: {
     list(a, b) {
       console.log(a, b);
-    }
-  }
-
-
+    },
+  },
 };
 </script>
 
@@ -423,35 +450,33 @@ export default {
   background-color: #eee;
   margin-right: 10px;
 }
-.left-box-right,.log{
+.left-box-right,
+.log {
   display: inline-block;
   flex: 1;
   overflow-x: hidden;
 }
-.log{
+.log {
   text-align: left;
   color: white;
   background-color: black;
-    overflow-x: hidden;
-    height: 800px;
+  overflow-x: hidden;
+  height: 800px;
 }
-.title-right span{
-    // background-color: rgb(98, 161, 239);
-    // color: rgb(248, 248, 251);
-    // border-radius: 5px;
-    padding: 10px 10px;
-    font-size: 15px;
-    
+.title-right span {
+  // background-color: rgb(98, 161, 239);
+  // color: rgb(248, 248, 251);
+  // border-radius: 5px;
+  padding: 10px 10px;
+  font-size: 15px;
 }
-.title-right span:hover{
-        cursor: pointer;
-        background-color: #ecf5ff;
-        color: #409eff;
-        border: 1px solid rgb(98, 161, 239);
-        border-radius: 5px;
+.title-right span:hover {
+  cursor: pointer;
+  background-color: #ecf5ff;
+  color: #409eff;
+  border: 1px solid rgb(98, 161, 239);
+  border-radius: 5px;
 }
-
-
 </style>>
 
 <style>

@@ -61,6 +61,7 @@
             label-width="100px"
             class="add-body"
             label-position="left"
+            style="margin-right: 10px;"
           >
             <el-form-item label="SQL变量名" prop="name" size="mini">
               <el-input type="text" v-model="writeSql.name" clearable placeholder="请输入英文变量名"></el-input>
@@ -121,6 +122,7 @@
                 :placeholder="resultsAction"
               ></el-input>
             </el-form-item>
+            
              <el-form-item label="处理结果" size="mini"  v-if="status.actionStatus">
               <el-input
                 type="textarea"
@@ -134,6 +136,20 @@
                 <!-- <div class="SqlRunResults">
                   <li v-for="(item,index) in writeSql.actionResults" :key="index">{{item}}</li>
                 </div> -->
+            </el-form-item>
+            <el-form-item label="存储结果" size="mini" style="text-align: left;" >
+              <el-checkbox-group v-model="saveResultChoice" @change="changeSave">
+              <el-checkbox label="保存到环境变量" ></el-checkbox>
+              <el-checkbox label="保存到全局变量"></el-checkbox>
+            </el-checkbox-group>
+             <el-select type="text" v-model="writeSql.envId" style="width: 100%;" v-if="status.saveResultsStatus">
+                <el-option
+                  v-for="(item,index) in envList"
+                  :key="index"
+                  :value="item.id"
+                  :label="item.name"
+                ></el-option>
+              </el-select>
             </el-form-item>
             <el-form-item label="描述" size="mini">
               <el-input type="text" v-model="writeSql.detail" clearable placeholder="简要描述"></el-input>
@@ -157,7 +173,8 @@ import {
   GetSql,
   UpdateSql,
   RemoveSql,
-  ValidSql
+  ValidSql,
+  EnvironmentsSelect,
 } from "../../axios/api";
 import { Message } from "element-ui";
 import storage from "../../libs/storage";
@@ -171,6 +188,8 @@ export default {
   },
   data() {
     return {
+      envList:[],
+      saveResultChoice:[],
       pageMethods: this.getSql_M,
       resultsAction:
         "如果执行结果为:[(1,2,3),(4,5,6)]\nres[0][0]取出值为1\nc=res[0],c[0]同样取值也是1,这种用逗号分割\n支持python列表操作",
@@ -180,6 +199,7 @@ export default {
         updateStatus: false,
         runStatus:false,  //执行结果控制
         actionStatus:false,  //处理结果控制
+        saveResultsStatus:false,//选择环境变量
 
       },
       writeSqlBox: {
@@ -198,6 +218,7 @@ export default {
         BoxId: null,
         type: null,
         sql: null,
+        envId:null,
         SqlRunResults: null,
         SqlActionResults: null,
         actionResults:null,
@@ -217,6 +238,25 @@ export default {
     };
   },
   methods: {
+    EnvironmentsSelect() {
+      EnvironmentsSelect().then((res) => {
+        if (res.status === 200) {
+          this.envList = res.results.E_data;
+          // this.statusIng.enviromentStatus = !this.statusIng.enviromentStatus;
+        }
+      });
+    },
+    changeSave(val){
+      //改变存储位置触发
+      console.log(this.saveResultChoice.indexOf("保存到环境变量"))
+      
+      if(this.saveResultChoice.indexOf("保存到环境变量")>=0){
+
+        this.status.saveResultsStatus=true
+      }else{
+        this.status.saveResultsStatus=false
+      }
+    },
     openAddSql() {
       this.status.writeSqlSatus = true;
       this.status.addStatus = true; //显示确定按钮
@@ -226,6 +266,9 @@ export default {
     closeAddSql() {
       this.status.writeSqlSatus = false;
       this.status.validStatus = false;
+      this.status.saveResultsStatus=false;
+      this.status.actionStatus=false;
+      // this.status.runStatus=false;
       this.writeSql.name = null;
       this.writeSql.BoxId = null;
       this.writeSql.type = null;
@@ -233,6 +276,9 @@ export default {
       this.writeSql.SqlRunResults = null;
       this.writeSql.SqlActionResults = null;
       this.writeSql.detail = null;
+      this.saveResultChoice=[];
+      
+      this.writeSql.envId=null
     },
     clickEdit(index, item) {
       this.GetBoxOrSqlType_M();
@@ -251,6 +297,15 @@ export default {
       this.writeSql.SqlRunResults = item.SqlRunResults;
       this.writeSql.SqlActionResults = item.SqlActionResults;
       this.writeSql.detail = item.detail;
+      
+      if (item.saveResultChoice){
+        this.status.saveResultsStatus=true
+        this.saveResultChoice=JSON.parse(item.saveResultChoice)
+        this.writeSql.envId=item.envId
+      }
+      
+      
+      
     },
     clickAddSql() {
       this.openAddSql(); //打开弹窗
@@ -306,6 +361,8 @@ export default {
         name: this.writeSql.name,
         BoxId: this.writeSql.BoxId,
         SqlActionResults:this.writeSql.SqlActionResults,
+        envId:this.writeSql.envId,
+        saveResultChoice:JSON.stringify(this.saveResultChoice),
         type: this.writeSql.type,
         sql: this.writeSql.sql,
         detail: this.writeSql.detail,
@@ -369,6 +426,7 @@ export default {
     ValidSql_M() {
       //新增SQL时校验sql结果
       ValidSql({
+        id:this.writeSqlBox.editId,
         Stype:1,
         name: this.writeSql.name,
         BoxId: this.writeSql.BoxId,
@@ -423,6 +481,8 @@ export default {
         BoxId: this.writeSql.BoxId,
         type: this.writeSql.type,
         sql: this.writeSql.port,
+        envId:this.writeSql.envId,
+        saveResultChoice:JSON.stringify(this.saveResultChoice),
         SqlActionResults:this.writeSql.SqlActionResults,
         detail: this.writeSql.detail,
         userId: storage.get("userId"),
@@ -442,6 +502,7 @@ export default {
   },
   mounted() {
     this.getSql_M();
+    this.EnvironmentsSelect()
   },
 };
 </script>

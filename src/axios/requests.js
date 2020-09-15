@@ -33,6 +33,9 @@ axios.interceptors.response.use(response=>{
         case 403:
             Message.error(data.msg);
             break;
+        case 409:
+            Message.error(data.msg);
+            break;
         case 500:
             Message.error(data.msg);
         default: 

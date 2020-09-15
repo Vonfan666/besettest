@@ -426,7 +426,7 @@
                           <el-button @click.prevent="addDictToList(index,0),addAction(index,0)">添加</el-button>
                           <el-button
                             @click.prevent="removeListToDict(item,0),removeAction(index,0)"
-                            v-if="index!=0"
+                           
                           >删除</el-button>
                         </el-form-item>
                       </div>
@@ -476,7 +476,7 @@
                         </el-form-item>
                         <el-form-item class="delete">
                           <el-button @click.prevent="addDictToList(index,1)">添加</el-button>
-                          <el-button @click.prevent="removeListToDict(item,1)" v-if="index!=0">删除</el-button>
+                          <el-button @click.prevent="removeListToDict(item,1)" >删除</el-button>
                           <!-- <el-button @click.prevent="pushHeader(item,1),statusIng.pushHeaderStatus=true" v-if="index===0">导入</el-button> -->
                         </el-form-item>
                       </div>
@@ -534,7 +534,7 @@
                         <!-- v-if="index===beforeAction.keys.length-1" 只有最后一个有添加删除按钮 -->
                         <el-form-item class="delete">
                           <el-button @click.prevent="addDictToList(index,2)">添加</el-button>
-                          <el-button @click.prevent="removeListToDict(item,2)" v-if="index!=0">删除</el-button>
+                          <el-button @click.prevent="removeListToDict(item,2)">删除</el-button>
                         </el-form-item>
                       </div>
                     </el-form>
@@ -566,7 +566,7 @@
                         <!-- v-if="index===beforeAction.keys.length-1" 只有最后一个有添加删除按钮 -->
                         <el-form-item class="delete">
                           <el-button @click.prevent="addDictToList(index,2)">添加</el-button>
-                          <el-button @click.prevent="removeListToDict(item,2)" v-if="index!=0">删除</el-button>
+                          <el-button @click.prevent="removeListToDict(item,2)">删除</el-button>
                         </el-form-item>
                       </div>
                     </el-form>
@@ -665,7 +665,7 @@
                         <!-- v-if="index===beforeAction.keys.length-1" 只有最后一个有添加删除按钮 -->
                         <el-form-item class="delete">
                           <el-button @click.prevent="addDictToList(index,3)">添加</el-button>
-                          <el-button @click.prevent="removeListToDict(item,3)" v-if="index!=0">删除</el-button>
+                          <el-button @click.prevent="removeListToDict(item,3)">删除</el-button>
                         </el-form-item>
                       </div>
                     </el-form>
@@ -988,7 +988,7 @@ export default {
       requestsData: {
         keys: [
           {
-            isRequestsData: "true", //是否选中
+            isRequestsData: true, //是否选中
             dataKey: "", //请求key
             dataValue: "", //请求值
             dataDetail: "", //请求详情
@@ -998,7 +998,7 @@ export default {
       requestsDataf: {
         keys: [
           {
-            isRequestsData: "true", //是否选中
+            isRequestsData: true, //是否选中
             dataKey: "", //请求key
             dataValue: "", //请求值
             dataDetail: "", //请求详情
@@ -1239,12 +1239,20 @@ export default {
       this.reqyestDataTypeRadio === 1
         ? (requestsData = JSON.parse(JSON.stringify(this.requestsData)))
         : (requestsData = JSON.parse(JSON.stringify(this.requestsDataf)));
-      requestsData.keys.forEach((item, index) => {
-        if (item.isRequestsData === false) {
-          requestsData.keys.splice(index, 1);
-          console.log(requestsData);
-        }
-      });
+      console.log(requestsData,"dasdas");
+      // requestsData.keys.forEach((item, index) => {
+      //   if (item.isRequestsData === false) {
+      //     console.log(requestsData,"dasdas");
+      //     requestsData.keys.splice(index, 1);
+      //     index--
+          
+      //   }
+      // });
+      for (var n=0;n<requestsData.keys.length;n++){
+        if (requestsData.keys[n].isRequestsData === false) {
+          requestsData.keys.splice(n, 1);
+          n--
+      }};
       DebugCase({
         id: this.currentCaseId,
         name: this.datas.interfaceName,
@@ -1257,6 +1265,8 @@ export default {
         // status: this.datas.interfaceIsOk,
         // detail: this.caseDetail,
         // isGlobalsHeader:""  //是否使用全局请起头
+        afterAction:JSON.stringify(this.afterAction),
+        beforeAction:JSON.stringify(this.beforeAction),
         headers: JSON.stringify(this.requestsHeader),
         data: JSON.stringify(requestsData),
         environmentId: this.datas.chiocsEnvironment,
@@ -1394,7 +1404,7 @@ export default {
           })
         : a === 2 && this.reqyestDataTypeRadio === 1
         ? ele.keys.splice(index + 1, 0, {
-            isRequestsData: "true",
+            isRequestsData: true,
             dataKey: "",
             dataValue: "",
             detaDetail: "",
@@ -1402,7 +1412,7 @@ export default {
           })
         : a === 2 && this.reqyestDataTypeRadio === 3
         ? this.requestsDataf.keys.splice(index + 1, 0, {
-            isRequestsData: "true",
+            isRequestsData: true,
             dataKey: "",
             dataValue: "",
             detaDetail: "",
@@ -1418,24 +1428,104 @@ export default {
         var ele = this.requestsDataf;
       }
       var index = ele.keys.indexOf(item);
-      if (index !== 0) {
+      // if (index !== 0) {
         ele.keys.splice(index, 1);
+      // }
+      if(a===0){
+        if (ele.keys.length===0){
+        ele.keys.push(
+          {
+            beforeIndex: "",
+            beforeSqlBoxType: "",
+            beforeType: "",
+            beforePlan: "",
+            beforeDetail: "",
+            key: Date.now(),
+          }
+        )
       }
+      }
+      if(a===0){
+        if (ele.keys.length===0){
+        ele.keys.push(
+          {
+            beforeIndex: "",
+            beforeSqlBoxType: "",
+            beforeType: "",
+            beforePlan: "",
+            beforeDetail: "",
+            key: Date.now(),
+          }
+        )
+      }
+      }
+      if(a===1){
+        if (ele.keys.length===0){
+        ele.keys.push(
+          {
+            headerKey: "",
+            headerValue: "",
+            headerDetail: "",
+            key: Date.now(),
+          }
+        )
+      }
+      }
+      if(a===2){
+        if (ele.keys.length===0){
+        ele.keys.push(
+         {
+            isRequestsData: true,
+            dataKey: "",
+            dataValue: "",
+            detaDetail: "",
+            key: Date.now(),
+          }
+        )
+      }
+      }
+      if(a===3){
+        if (ele.keys.length===0){
+        ele.keys.push(
+          {
+            afterIndex: "", //8.22-23.22
+            afterType: "",
+            afterSqlBoxType: "",
+            afterPlan: "",
+            afterDetail: "",
+            key: Date.now(),
+          }
+        )
+      }
+      }
+
+      
       // console.log(this.requestsHeader);
     },
     //编辑顺序时判断是否重复
     changeIndex(index, a) {
       var ele = this.isBeforeEle(a);
       var list = ele.keys;
-      if (parseInt(list[index].beforeIndex) > parseInt(99)) {
+      if(a===3){
+        if (parseInt(list[index].afterIndex) > parseInt(99)) {
+        Message.error("最大值不能超过99");
+      }
+      if(!this.is_digitals(list[index].afterIndex)){
+        Message.error("序号必须为数字");
+      }
+      }else{
+        if (parseInt(list[index].beforeIndex) > parseInt(99)) {
         Message.error("最大值不能超过99");
       }
       if(!this.is_digitals(list[index].beforeIndex)){
         Message.error("序号必须为数字");
       }
+      }
+      
       
       
     },
+
     is_digitals(str) { 
           var reg=/^[0-9]*$/; //匹配整数 
           return reg.test(str);
@@ -1864,7 +1954,7 @@ export default {
       this.requestsData = {
         keys: [
           {
-            isRequestsData: "true", //是否选中
+            isRequestsData: true, //是否选中
             dataKey: "", //请求头key
             dataValue: "", //请求头value
             dataDetail: "", //简要描述
@@ -1874,7 +1964,7 @@ export default {
       this.requestsDataf = {
         keys: [
           {
-            isRequestsData: "true", //是否选中
+            isRequestsData: true, //是否选中
             dataKey: "", //请求key
             dataValue: "", //请求值
             dataDetail: "", //请求详情
@@ -1895,6 +1985,7 @@ export default {
     },
     //选择接口文档且填充部分类容
     chiocesInterface() {
+
       this.clearContext();
       this.InterfaceDetailGet();
     },
@@ -1945,7 +2036,7 @@ export default {
           ? (this.requestsData.keys.splice(0, this.requestsData.keys.length),
             self.post_data.forEach((item, index) => {
               this.requestsData.keys.push({
-                isRequestsData: "true", //是否选中默认为true
+                isRequestsData: true, //是否选中默认为true
                 dataKey: item.cname,
                 dataValue: item.mockValue,
                 dataDetail: item.detail,
@@ -1971,7 +2062,7 @@ export default {
           ? (this.requestsDataf.keys.splice(0, this.requestsDataf.keys.length),
             self.post_data.forEach((item, index) => {
               this.requestsDataf.keys.push({
-                isRequestsData: "true", //是否选中默认为true
+                isRequestsData: true, //是否选中默认为true
                 dataKey: item.cname,
                 dataValue: item.mockValue,
                 dataDetail: item.detail,
@@ -2123,6 +2214,7 @@ export default {
     },
     //替换前置操作以及后置操作
     replace_actions(self){
+
       this.beforeAction=self.beforeAction
       this.afterAction=self.afterAction
     },

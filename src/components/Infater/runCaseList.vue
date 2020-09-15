@@ -165,7 +165,7 @@
     <el-drawer :visible.sync="statusIng.drawerStatus" :with-header="false" size="60%">
       <div>
         <left-box
-          :list.sync="resResults"
+          :listReslits.sync="resResults"
           :code.sync="code"
           ref="letfBox"
           v-if="statusIng.drawerStatus"
@@ -261,13 +261,15 @@ export default {
     //调试用例
     debugCase(item, index) {
       Runcase({
-        id: JSON.stringify([item.id])
+        id: JSON.stringify([item.id]),
+        userId:storage.get("userId")
       }).then(res => {
         res.status === 200
           ? ((this.resResults = res.results),
             (this.statusIng.drawerStatus = true)) //展开左侧
           : Message.error(res.msg);
       });
+      console.log(this.resResults)
     },
     //二次确认删除
     D_ClassRemove() {
