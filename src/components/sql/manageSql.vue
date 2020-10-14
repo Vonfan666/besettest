@@ -48,6 +48,7 @@
     <div class="foot">
           <page-box ref="SqlpageBox"  :page_Methods="pageMethods"></page-box>
       </div>
+    
     <add-sql v-slot:addSql :styleCode="addSql.styleCode" v-if="status.addSqlSatus">
       <div class="addSql">
         <div class="header">

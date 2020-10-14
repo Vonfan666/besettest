@@ -298,9 +298,13 @@ export default {
       this.writeSql.SqlActionResults = item.SqlActionResults;
       this.writeSql.detail = item.detail;
       
-      if (item.saveResultChoice){
-        this.status.saveResultsStatus=true
+      if (item.saveResultChoice ){
         this.saveResultChoice=JSON.parse(item.saveResultChoice)
+        // "保存到环境变量" in this.saveResultChoice ?this.status.saveResultsStatus=true:null
+        if(this.saveResultChoice.indexOf("保存到环境变量")>=0){
+          this.status.saveResultsStatus=true
+        }
+        
         this.writeSql.envId=item.envId
       }
       

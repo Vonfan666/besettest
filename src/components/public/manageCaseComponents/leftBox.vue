@@ -201,26 +201,24 @@ export default {
       this.lists.listDictPostResData = this.listDict.resData;
       this.lists.listDictPostResText = this.listDict.resText;
       this.lists.listDictPostCode = this.listDict.code;
-        this.lists.listDictPostErrors = this.listDict.errors;
+      this.lists.listDictPostErrors = this.listDict.errors;
       console.log("errors", this.listDict);
       // this.lists.
-      if (this.listDict.beforeAction ) {
+      if (this.listDict.beforeAction) {
         //九月十四修改
         if (this.listDict.beforeAction.code !== 1) {
           this.lists.listDictPostCode = 0;
           this.lists.listDictPostErrors = this.listDict.beforeAction.msg;
         }
-     
       }
       if (this.listDict.afterAction) {
         //九月十四修改
- 
+
         if (this.listDict.afterAction.code !== 1) {
           this.lists.listDictPostCode = 0;
           this.lists.listDictPostErrors = this.listDict.afterAction.msg;
         }
       }
-
     },
     //tab组件切换方法
     handleClick(tab, event) {
@@ -299,23 +297,34 @@ export default {
       console.log(item, "diuduid");
 
       this.list.push(item);
-      if (item.beforeAction && item.afterAction){
-        item.code === 1 ? this.caseNameColorList.push("success") : null; //正常返回数据
-        item.code === 0 ? this.caseNameColorList.push("danger") : null; //请求异常数据
+    
+        //afterAction里面的code {"code":0,"msg":"连接数据库报错:%s"%f}
+        //  {"code":1,"msg":"Sql执行成功","data":data}
+        //   {"code":2,"msg":"SQL操作失败，已完成回滚%s"%e}
+    
+      if (item.code === 0) {
+        this.caseNameColorList.push("danger");
+      }
+      if (item.code === 1) {
+        if (!item.afterAction && !item.beforeAction) {
+          //先处理都不存在数据的情况
+          this.caseNameColorList.push("success");
+        }
+        if (item.afterAction || item.beforeAction) {
+          // 都存在  或者 存在一个
+          if (item.afterAction) {
+            item.afterAction.code !== 1
+              ? this.caseNameColorList.push("danger")
+              : this.caseNameColorList.push("success"); //请求异常数据
+          } else {
+            item.beforeAction.code !== 1
+              ? this.caseNameColorList.push("danger")
+              : this.caseNameColorList.push("success"); //请求异常数据
+          }
+        }
 
-        item.code === 2 ? this.caseNameColorList.push("warning") : null; //断言失败
       }
-      
-      if (item.beforeAction) {
-        item.beforeAction.code !== 1
-          ? this.caseNameColorList.push("info")
-          : null; //请求异常数据
-      }
-      if (item.afterAction) {
-        item.afterAction.code !== 1
-          ? this.caseNameColorList.push("info")
-          : null; //请求异常数据
-      }
+
       if (this.list.length > 1) {
         this.leftCaseName = true;
       }
@@ -388,7 +397,7 @@ export default {
       this.list = this.listReslits.results;
       this.logList = this.listReslits.logList;
       console.log(this.list);
-      this.caseNameColor(this.list);
+      // this.caseNameColor(this.list);
       this.chiocesLitsOne();
     }
     // else{

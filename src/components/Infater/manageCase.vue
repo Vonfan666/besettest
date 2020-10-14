@@ -326,13 +326,15 @@
                 <span @click="clickReqTitle($event,1)" class="t2">请求头</span>
                 <span @click="clickReqTitle($event,2)" class="t2">请求参数</span>
                 <span @click="clickReqTitle($event,3)" class="t2">后置操作</span>
+                <span @click="clickReqTitle($event,4)" class="t2">新增变量</span>
+                <span @click="clickReqTitle($event,5)" class="t2">断言操作</span>
               </div>
               <div class="requestsContext">
                 <div class="requestsFrom" v-show="statusIng.requestsStatus[0]">
                   <div class="t1">
                     <span class="requestsTitile1">序号</span>
                     <span class="requestsTitile3">操作类型</span>
-                    <span class="requestsTitile2">数据库操作</span>
+                    <span class="requestsTitile3">数据库操作</span>
                     <span class="requestsTitile4">操作处理</span>
                     <span class="requestsTitile5">操作描述</span>
                   </div>
@@ -671,6 +673,159 @@
                     </el-form>
                   </div>
                 </div>
+                <div class="requestsFrom" v-show="statusIng.requestsStatus[4]">
+                  <div class="t1">
+                    <span class="requestsTitile3">变量名</span>
+                    <span class="requestsTitile5">操作</span>
+                    <span class="requestsTitile4">选择环境</span>
+                    <span class="requestsTitile5">描述</span>
+                  </div>
+                  <div class="requestsTitile">
+                    <el-form :model="addEnv" ref="refFrom" class="beforeFrom">
+                      <div v-for="(item,index) in addEnv.keys" :key="item.key">
+            
+                        <el-form-item hide-required-asterisk class="requestsTitile3">
+                          <el-input
+                            placeholder="英文变量名"
+                            v-model="item.name"
+                          ></el-input>
+                        </el-form-item>
+           
+                        <el-form-item class="requestsTitile5" hide-required-asterisk>
+                          <el-input
+                            placeholder="python语法"
+                            v-model="item.action"
+                          ></el-input>
+                        </el-form-item>
+              
+                        <el-form-item class="requestsTitile3" hide-required-asterisk>
+                          <el-select
+                            filterable
+                            placeholder="选择环境"
+                            v-model="item.envId"
+                            @visible-change="env_chioceAction_D(index)"
+                          >
+                            
+                            <el-option
+                              v-for="(item1,index1)  in globarls.concat(Environments)"
+                              :key="index1"
+                              :label="item1.name"
+                              :value="item1.id"
+                            ></el-option>
+                            
+                          </el-select>
+                        </el-form-item>
+                        <el-form-item class="requestsTitile5">
+                          <el-input placeholder="简要描述后置操作" v-model="item.detail"></el-input>
+                        </el-form-item>
+ 
+                        <el-form-item class="delete">
+                          <el-button @click.prevent="addDictToList(index,4)">添加</el-button>
+                          <el-button @click.prevent="removeListToDict(item,4)">删除</el-button>
+                        </el-form-item>
+                      </div>
+                    </el-form>
+                  </div>
+                </div>
+                <div class="requestsFrom" v-show="statusIng.requestsStatus[5]">
+                  <div class="t1">
+                    <span class="requestsTitile1">序号</span>
+                    <span class="requestsTitile2">操作名称</span>
+                    <span class="requestsTitile3">操作类型</span>
+                    <span class="requestsTitile4">操作数据</span>
+                    <span class="requestsTitile5">操作描述</span>
+                  </div>
+                  <div class="requestsTitile">
+                    <el-form :model="afterAction" ref="refFrom" class="beforeFrom">
+                      <div v-for="(item,index) in afterAction.keys" :key="item.key">
+                        <!-- :prop="'keys.' + index + '.beforeIndex'"
+                        :rules="{ required: true, message: '必填' }"-->
+                        <el-form-item hide-required-asterisk class="requestsTitile1">
+                          <el-input
+                            placeholder="序号"
+                            v-model="item.afterIndex"
+                            @change="changeIndex(index,3)"
+                          ></el-input>
+                        </el-form-item>
+                        <!-- :prop="'keys.'+index+ '.beforeSqlBoxType'"
+                          
+                        :rules="{ required: true, message: '必填' }"-->
+                        <el-form-item class="requestsTitile2" hide-required-asterisk>
+                          <el-select
+                            placeholder="请选择类型"
+                            v-model="item.afterType"
+                            @change="after_sqlAction_V(index)"
+                          >
+                            <el-option
+                              v-for="(item1,index_a_1)  in actionLists"
+                              :key="index_a_1"
+                              :label="item1.name"
+                              :value="item1.typeC"
+                            ></el-option>
+                          </el-select>
+                        </el-form-item>
+                        <!-- :prop="'keys.'+index+ '.beforeType'"                          
+                        :rules="{ required: true, message: '必填' }"-->
+                        <el-form-item
+                          class="requestsTitile3"
+                          hide-required-asterisk
+                          v-if="afterAction.keys[index].afterType==1"
+                        >
+                          <el-select
+                            placeholder="请选择库"
+                            filterable
+                            v-model="item.afterSqlBoxType"
+                            @change="after_sqlAction_D(index) "
+                            @visible-change="after_sqlAction_V(index)"
+                          >
+                            <el-option
+                              v-for="(item1,index1)  in after_sqlAction_D(index)"
+                              :key="index1"
+                              :label="item1.name"
+                              :value="item1.id"
+                            ></el-option>
+                          </el-select>
+                        </el-form-item>
+                        <el-form-item
+                          class="requestsTitile3"
+                          hide-required-asterisk
+                          v-if="afterAction.keys[index].afterType!=1"
+                        >
+                          <el-select disabled value></el-select>
+                        </el-form-item>
+                        <!-- :prop="'keys.'+index+ '.beforePlan'"
+                        :rules="{ required: true, message: '必填' }"-->
+                        <el-form-item class="requestsTitile4" hide-required-asterisk>
+                          <el-select
+                            filterable
+                            placeholder="选择操作"
+                            v-model="item.afterPlan"
+                            @visible-change="after_chioceAction_D(index)"
+                          >
+                            <el-option
+                              v-for="(item1,index1)  in after_chioceAction_D(index)"
+                              :key="index1"
+                              :label="item1.name"
+                              :value="item1.id"
+                            ></el-option>
+                          </el-select>
+                        </el-form-item>
+                        <el-form-item class="requestsTitile5">
+                          <el-input placeholder="简要描述后置操作" v-model="item.beforeDetail"></el-input>
+                        </el-form-item>
+                        <!-- <div class="delete">
+                      <span @click="addBefore(index)">新增</span>
+                      <span @click.prevent="removeBefore(item)">删除</span>
+                        </div>-->
+                        <!-- v-if="index===beforeAction.keys.length-1" 只有最后一个有添加删除按钮 -->
+                        <el-form-item class="delete">
+                          <el-button @click.prevent="addDictToList(index,3)">添加</el-button>
+                          <el-button @click.prevent="removeListToDict(item,3)">删除</el-button>
+                        </el-form-item>
+                      </div>
+                    </el-form>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -877,7 +1032,7 @@ export default {
       commandCode: "", //存储临时变量--command
       caseAddFilesBoxStyle: "height:250px;width:400px", //新建分组长宽
       statusIng: {
-        requestsStatus: [true, false, false, false],
+        requestsStatus: [true, false, false, false,false,false],
         searchStatus: false,
         caseAddFilesBoxStatus: false,
         caseAddInterfaceBoxStatus: false,
@@ -959,13 +1114,13 @@ export default {
       //前置处理器
       beforeAction: {
         keys: [
-          {
-            beforeIndex: 1, //前置条件中执行顺序
-            beforeType: 1, //前置条件类型---如文件操作、数据库操作等
-            beforeSqlBoxType: 44, //数据库选择
-            beforePlan: 13, //前置处理--选择文件操作中的具体事务，或者数据库中的具体事务
-            beforeDetail: "", //简要描述
-          },
+          // {
+          //   beforeIndex: 1, //前置条件中执行顺序
+          //   beforeType: 1, //前置条件类型---如文件操作、数据库操作等
+          //   beforeSqlBoxType: 44, //数据库选择
+          //   beforePlan: 13, //前置处理--选择文件操作中的具体事务，或者数据库中的具体事务
+          //   beforeDetail: "", //简要描述
+          // },
           {
             beforeIndex: "", //前置条件中执行顺序
             beforeType: "", //前置条件类型---如文件操作、数据库操作等
@@ -975,7 +1130,26 @@ export default {
           },
         ],
       },
-
+      addEnv:{
+        keys:[
+          {
+            name:null,   //加入环境变量的key 在当前环境添加需要校验是否重复
+            action:null,   //res["key"]  格式的取值
+            envId:null, // 加入环境的id
+            detail:null,//描述
+          }
+        ]
+      },
+      assertAction:{
+        keys:[
+          {
+            expectedRes:null,  //预期结果
+            assertId:null,  //判断条件
+            realRes:"res",   //实际结果
+            detail:null,  //秒速
+          }
+        ]
+      },
       requestsHeader: {
         keys: [
           {
@@ -1055,7 +1229,7 @@ export default {
   },
   methods: {
     selectResult(item) {
-      console.log(item);
+      // console.log(item);
       if (item.type === 1) {
         CaseResultsDetail({
           id: item.id,
@@ -1071,7 +1245,7 @@ export default {
           id: item.id,
         }).then((res) => {
           if (res.status === 200) {
-            console.log(res.results);
+            // console.log(res.results);
 
             this.resResults = res.results;
             this.statusIng.drawerStatus = true; //展开左侧
@@ -1086,10 +1260,10 @@ export default {
         type: "warning",
       })
         .then(() => {
-          console.log(arguments);
-          console.log(arguments[0]);
-          console.log(arguments[1]);
-          console.log(arguments[2]);
+          // console.log(arguments);
+          // console.log(arguments[0]);
+          // console.log(arguments[1]);
+          // console.log(arguments[2]);
           // console.log(func)
           arguments[0](arguments[1]);
           // this.$message({
@@ -1105,7 +1279,7 @@ export default {
         });
     },
     pageRemove(item) {
-      console.log("item", item);
+      // console.log("item", item);
       var page = this.$refs.DebugResultPage.currentPage;
       if (this.resultsLog.length === 1 && page !== 1) {
         page = page - 1;
@@ -1141,7 +1315,7 @@ export default {
         }).then((res) => {
           if (res.status === 200) {
             this.loading.loading_results = false;
-            console.log(res.results);
+            // console.log(res.results);
             this.resultsLog = res.results;
             this.$refs.DebugResultPage.total = res.total;
             this.$refs.DebugResultPage.allPage = res.allPage;
@@ -1165,7 +1339,7 @@ export default {
         }).then((res) => {
           if (res.status === 200) {
             this.loading.loading_results = false;
-            console.log(res.results);
+            // console.log(res.results);
             this.resultsLog = res.results;
             this.$refs.DebugResultPage.total = res.total;
             this.$refs.DebugResultPage.allPage = res.allPage;
@@ -1191,7 +1365,7 @@ export default {
     },
     runAllCase() {
       //执行整个接口用例  这里是前端排序
-      console.log(this.multipleSelection);
+      // console.log(this.multipleSelection);
       var idList = [];
       var codeDict = {};
       if (this.multipleSelection.length > 0) {
@@ -1224,7 +1398,7 @@ export default {
       //执行单个测试用例
       var idList = [];
       idList.push(id);
-      console.log(idList);
+      // console.log(idList);
       if (id) {
         this.RuncaseMethod(idList);
         // console.log(this.resResults)
@@ -1239,7 +1413,7 @@ export default {
       this.reqyestDataTypeRadio === 1
         ? (requestsData = JSON.parse(JSON.stringify(this.requestsData)))
         : (requestsData = JSON.parse(JSON.stringify(this.requestsDataf)));
-      console.log(requestsData,"dasdas");
+      // console.log(requestsData,"dasdas");
       // requestsData.keys.forEach((item, index) => {
       //   if (item.isRequestsData === false) {
       //     console.log(requestsData,"dasdas");
@@ -1269,6 +1443,8 @@ export default {
         beforeAction:JSON.stringify(this.beforeAction),
         headers: JSON.stringify(this.requestsHeader),
         data: JSON.stringify(requestsData),
+        addEnv: JSON.stringify(this.addEnv),
+        assertAction: JSON.stringify(this.assertAction),
         environmentId: this.datas.chiocsEnvironment,
       }).then((res) => {
         if (res.status === 200) {
@@ -1307,7 +1483,7 @@ export default {
     },
     //将对象转化为 换行的格式
     reversePushHeader() {
-      console.log("2", this.requestsHeader.keys);
+      // console.log("2", this.requestsHeader.keys);
       if (this.requestsHeader.keys.length > 0) {
         //导入前先清空keys列表
         this.pushHeaderText = "";
@@ -1365,7 +1541,11 @@ export default {
         ? (ele = this.requestsData)
         : a === 3
         ? (ele = this.afterAction)
-        : null;
+        : a === 4
+        ? (ele=this.addEnv)
+        : a===5
+        ? (ele=this.assertAction):null
+        ;
       return ele;
     },
     //新增前置处理项
@@ -1391,8 +1571,9 @@ export default {
             headerValue: "",
             headerDetail: "",
             key: Date.now(),
-          }),
-          console.log(this.requestsHeader))
+          })
+          // console.log(this.requestsHeader)
+          )
         : a === 3
         ? ele.keys.splice(index + 1, 0, {
             afterIndex: "", //8.22-23.22
@@ -1418,7 +1599,21 @@ export default {
             detaDetail: "",
             key: Date.now(),
           })
-        : null;
+        : a === 4 ? ele.keys.splice(index+1,0, {
+            name:null,   //加入环境变量的key 在当前环境添加需要校验是否重复
+            action:null,   //res["key"]  格式的取值
+            envId:null, // 加入环境的id
+            detail:null,//描述
+            key: Date.now(),
+          }) 
+        : a===5 ? ele.keys.splice(index+1,0, {
+            expectedRes:null,  //预期结果
+            assertId:null,  //判断条件
+            realRes:"res",   //实际结果
+            detail:null,  //秒速
+            key: Date.now(),
+          }) :null
+          ;
     },
 
     //删除前置处理项
@@ -1498,7 +1693,32 @@ export default {
         )
       }
       }
-
+      if(a===4){
+        if (ele.keys.length===0){
+        ele.keys.push(
+           {
+            name:null,   //加入环境变量的key 在当前环境添加需要校验是否重复
+            action:null,   //res["key"]  格式的取值
+            envId:null, // 加入环境的id
+            detail:null,//描述
+            key: Date.now(),
+           }
+        )
+      }
+      }
+      if(a===5){
+        if (ele.keys.length===0){
+        ele.keys.push(
+         {
+            expectedRes:null,  //预期结果
+            assertId:null,  //判断条件
+            realRes:"res",   //实际结果
+            detail:null,  //秒速
+            key: Date.now(),
+          }
+        )
+      }
+      }
       
       // console.log(this.requestsHeader);
     },
@@ -1565,7 +1785,7 @@ export default {
             )
             .indexOf(true)
         ];
-        console.log("1", list_dict);
+        // console.log("1", list_dict);
         if (list_dict !== undefined) {
           return list_dict.lists;
         }
@@ -1590,7 +1810,7 @@ export default {
               (rows) => rows.typeC == this.beforeAction.keys[index].beforeType
             )
             .indexOf(true);
-          console.log(actionType_list);
+          // console.log(actionType_list);
           if (this.beforeAction.keys[index].beforeSqlBoxType) {
             var lists =
               actionType_list[
@@ -1601,7 +1821,7 @@ export default {
                   )
                   .indexOf(true)
               ].children;
-            console.log("2", lists);
+            // console.log("2", lists);
             if (lists !== undefined) {
               return lists[0];
             }
@@ -1640,7 +1860,7 @@ export default {
             )
             .indexOf(true)
         ];
-        console.log("1", list_dict);
+        // console.log("1", list_dict);
         return list_dict.lists;
       } else {
         [];
@@ -1656,7 +1876,7 @@ export default {
         var actionType_index = this.actionLists
           .map((rows) => rows.typeC == this.afterAction.keys[index].afterType)
           .indexOf(true);
-        console.log(actionType_list);
+        // console.log(actionType_list);
         if (this.afterAction.keys[index].afterSqlBoxType) {
           var lists =
             actionType_list[
@@ -1667,7 +1887,7 @@ export default {
                 )
                 .indexOf(true)
             ].children;
-          console.log("2", lists);
+          // console.log("2", lists);
           return lists[0];
         }
       }
@@ -1685,7 +1905,9 @@ export default {
         return [];
       }
     },
+    env_chioceAction_D(index){
 
+    },
     selection(index) {
       var index1 = this.beforeAction.keys[index].beforeType;
       if (!index1) {
@@ -1911,6 +2133,7 @@ export default {
     },
     enviromentAction() {
       this.statusIng.enviromentStatus = !this.statusIng.enviromentStatus;
+      this.EnvironmentsSelect()
     },
 
     ContextIsNull(oldValue, newValue) {
@@ -1982,7 +2205,25 @@ export default {
           },
         ],
       };
+      this.addEnv = { keys:[ {
+            name:null,   //加入环境变量的key 在当前环境添加需要校验是否重复
+            action:null,   //res["key"]  格式的取值
+            envId:null, // 加入环境的id
+            detail:null,//描述
+            // key: Date.now(),
+           }]}
+      this.assertAction = {
+        keys:[
+          {
+            expectedRes:null,  //预期结果
+            assertId:null,  //判断条件
+            realRes:"res",   //实际结果
+            detail:null,  //秒速
+          }
+        ]
+      }
     },
+    
     //选择接口文档且填充部分类容
     chiocesInterface() {
 
@@ -2194,6 +2435,8 @@ export default {
         ? this.replace_3f(self)
         : null;
       this.datas.postMethods = self.postMethod;
+      this.replace_addEnv_assert(self)  //替换新编变量以及断言
+
     },
     //替换请求头
     replace_2(self) {
@@ -2217,6 +2460,15 @@ export default {
 
       this.beforeAction=self.beforeAction
       this.afterAction=self.afterAction
+    },
+
+    replace_addEnv_assert(self){
+      if(self.addEnv){
+        this.addEnv=JSON.parse(self.addEnv)
+      }
+      if (self.assertAction){
+        this.assertAction=JSON.parse(self.assertAction)
+      }
     },
     //********************************************************************************************************* */
     //以下方法为接口请求
@@ -2278,6 +2530,8 @@ export default {
         headers: JSON.stringify(this.requestsHeader),
         data: JSON.stringify(requestsData),
         afterAction: JSON.stringify(this.afterAction),
+        addEnv: JSON.stringify(this.addEnv),
+        assertAction: JSON.stringify(this.assertAction),
         environmentId: this.datas.chiocsEnvironment,
       }).then((res) => {
         res.status === 200
