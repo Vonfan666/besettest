@@ -207,7 +207,7 @@
               <el-table-column fixed="right" label="操作" width="100">
                 <template slot-scope="scope" fit>
                   <el-button @click="deleteTwo(pageRemove,scope.row)" type="text" size="small">删除</el-button>
-                  <el-button @click="selectResult(scope.row)" type="text" size="small">查看</el-button>
+                  <!-- <el-button @click="selectResult(scope.row)" type="text" size="small">查看</el-button> -->
                 </template>
               </el-table-column>
             </el-table>

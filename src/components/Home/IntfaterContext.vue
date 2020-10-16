@@ -133,8 +133,8 @@
             <div class="mockDataBody2">
               <span class="t2">自定义返回数据：</span>
               <div v-if="mockRadio==1">
-                <!-- <el-form :model="mockDatas" :rules="rulesMock" ref="mockDataRef" >
-                <el-form-item prop="mockData">-->
+                <el-form :model="mockDatas" :rules="rulesMock" ref="mockDataRef" >
+                <el-form-item prop="mockData">
                 <el-input
                   type="textarea"
                   :autosize="{ minRows: 6, maxRows: 6}"
@@ -143,11 +143,11 @@
                   resize="none"
                   clearable
                 ></el-input>
-                <!-- </el-form-item>
-                </el-form>-->
+                </el-form-item>
+                </el-form>
               </div>
               <div v-else>
-                <el-form :model="mockDatas" :rules="rulesMock" ref="mockDataRef" size="mini">
+                <el-form :model="mockDatas" :rules="rulesMock" ref="mockDataRef">
                   <el-form-item prop="mockData">
                     <el-input
                       type="textarea"
@@ -252,8 +252,8 @@
       </div>
     </ischildId-box>
 
-    <div class="tt">
-      <el-button type="primary" size="small" @click="ischildId()">确认</el-button>
+    <div class="tt"    >
+      <el-button type="primary" size="small"  @click="ischildId()">确认</el-button>
     </div>
   </div>
 </template>
@@ -968,6 +968,9 @@ export default {
         if (res.status === 200) {
           Message.success("更新成功");
           // console.log(res.results.res_data);
+          this.mockDatas.mockData=res.results[0].mock_data
+          this.mockRadio=res.results[0].mock_type
+          console.log(this.mockDatas.mockData,this.mockRadio,"___________")
           this.postheaders = this.SplitData(res.results.post_header);
 
           this.postDatas = this.SplitData(res.results.post_data);
@@ -1052,8 +1055,8 @@ export default {
         this.$refs.mockDataRef.validate(valid => {
           if (valid) {
             obj["mock_type"] = "2";
-            obj["mock_data"] = this.mockDatas.mockData;
-
+            obj["mock_data"] = JSON.stringify(JSON.parse(this.mockDatas.mockData));
+            
             if (
               Object.prototype.toString.call(
                 JSON.parse(this.mockDatas.mockData)
@@ -1073,11 +1076,12 @@ export default {
         });
       }
       if (this.mockRadio === "1") {
+        
         this.mockDatas.mockData != null && this.mockDatas.mockData != ""
           ? Object.prototype.toString.call(
               JSON.parse(this.mockDatas.mockData)
             ) == "[object Object]"
-            ? ((obj["mock_data"] = this.mockDatas.mockData),
+            ? ((obj["mock_data"] = JSON.stringify(JSON.parse(this.mockDatas.mockData))),
               MockResData(obj).then(res => {
                 res.status === 200
                   ? (Message.success(res.msg), (this.mockStatus = false))

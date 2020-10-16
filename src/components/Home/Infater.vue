@@ -464,7 +464,11 @@ export default {
           this.$refs.irCon.model.postAttr=res.results[0].post_attr
           this.$refs.irCon.model.interDetail=res.results[0].interface_detail
           this.$refs.irCon.model.mockAttr=res.results[0].mock_attr
-
+          if (res.results[0].mock_type){
+            this.$refs.irCon.mockDatas.mockData=JSON.stringify(res.results[0].mock_data, null, 4);
+            this.$refs.irCon.mockRadio=res.results[0].mock_type;
+          }
+          
 
           if(this.$refs.irCon.postheaders==null){
             this.$refs.irCon.postheaders=[]

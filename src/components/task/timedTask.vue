@@ -303,17 +303,18 @@ export default {
       });
     },
     clickEdit(index,item){
+      console.log(item)
       this.getCasePlan_M();
-      this.status.addStatus=false
+      this.status.addStatus=false;
       this.status.editStatus=true
       this.addTask.taskStatus = true;
-      this.addTask.taskName=item.taskName,
-      this.addTask.cron=item.cron,
-      this.addTask.Plan=item.plan.id,
-      this.addTask.status=item.status.id,  //任务状态是默认的
-      this.addTask.detail=item.detail
-      this.addTask.item=item
-      this.addTask.index=index
+      this.addTask.taskName=item.taskName;
+      this.addTask.cron=item.cron;
+      this.addTask.Plan=item.plan.id;
+      this.addTask.status=item.status.id;  //任务状态是默认的
+      this.addTask.detail=item.detail;
+      this.addTask.item=item;
+      this.addTask.index=index;
     },
     TaskStop(index,item){
       var itemCode=null
@@ -331,6 +332,8 @@ export default {
       })
     },
     updateTask(){
+      console.log(this.addTask.item)
+      console.log(this.addTask.item.id)
       UpdateTimedTask({
         id:this.addTask.item.id,
         // userId:storage.get("userId"),
